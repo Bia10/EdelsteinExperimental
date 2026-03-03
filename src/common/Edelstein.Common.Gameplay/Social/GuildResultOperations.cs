@@ -9,6 +9,32 @@
 /// </summary>
 public enum GuildResultOperations : byte
 {
+    // ── Low sub-opcodes dispatched by the server ──────────────────────────────
+    // These values live below LoadGuild_Done (0x1C) and are sent server→client
+    // on CP_GuildResult. They have no matching request-side enum entry.
+
+    /// <summary>Server prompts guild name input (NPC dialog).</summary>
+    InputGuildName = 0x01,
+
+    /// <summary>
+    /// Server sends the guild creation agreement dialog to all party members.
+    /// Non-boss payload: partyID(4) + inviterName(str) + guildName(str).
+    /// Boss payload: no additional fields (boss gets a GuildNPCSay dialog).
+    /// </summary>
+    CreateGuildAgree = 0x03,
+
+    /// <summary>
+    /// Server delivers a guild invitation to the target character.
+    /// Payload: inviterName(str) + job(4) + level(4) + inviterID(4).
+    /// Client shows CUIFadeYesNo::CreateGuildInvite or auto-declines if blacklisted.
+    /// </summary>
+    GuildInvite = 0x05,
+
+    /// <summary>Server opens the guild mark editor for the guild master.</summary>
+    SetGuildMark = 0x11,
+
+    // ── Main result opcodes (0x1C onward) ─────────────────────────────────────
+
     LoadGuild_Done = 0x1C,
 
     CheckGuildName_Available = 0x1D,

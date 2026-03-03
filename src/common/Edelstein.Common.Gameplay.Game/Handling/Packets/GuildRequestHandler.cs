@@ -41,17 +41,16 @@ public class GuildRequestHandler : AbstractFieldHandler
                 return user.StageUser.Context.Pipelines.FieldOnPacketGuildNameCheckRequest.Process(
                     new FieldOnPacketGuildNameCheckRequest(user, reader.ReadString()));
 
-            // ── Creation ─────────────────────────────────────────────────────
-
-            case GuildRequestOperations.CreateNewGuild:
-                return user.StageUser.Context.Pipelines.FieldOnPacketGuildCreateRequest.Process(
-                    new FieldOnPacketGuildCreateRequest(user, reader.ReadString()));
-
-            // ── Dissolution ───────────────────────────────────────────────────
-
-            case GuildRequestOperations.RemoveGuild:
-                return user.StageUser.Context.Pipelines.FieldOnPacketGuildDisbandRequest.Process(
-                    new FieldOnPacketGuildDisbandRequest(user));
+            // ── Creation (agree-reply from client) ───────────────────────────────
+            // R-007: client sends 0x20 (Encode1(32)) + charID(4) + bAgree(1).
+            // The guild was already created during the CheckGuildName (0x02) flow.
+            // These agree/disagree replies are informational; no further action.
+            // Dead sub-opcodes 0x04 (CreateNewGuild) and 0x09 (RemoveGuild)
+            // are intentionally absent (see R-003 / R-005).
+            case (GuildRequestOperations)0x20:
+                reader.ReadInt();  // charID  — discard
+                reader.ReadByte(); // bAgree  — discard
+                return Task.CompletedTask;
 
             // ── Membership management ────────────────────────────────────────
 
@@ -60,9 +59,14 @@ public class GuildRequestHandler : AbstractFieldHandler
                     new FieldOnPacketGuildInviteRequest(user, reader.ReadString()));
 
             case GuildRequestOperations.JoinGuild:
-                // Client sends the target guild ID when accepting an invitation.
+            {
+                // R-004: client sends inviterID(4) + myCharacterID(4).
+                // We trust the session for own identity; inviterID resolves the invitation.
+                var inviterID = reader.ReadInt();
+                reader.ReadInt(); // myCharacterID — trusted from session, always discard
                 return user.StageUser.Context.Pipelines.FieldOnPacketGuildJoinRequest.Process(
-                    new FieldOnPacketGuildJoinRequest(user, reader.ReadInt()));
+                    new FieldOnPacketGuildJoinRequest(user, inviterID));
+            }
 
             case GuildRequestOperations.WithdrawGuild:
             {

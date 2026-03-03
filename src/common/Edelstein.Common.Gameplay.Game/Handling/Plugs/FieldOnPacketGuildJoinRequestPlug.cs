@@ -18,7 +18,7 @@ public class FieldOnPacketGuildJoinRequestPlug : IPipelinePlug<FieldOnPacketGuil
     {
         var response = await message.User.StageUser.Context.Services.Guild.InviteAccept(
             new GuildInviteAcceptRequest(
-                message.GuildID,
+                message.InviterID,
                 message.User.Character.ID,
                 message.User.Character.Name,
                 message.User.Character.Job,

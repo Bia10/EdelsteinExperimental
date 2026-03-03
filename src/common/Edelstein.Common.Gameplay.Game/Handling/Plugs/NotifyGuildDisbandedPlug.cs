@@ -32,6 +32,9 @@ public class NotifyGuildDisbandedPlug : IPipelinePlug<NotifyGuildDisbanded>
 
             using var packet = new PacketWriter(PacketSendOperations.GuildResult);
             packet.WriteByte((byte)GuildResultOperations.RemoveGuild_Done);
+            // R-002: payload is guildID(4) only. Client reads it as a guard;
+            // if it does not match own guildID the packet is silently ignored.
+            packet.WriteInt(message.GuildID);
             _ = user.Dispatch(packet.Build());
         }
     }

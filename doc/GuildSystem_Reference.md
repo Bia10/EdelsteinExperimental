@@ -1088,19 +1088,24 @@ void CWvsContext::GuildNPCSay(ZArray<ZXString<char>> *aText, int nNpcID)
 
 All guild request packets use COutPacket header **149** (`CP_GuildRequest`).
 
-| Sub-opcode | Function | Packet Layout |
-|-----------|----------|---------------|
-| 0x00 | (acknowledge join) | — |
-| 0x02 | `InputGuildName` | Encode1(2) + EncodeStr(guildName) |
-| 0x05 | `SendInviteGuildMsg` | Encode1(5) + EncodeStr(targetName) |
-| 0x07 | `SendWithdrawGuildMsg` | Encode1(7) + Encode4(charID) + EncodeStr(charName) |
-| 0x08 | `SendKickGuildMsg` | Encode1(8) + Encode4(targetCharID) + EncodeStr(targetName) |
-| 0x0D | `SendSetGradeNameMsg` | Encode1(13) + EncodeStr×5 |
-| 0x0E | `SendSetMemberGradeMsg` | Encode1(14) + Encode4(charID) + Encode1(grade) |
-| 0x0F | `SendSetGuildMarkMsg` | Encode1(15) + Encode2(markBg) + Encode1(bgColor) + Encode2(mark) + Encode1(markColor) |
-| 0x10 | `SendSetGuildNoticeMsg` | Encode1(16) + EncodeStr(notice) |
-| 0x1B | `GuildReg_SetSkill` | Encode1(27) + ... (guild skill purchase) |
-| 0x20 | `SendCreateGuildAgreeMsg` | Encode1(32) + Encode4(charID) + Encode1(bAgree) |
+> **Dead opcodes (never sent by V95 client):** `0x04` (GuildReq_CreateNewGuild), `0x09`
+> (GuildReq_RemoveGuild), `0x1B` (GuildReg_SetSkill) — none of these appear in any
+> `COutPacket(149)` construction in the binary. All three are NPC-script-driven
+> server-side operations. Do **not** wait for them from clients.
+
+| Sub-opcode | Function | Source | Packet Layout |
+|-----------|----------|--------|---------------|
+| 0x00 | (acknowledge join) | `OnGuildResult` case 41 | Encode1(0) only |
+| 0x02 | `InputGuildName` | `CField::InputGuildName` | Encode1(2) + EncodeStr(guildName) |
+| 0x05 | `SendInviteGuildMsg` | `CField::SendInviteGuildMsg` | Encode1(5) + EncodeStr(targetName) |
+| 0x06 | (accept guild invite) | `CUIFadeYesNo::OnButtonClicked` m_nType=8 | Encode1(6) + Encode4(inviterCharID) + Encode4(myCharID) |
+| 0x07 | `SendWithdrawGuildMsg` | `CField::SendWithdrawGuildMsg` | Encode1(7) + Encode4(myCharID) + EncodeStr(myCharName) |
+| 0x08 | `SendKickGuildMsg` | `CField::SendKickGuildMsg` | Encode1(8) + Encode4(targetCharID) + EncodeStr(targetName) |
+| 0x0D | `SendSetGradeNameMsg` | `CField::SendSetGradeNameMsg` | Encode1(13) + EncodeStr×5 |
+| 0x0E | `SendSetMemberGradeMsg` | `CField::SendSetMemberGradeMsg` | Encode1(14) + Encode4(charID) + Encode1(grade) |
+| 0x0F | `SendSetGuildMarkMsg` | `CField::SendSetGuildMarkMsg` | Encode1(15) + Encode2(markBg) + Encode1(bgColor) + Encode2(mark) + Encode1(markColor) |
+| 0x10 | `SendSetGuildNoticeMsg` | `CField::SendSetGuildNoticeMsg` | Encode1(16) + EncodeStr(notice) |
+| 0x20 | `SendCreateGuildAgreeMsg` | `CField::SendCreateGuildAgreeMsg` | Encode1(32) + Encode4(myCharID) + Encode1(bAgree) |
 
 Guild **response** packets use header **150** (`CP_GuildResult`):
 
@@ -1126,10 +1131,10 @@ Guild **response** packets use header **150** (`CP_GuildResult`):
 | Case | Name | Behavior |
 |------|------|----------|
 | 1 | InputGuildName | Prompts guild name input (create flow) |
-| 3 | CreateGuildAgree | Shows creation agreement dialog. NPC 2010007 for party boss; `CCreateGuildAgreeDlg` modal for members |
-| 5 | GuildInvite | Decodes inviter name/job/level/ID. Shows `CUIFadeYesNo::CreateGuildInvite` or auto-declines if blacklisted |
+| 3 | CreateGuildAgree | **Boss:** no bytes read — NPC 2010007 says start dialog. **Non-boss:** `Decode4(partyID)` guard + `DecodeStr(inviterName)` + `DecodeStr(guildName)` → shows `CCreateGuildAgreeDlg`; result fires `SendCreateGuildAgreeMsg` (sub-op 0x20) |
+| 5 | GuildInvite | Payload: `inviterCharID(4) + inviterName(str) + inviterJob(4) + inviterLevel(4)`. Shows `CUIFadeYesNo::CreateGuildInvite`; auto-declines (sends CP_GuildResult 55 or 56) if blacklisted or already-invited |
 | 17 | SetGuildMark | Opens `CSetGuildMarkDlg` modal for guild master |
-| 28 | LoadGuild | Full guild reload: `GUILDDATA::Clear` + `GUILDDATA::Decode`; updates passive skills; if alliance, sends alliance info request (opcode 167 sub 1) |
+| 28 | LoadGuild | Payload: `Decode1(hasData)`. If hasData≠1: full guild reload via `GUILDDATA::Clear` + `GUILDDATA::Decode`; updates passive skills; if `nAllianceID≠0` sends AllianceReq_Load (opcode 167 sub 1) |
 | 30 | GuildNameInUse | Shows "name in use" NPC dialog, re-prompts `InputGuildName` |
 | 33 | GuildCreateError | NPC dialog (StringPool 0xCF3) |
 | 34 | GuildCreated | Full guild decode; master sees "created" NPC dialog; members see chat message (0x15D) |
@@ -1145,7 +1150,7 @@ Guild **response** packets use header **150** (`CP_GuildResult`):
 | 47 | WithdrawError | Chat log (0x16B) |
 | 49 | MemberExpelled | Same as 46 but: self → "expelled" (0x1A8C), other → "kicked" (0x160) |
 | 50 | ExpelError | Chat log (0x16B) |
-| 52 | GuildDisbanded | Master: NPC dialog (0xCF1). Members: chat (0x166). Both clear guild data |
+| 52 | GuildDisbanded | Payload: `Decode4(guildID)` guard only. Master: NPC dialog (0xCF1) then `GUILDDATA::Clear`. Members: chat (0x166) then `GUILDDATA::Clear` |
 | 54 | DisbandError | NPC dialog (0xCF5) |
 | 55 | InviteSent | Decodes target name; chat (0x15B) |
 | 56 | InviteRejected | Decodes target name; chat (0xACF) |

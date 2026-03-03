@@ -242,9 +242,11 @@ public class GuildService : IGuildService
             await using var db = await _dbFactory.CreateDbContextAsync();
             var now = DateTime.UtcNow;
 
+            // Look up the pending invitation by (InviterID, CharacterID) — this is
+            // what the V95 client sends in the JoinGuild (0x06) packet (R-004).
             var invitation = await db.GuildInvitations
                 .FirstOrDefaultAsync(i =>
-                    i.GuildID == request.GuildID &&
+                    i.InviterID == request.InviterID &&
                     i.CharacterID == request.CharacterID);
 
             if (invitation == null || invitation.DateExpire < now)
@@ -255,7 +257,7 @@ public class GuildService : IGuildService
 
             var guild = await db.Guilds
                 .Include(g => g.Members)
-                .FirstOrDefaultAsync(g => g.ID == request.GuildID);
+                .FirstOrDefaultAsync(g => g.ID == invitation.GuildID);
 
             if (guild == null)
                 return new GuildResponse(GuildResult.FailedGuildNotFound);
@@ -265,7 +267,7 @@ public class GuildService : IGuildService
 
             var newMember = new GuildMemberEntity
             {
-                GuildID = request.GuildID,
+                GuildID = invitation.GuildID,
                 CharacterID = request.CharacterID,
                 CharacterName = request.CharacterName,
                 Job = request.Job,
@@ -282,7 +284,7 @@ public class GuildService : IGuildService
             var membership = await LoadMembershipAsync(db, request.CharacterID);
             if (membership != null)
                 await _messaging.PublishAsync(new NotifyGuildMemberJoined(
-                    request.GuildID,
+                    invitation.GuildID,
                     membership,
                     new GuildMembershipMember(newMember)));
 

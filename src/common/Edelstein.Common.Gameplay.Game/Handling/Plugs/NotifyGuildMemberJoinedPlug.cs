@@ -55,7 +55,18 @@ public class NotifyGuildMemberJoinedPlug : IPipelinePlug<NotifyGuildMemberJoined
             packet.WriteByte((byte)GuildResultOperations.JoinGuild_Done);
             packet.WriteInt(message.GuildID);
             packet.WriteInt(message.NewMember.CharacterID);
-            packet.WriteGuildMember(message.NewMember);
+
+            if (!isNewMember)
+            {
+                // R-002 case 41: existing members receive the full GUILDMEMBER
+                // struct (37 bytes) so they can insert the newcomer into their
+                // local roster immediately without a separate load.
+                packet.WriteGuildMember(message.NewMember);
+            }
+            // The new member receives guildID + charID only. Their client
+            // auto-responds with CP_GuildRequest sub 0x00 (LoadGuild), which
+            // triggers HandleLoadGuildAsync to deliver the full GUILDDATA.
+
             _ = user.Dispatch(packet.Build());
         }
     }
