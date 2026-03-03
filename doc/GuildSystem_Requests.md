@@ -28,27 +28,35 @@ omitted lines (job, level, grade, online/offline, commitment, any padding).
 
 ---
 
-## R-002 — Server→Client payload formats for LP_GuildResult (BLOCKER per operation)
+## R-002 — Server→Client payload formats for LP_GuildResult (PARTIALLY RESOLVED)
 
-Section 11 of the reference doc (`CWvsContext::OnGuildResult`) is fully omitted.  
-For each result code below, we need: what bytes follow the sub-opcode byte?
+Section 11 of the reference doc (`CWvsContext::OnGuildResult`) **is present** and provides
+a complete switch-case table. The table below reflects what is now confirmed from the doc.
+Only two items remain uncertain.
 
-| Result code | Value | Needed payload format |
-|------------|-------|----------------------|
-| `CreateGuildAgree_Reply` | 0x20 | ? |
-| `CreateNewGuild_Done` | 0x22 | GUILDDATA? ACK only? |
-| `JoinGuild_Done` | 0x29 | GUILDDATA? IGuildMember? |
-| `WithdrawGuild_Done` | 0x2E | charID + charName? full GUILDDATA? |
-| `KickGuild_Done` | 0x31 | charID + charName? |
-| `RemoveGuild_Done` | 0x34 | guildID only? |
-| `ChangeLevelOrJob` | 0x3E | charID + level + job? |
-| `NotifyLoginOrLogout` | 0x3F | charID + channel? |
-| `SetGradeName_Done` | 0x40 | 5 × grade name strings? |
-| `SetMemberGrade_Done` | 0x42 | charID + grade? |
-| `SetMark_Done` | 0x45 | markBg + bgColor + mark + markColor? |
-| `SetNotice_Done` | 0x47 | notice string? |
-| `SetSkill_Done` | 0x51 | skillID + SKILLENTRY? |
-| `InviteGuild_Rejected` | 0x39 | inviterID / name? |
+| Result code | Hex | Decimal case | Confirmed payload |
+|------------|-----|-------------|-------------------|
+| `CreateGuildAgree` | 0x03 | 3 | No explicit byte payload — shows creation-agree dialog only |
+| `CreateNewGuild_Done` | 0x22 | 34 | Full GUILDDATA (same path as LoadGuild) |
+| `JoinGuild_Done` | 0x29 | 41 | guildID(4) + charID(4); if self → client sends sub-0x00 back, awaits LoadGuild; if other → decode GUILDMEMBER (see R-001) |
+| `WithdrawGuild_Done` | 0x2E | 46 | guildID(4) + charID(4) + charName(str) |
+| `KickGuild_Done` | 0x31 | 49 | Same as Withdraw: guildID(4) + charID(4) + charName(str) |
+| `RemoveGuild_Done` | 0x34 | 52 | **UNKNOWN** — doc only describes behavior (clear data), no explicit bytes listed |
+| `ChangeLevelOrJob` | 0x3E | 62 | guildID(4) + charID(4) + nLevel(4) + nJob(4) |
+| `NotifyLoginOrLogout` | 0x3F | 63 | guildID(4) + charID(4) + bOnLine(1) |
+| `SetGradeName_Done` | 0x40 | 64 | guildID(4) + 5 × gradeName(str) |
+| `SetMemberGrade_Done` | 0x42 | 66 | guildID(4) + charID(4) + nGrade(1) |
+| `SetMark_Done` | 0x45 | 69 | guildID(4) + markBg(2) + bgColor(1) + mark(2) + markColor(1) |
+| `SetNotice_Done` | 0x47 | 71 | guildID(4) + notice(str) |
+| `SetSkill_Done` | 0x51 | 81 | guildID(4) + nSkillID(4) + SKILLENTRY |
+| `InviteGuild_Rejected` | 0x39 | 57 | targetName(str) only (chat 0xACF to inviter) |
+
+**Still unknown:** `RemoveGuild_Done (0x34)` — whether any guildID or other field follows the
+sub-opcode before the client clears local guild data.
+
+**Note on CreateGuildAgree sub-opcode:** Section 10 shows client sends `SendCreateGuildAgreeMsg`
+with sub-opcode **0x20** (decimal 32), not 0x03. This is a **separate discrepancy** from the
+server-side result case 3 (`GuildRes_CreateGuildAgree`). See R-007 for the client-side question.
 
 ---
 
