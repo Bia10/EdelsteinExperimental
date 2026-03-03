@@ -10,6 +10,9 @@
 !**/manifest.json
 !**/appsettings.json
 !**/devsettings.json
+# Local-only config overrides — never commit these
+**/appsettings.local.json
+**/devsettings.local.json
 
 !**/packages.lock.json
 
