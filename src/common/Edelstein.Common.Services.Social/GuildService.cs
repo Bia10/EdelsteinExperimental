@@ -10,18 +10,18 @@ namespace Edelstein.Common.Services.Social;
 
 public class GuildService : IGuildService
 {
-    private const int DefaultMaxMemberNum = 10;
-    private const int InviteExpiryMinutes = 3;
-
+    private readonly GuildOptions _options;
     private readonly IDbContextFactory<SocialDbContext> _dbFactory;
     private readonly IMessageBus _messaging;
     private readonly ICharacterRepository _characterRepository;
 
     public GuildService(
+        GuildOptions options,
         IDbContextFactory<SocialDbContext> dbFactory,
         IMessageBus messaging,
         ICharacterRepository characterRepository)
     {
+        _options = options;
         _dbFactory = dbFactory;
         _messaging = messaging;
         _characterRepository = characterRepository;
@@ -63,7 +63,9 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            if (string.IsNullOrWhiteSpace(request.GuildName) || request.GuildName.Length > 12)
+            if (string.IsNullOrWhiteSpace(request.GuildName)
+                || request.GuildName.Length < _options.MinNameLength
+                || request.GuildName.Length > _options.MaxNameLength)
                 return new GuildNameCheckResponse(GuildResult.FailedNameInvalid);
 
             var taken = await db.Guilds.AnyAsync(g => g.Name == request.GuildName);
@@ -94,7 +96,7 @@ public class GuildService : IGuildService
             {
                 Name = request.GuildName,
                 MasterCharacterID = request.CharacterID,
-                MaxMemberNum = DefaultMaxMemberNum,
+                MaxMemberNum = _options.DefaultMaxMemberNum,
                 GradeName1 = "Master",
                 GradeName2 = "Jr.Master",
                 GradeName3 = "Member",
@@ -211,7 +213,7 @@ public class GuildService : IGuildService
                 GuildID = request.GuildID,
                 InviterID = request.InviterID,
                 CharacterID = target.ID,
-                DateExpire = now.AddMinutes(InviteExpiryMinutes),
+                DateExpire = now.AddMinutes(_options.InviteExpiryMinutes),
             });
 
             await db.SaveChangesAsync();
