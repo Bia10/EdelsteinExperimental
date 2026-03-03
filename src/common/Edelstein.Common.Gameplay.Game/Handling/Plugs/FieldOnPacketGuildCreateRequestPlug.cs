@@ -35,9 +35,9 @@ public class FieldOnPacketGuildCreateRequestPlug : IPipelinePlug<FieldOnPacketGu
         var opcode = response.Result switch
         {
             GuildResult.FailedAlreadyInGuild => GuildResultOperations.CreateNewGuild_AlreadyJoined,
-            GuildResult.FailedNameTaken      => GuildResultOperations.CreateNewGuild_GuildNameAlreadyExist,
-            GuildResult.FailedBeginner       => GuildResultOperations.CreateNewGuild_Beginner,
-            _                                => GuildResultOperations.CreateNewGuild_Unknown
+            GuildResult.FailedNameTaken => GuildResultOperations.CreateNewGuild_GuildNameAlreadyExist,
+            GuildResult.FailedBeginner => GuildResultOperations.CreateNewGuild_Beginner,
+            _ => GuildResultOperations.CreateNewGuild_Unknown
         };
 
         using var packet = new PacketWriter(PacketSendOperations.GuildResult);

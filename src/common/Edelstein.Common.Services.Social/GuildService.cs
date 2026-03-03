@@ -27,7 +27,6 @@ public class GuildService : IGuildService
         _characterRepository = characterRepository;
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private static async Task<GuildMembership?> LoadMembershipAsync(
         SocialDbContext db,
@@ -43,7 +42,6 @@ public class GuildService : IGuildService
         return entity == null ? null : new GuildMembership(entity);
     }
 
-    // ── Query ─────────────────────────────────────────────────────────────────
 
     public async Task<GuildLoadResponse> Load(GuildLoadRequest request)
     {
@@ -79,7 +77,6 @@ public class GuildService : IGuildService
         }
     }
 
-    // ── Lifecycle ─────────────────────────────────────────────────────────────
 
     public async Task<GuildResponse> Create(GuildCreateRequest request)
     {
@@ -160,7 +157,6 @@ public class GuildService : IGuildService
         }
     }
 
-    // ── Membership ────────────────────────────────────────────────────────────
 
     public async Task<GuildResponse> Invite(GuildInviteRequest request)
     {
@@ -408,7 +404,6 @@ public class GuildService : IGuildService
         }
     }
 
-    // ── Administration ────────────────────────────────────────────────────────
 
     public async Task<GuildResponse> SetNotice(GuildSetNoticeRequest request)
     {
@@ -539,7 +534,6 @@ public class GuildService : IGuildService
         }
     }
 
-    // ── Real-time member state ─────────────────────────────────────────────────
 
     public async Task<GuildResponse> UpdateLevelOrJob(GuildUpdateLevelOrJobRequest request)
     {

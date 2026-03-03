@@ -10,7 +10,7 @@ namespace Edelstein.Common.Services.Social;
 /// </summary>
 public class GuildMembership : IGuildMembership
 {
-    // ── IGuild ────────────────────────────────────────────────────────────────
+
     public int ID { get; set; }
     public string Name { get; set; } = string.Empty;
     public string GradeName1 { get; set; } = string.Empty;
@@ -29,7 +29,7 @@ public class GuildMembership : IGuildMembership
     public byte GuildLevel { get; set; }
     public int AllianceID { get; set; }
 
-    // ── IGuildMember (this user's own record) ─────────────────────────────────
+
     public int GuildID { get; set; }
     public int CharacterID { get; set; }
     public string CharacterName { get; set; } = string.Empty;
@@ -40,7 +40,6 @@ public class GuildMembership : IGuildMembership
     public int Commitment { get; set; }
     public int AllianceGrade { get; set; }
 
-    // ── IGuildMembership ──────────────────────────────────────────────────────
     public IDictionary<int, IGuildMember> Members { get; set; } = new Dictionary<int, IGuildMember>();
     public IDictionary<int, IGuildSkillRecord> Skills { get; set; } = new Dictionary<int, IGuildSkillRecord>();
 
@@ -55,7 +54,7 @@ public class GuildMembership : IGuildMembership
     {
         var guild = guildMember.Guild;
 
-        // ── Guild header ──────────────────────────────────────────────────────
+
         ID = guild.ID;
         Name = guild.Name;
         GradeName1 = guild.GradeName1;
@@ -74,7 +73,7 @@ public class GuildMembership : IGuildMembership
         GuildLevel = guild.GuildLevel;
         AllianceID = guild.AllianceID;
 
-        // ── Own member record ─────────────────────────────────────────────────
+
         GuildID = guildMember.GuildID;
         CharacterID = guildMember.CharacterID;
         CharacterName = guildMember.CharacterName;
@@ -85,13 +84,13 @@ public class GuildMembership : IGuildMembership
         Commitment = guildMember.Commitment;
         AllianceGrade = guildMember.AllianceGrade;
 
-        // ── Full roster ───────────────────────────────────────────────────────
+
         Members = guild.Members
             .ToDictionary(
                 m => m.CharacterID,
                 m => (IGuildMember)new GuildMembershipMember(m));
 
-        // ── Purchased skills ──────────────────────────────────────────────────
+
         Skills = guild.Skills
             .ToDictionary(
                 s => s.SkillID,

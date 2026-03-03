@@ -33,10 +33,10 @@ public class FieldOnPacketGuildJoinRequestPlug : IPipelinePlug<FieldOnPacketGuil
 
         var opcode = response.Result switch
         {
-            GuildResult.FailedFull           => GuildResultOperations.JoinGuild_AlreadyFull,
+            GuildResult.FailedFull => GuildResultOperations.JoinGuild_AlreadyFull,
             GuildResult.FailedAlreadyInGuild => GuildResultOperations.JoinGuild_AlreadyJoined,
             GuildResult.FailedCharacterNotFound => GuildResultOperations.JoinGuild_UnknownUser,
-            _                                => GuildResultOperations.JoinGuild_Unknown
+            _ => GuildResultOperations.JoinGuild_Unknown
         };
 
         using var packet = new PacketWriter(PacketSendOperations.GuildResult);

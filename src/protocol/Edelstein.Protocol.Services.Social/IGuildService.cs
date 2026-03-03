@@ -9,7 +9,6 @@ namespace Edelstein.Protocol.Services.Social;
 /// </summary>
 public interface IGuildService
 {
-    // ── Query ─────────────────────────────────────────────────────────────────
 
     /// <summary>
     /// Loads the full guild membership snapshot for the given character.
@@ -23,12 +22,10 @@ public interface IGuildService
     /// </summary>
     Task<GuildNameCheckResponse> CheckName(GuildNameCheckRequest request);
 
-    // ── Lifecycle ─────────────────────────────────────────────────────────────
 
     Task<GuildResponse> Create(GuildCreateRequest request);
     Task<GuildResponse> Disband(GuildDisbandRequest request);
 
-    // ── Membership ────────────────────────────────────────────────────────────
 
     Task<GuildResponse> Invite(GuildInviteRequest request);
     Task<GuildResponse> InviteAccept(GuildInviteAcceptRequest request);
@@ -37,14 +34,12 @@ public interface IGuildService
     Task<GuildResponse> Leave(GuildLeaveRequest request);
     Task<GuildResponse> Kick(GuildKickRequest request);
 
-    // ── Administration ────────────────────────────────────────────────────────
 
     Task<GuildResponse> SetNotice(GuildSetNoticeRequest request);
     Task<GuildResponse> SetGradeNames(GuildSetGradeNamesRequest request);
     Task<GuildResponse> SetMemberGrade(GuildSetMemberGradeRequest request);
     Task<GuildResponse> SetMark(GuildSetMarkRequest request);
 
-    // ── Real-time member state ─────────────────────────────────────────────────
 
     Task<GuildResponse> UpdateLevelOrJob(GuildUpdateLevelOrJobRequest request);
 

@@ -28,8 +28,8 @@ public class NotifyGuildMemberInvitedPlug : IPipelinePlug<NotifyGuildMemberInvit
 
         // Inviter job/level are not persisted in the notification; look them up
         // from the stage. Fall back to 0 if the inviter went offline.
-        var inviter      = await _stage.Users.Retrieve(message.InviterID);
-        var inviterJob   = inviter?.Character?.Job   ?? 0;
+        var inviter = await _stage.Users.Retrieve(message.InviterID);
+        var inviterJob = inviter?.Character?.Job ?? 0;
         var inviterLevel = inviter?.Character?.Level ?? 0;
 
         using var packet = new PacketWriter(PacketSendOperations.GuildResult);

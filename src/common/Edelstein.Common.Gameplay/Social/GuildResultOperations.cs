@@ -9,7 +9,7 @@
 /// </summary>
 public enum GuildResultOperations : byte
 {
-    // ── Low sub-opcodes dispatched by the server ──────────────────────────────
+    // Low sub-opcodes dispatched by the server.
     // These values live below LoadGuild_Done (0x1C) and are sent server→client
     // on CP_GuildResult. They have no matching request-side enum entry.
 
@@ -33,7 +33,7 @@ public enum GuildResultOperations : byte
     /// <summary>Server opens the guild mark editor for the guild master.</summary>
     SetGuildMark = 0x11,
 
-    // ── Main result opcodes (0x1C onward) ─────────────────────────────────────
+    // Main result opcodes (0x1C onward).
 
     LoadGuild_Done = 0x1C,
 

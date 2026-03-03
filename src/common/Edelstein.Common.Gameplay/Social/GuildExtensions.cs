@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using Edelstein.Common.Utilities.Packets;
 using Edelstein.Protocol.Services.Social;
 using Edelstein.Protocol.Utilities.Packets;
@@ -48,7 +48,6 @@ public static class GuildExtensions
     /// </remarks>
     public static IPacketWriter WriteGuildData(this IPacketWriter writer, IGuildMembership membership)
     {
-        // ── Guild header ──────────────────────────────────────────────────────
         writer.WriteInt(membership.ID);
         writer.WriteString(membership.Name);
 
@@ -59,7 +58,6 @@ public static class GuildExtensions
         writer.WriteString(membership.GradeName4);
         writer.WriteString(membership.GradeName5);
 
-        // ── Member arrays (master first, then rest sorted by grade then charID) ─
         var members = membership.Members.Values
             .OrderBy(m => m.Grade)
             .ThenBy(m => m.CharacterID)
@@ -74,7 +72,6 @@ public static class GuildExtensions
         foreach (var m in members)
             writer.WriteGuildMember(m);
 
-        // ── Guild settings ────────────────────────────────────────────────────
         writer.WriteInt(membership.MaxMemberNum);
 
         writer.WriteShort(membership.MarkBg);
@@ -87,7 +84,6 @@ public static class GuildExtensions
         writer.WriteInt(membership.AllianceID);
         writer.WriteByte(membership.GuildLevel);
 
-        // ── Guild skill records ───────────────────────────────────────────────
         var skills = membership.Skills.Values.ToImmutableList();
 
         writer.WriteShort((short)skills.Count);

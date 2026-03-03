@@ -35,9 +35,9 @@ public class FieldOnPacketGuildInviteRequestPlug : IPipelinePlug<FieldOnPacketGu
         // Map service result to the LP_GuildResult acknowledgement opcode.
         var opcode = response.Result switch
         {
-            GuildResult.Success            => GuildResultOperations.InviteGuild_BlockedUser,  // "invite sent"
+            GuildResult.Success => GuildResultOperations.InviteGuild_BlockedUser,  // "invite sent"
             GuildResult.FailedAlreadyInvited => GuildResultOperations.InviteGuild_AlreadyInvited,
-            _                              => GuildResultOperations.InviteGuild_AlreadyInvited
+            _ => GuildResultOperations.InviteGuild_AlreadyInvited
         };
 
         // Send acknowledgement to the inviter (contains the target character name).

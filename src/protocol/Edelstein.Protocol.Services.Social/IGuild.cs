@@ -22,11 +22,10 @@ public interface IGuild : IIdentifiable<int>
     /// <summary>Character ID of the guild master (grade = 1).</summary>
     int MasterCharacterID { get; }
 
-    // ── Emblem ───────────────────────────────────────────────────────────────
     short MarkBg { get; }
-    byte  MarkBgColor { get; }
+    byte MarkBgColor { get; }
     short Mark { get; }
-    byte  MarkColor { get; }
+    byte MarkColor { get; }
 
     string Notice { get; }
 

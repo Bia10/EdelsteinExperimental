@@ -28,20 +28,15 @@ public class GuildRequestHandler : AbstractFieldHandler
 
         switch (type)
         {
-            // ── Post-join guild data load ─────────────────────────────────────
             // Sent by the client immediately after receiving JoinGuild_Done for
             // self to acknowledge and request the full GUILDDATA packet.
-
             case GuildRequestOperations.LoadGuild:
                 return HandleLoadGuildAsync(user);
-
-            // ── Name check ───────────────────────────────────────────────────
 
             case GuildRequestOperations.CheckGuildName:
                 return user.StageUser.Context.Pipelines.FieldOnPacketGuildNameCheckRequest.Process(
                     new FieldOnPacketGuildNameCheckRequest(user, reader.ReadString()));
 
-            // ── Creation (agree-reply from client) ───────────────────────────────
             // R-007: client sends 0x20 (Encode1(32)) + charID(4) + bAgree(1).
             // The guild was already created during the CheckGuildName (0x02) flow.
             // These agree/disagree replies are informational; no further action.
@@ -51,8 +46,6 @@ public class GuildRequestHandler : AbstractFieldHandler
                 reader.ReadInt();  // charID  — discard
                 reader.ReadByte(); // bAgree  — discard
                 return Task.CompletedTask;
-
-            // ── Membership management ────────────────────────────────────────
 
             case GuildRequestOperations.InviteGuild:
                 return user.StageUser.Context.Pipelines.FieldOnPacketGuildInviteRequest.Process(
@@ -86,8 +79,6 @@ public class GuildRequestHandler : AbstractFieldHandler
                         reader.ReadString() // targetName
                     ));
 
-            // ── Administration ────────────────────────────────────────────────
-
             case GuildRequestOperations.SetNotice:
                 return user.StageUser.Context.Pipelines.FieldOnPacketGuildSetNoticeRequest.Process(
                     new FieldOnPacketGuildSetNoticeRequest(user, reader.ReadString()));
@@ -118,8 +109,6 @@ public class GuildRequestHandler : AbstractFieldHandler
                         reader.ReadShort(), // mark
                         reader.ReadByte()   // markColor
                     ));
-
-            // ── Inline real-time state updates (no pipeline needed) ──────────
 
             case GuildRequestOperations.ChangeLevel:
             {
