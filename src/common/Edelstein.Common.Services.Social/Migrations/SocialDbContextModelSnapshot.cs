@@ -77,6 +77,182 @@ namespace Edelstein.Common.Services.Social.Migrations
                     b.ToTable("friend_profiles", (string)null);
                 });
 
+            modelBuilder.Entity("Edelstein.Common.Services.Social.Entities.GuildEntity", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("AllianceID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("GradeName1")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("GradeName2")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("GradeName3")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("GradeName4")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("GradeName5")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte>("GuildLevel")
+                        .HasColumnType("smallint");
+
+                    b.Property<short>("Mark")
+                        .HasColumnType("smallint");
+
+                    b.Property<short>("MarkBg")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte>("MarkBgColor")
+                        .HasColumnType("smallint");
+
+                    b.Property<byte>("MarkColor")
+                        .HasColumnType("smallint");
+
+                    b.Property<int>("MasterCharacterID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxMemberNum")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Notice")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Point")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("guilds", (string)null);
+                });
+
+            modelBuilder.Entity("Edelstein.Common.Services.Social.Entities.GuildInvitationEntity", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("CharacterID")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("DateExpire")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("GuildID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("InviterID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("GuildID");
+
+                    b.ToTable("guild_invitations", (string)null);
+                });
+
+            modelBuilder.Entity("Edelstein.Common.Services.Social.Entities.GuildMemberEntity", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+
+                    b.Property<int>("AllianceGrade")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ChannelID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("CharacterID")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("CharacterName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Commitment")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Grade")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("GuildID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Job")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("CharacterID")
+                        .IsUnique();
+
+                    b.HasIndex("GuildID");
+
+                    b.ToTable("guild_members", (string)null);
+                });
+
+            modelBuilder.Entity("Edelstein.Common.Services.Social.Entities.GuildSkillEntity", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("BuyerName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("DateExpire")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("GuildID")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Level")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("SkillID")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("GuildID", "SkillID")
+                        .IsUnique();
+
+                    b.ToTable("guild_skills", (string)null);
+                });
+
             modelBuilder.Entity("Edelstein.Common.Services.Social.Entities.PartyEntity", b =>
                 {
                     b.Property<int>("ID")
@@ -169,6 +345,39 @@ namespace Edelstein.Common.Services.Social.Migrations
                     b.Navigation("Profile");
                 });
 
+            modelBuilder.Entity("Edelstein.Common.Services.Social.Entities.GuildInvitationEntity", b =>
+                {
+                    b.HasOne("Edelstein.Common.Services.Social.Entities.GuildEntity", "Guild")
+                        .WithMany("Invitations")
+                        .HasForeignKey("GuildID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("Edelstein.Common.Services.Social.Entities.GuildMemberEntity", b =>
+                {
+                    b.HasOne("Edelstein.Common.Services.Social.Entities.GuildEntity", "Guild")
+                        .WithMany("Members")
+                        .HasForeignKey("GuildID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Guild");
+                });
+
+            modelBuilder.Entity("Edelstein.Common.Services.Social.Entities.GuildSkillEntity", b =>
+                {
+                    b.HasOne("Edelstein.Common.Services.Social.Entities.GuildEntity", "Guild")
+                        .WithMany("Skills")
+                        .HasForeignKey("GuildID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Guild");
+                });
+
             modelBuilder.Entity("Edelstein.Common.Services.Social.Entities.PartyInvitationEntity", b =>
                 {
                     b.HasOne("Edelstein.Common.Services.Social.Entities.PartyEntity", "Party")
@@ -194,6 +403,15 @@ namespace Edelstein.Common.Services.Social.Migrations
             modelBuilder.Entity("Edelstein.Common.Services.Social.Entities.FriendProfileEntity", b =>
                 {
                     b.Navigation("Friends");
+                });
+
+            modelBuilder.Entity("Edelstein.Common.Services.Social.Entities.GuildEntity", b =>
+                {
+                    b.Navigation("Invitations");
+
+                    b.Navigation("Members");
+
+                    b.Navigation("Skills");
                 });
 
             modelBuilder.Entity("Edelstein.Common.Services.Social.Entities.PartyEntity", b =>

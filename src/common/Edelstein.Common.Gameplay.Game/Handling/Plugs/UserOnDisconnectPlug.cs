@@ -17,8 +17,9 @@ public class UserOnDisconnectPlug : AbstractUserOnDisconnectPlug<IGameStageUser>
         IAccountWorldRepository accountWorldRepository,
         ICharacterRepository characterRepository, 
         IFriendService friendService, 
-        IPartyService partyService
-    ) : base(session, accountRepository, accountWorldRepository, characterRepository, friendService, partyService)
+        IPartyService partyService,
+        IGuildService guildService
+    ) : base(session, accountRepository, accountWorldRepository, characterRepository, friendService, partyService, guildService)
     {
     }
     

@@ -1,4 +1,4 @@
-using Edelstein.Common.Constants;
+﻿using Edelstein.Common.Constants;
 using Edelstein.Protocol.Gameplay.Game.Rates;
 
 namespace Edelstein.Common.Gameplay.Game.Rates;
@@ -14,11 +14,13 @@ public sealed class GuildRateModifierSource : IRateModifierSource
             return [];
 
         IReadOnlyList<IRateModifier> result = [];
-        var skills = user.Character.Skills;
+        var guildSkills = user.StageUser.Guild?.Skills;
 
         foreach (var skillId in GuildSkillIds)
         {
-            var level = skills[skillId]?.Level ?? 0;
+            var level = guildSkills != null && guildSkills.TryGetValue(skillId, out var skill)
+                ? skill.Level
+                : 0;
             if (level <= 0) continue;
 
             var template = await user.StageUser.Context.Templates.Skill.Retrieve(skillId);

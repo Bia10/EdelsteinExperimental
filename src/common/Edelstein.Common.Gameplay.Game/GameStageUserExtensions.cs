@@ -74,6 +74,17 @@ public static class GameStageUserExtensions
         }
     }
 
+    public async static Task DispatchInitGuild(this IGameStageUser user)
+    {
+        if (user.Guild != null)
+        {
+            using var packet = new PacketWriter(PacketSendOperations.GuildResult);
+            packet.WriteByte((byte)GuildResultOperations.LoadGuild_Done);
+            packet.WriteGuildData(user.Guild);
+            await user.Dispatch(packet.Build());
+        }
+    }
+
     public async static Task DispatchInitQuestTime(this IGameStageUser user)
     {
         var records = await user.Context.Managers.QuestTime.RetrieveAll();

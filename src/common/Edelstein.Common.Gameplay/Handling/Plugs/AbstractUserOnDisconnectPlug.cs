@@ -20,6 +20,7 @@ public abstract class AbstractUserOnDisconnectPlug<TStageUser> : IPipelinePlug<U
     private readonly ICharacterRepository _characterRepository;
     private readonly IFriendService _friendService;
     private readonly IPartyService _partyService;
+    private readonly IGuildService _guildService;
 
     protected AbstractUserOnDisconnectPlug(
         ISessionService session,
@@ -27,7 +28,8 @@ public abstract class AbstractUserOnDisconnectPlug<TStageUser> : IPipelinePlug<U
         IAccountWorldRepository accountWorldRepository,
         ICharacterRepository characterRepository, 
         IFriendService friendService, 
-        IPartyService partyService
+        IPartyService partyService,
+        IGuildService guildService
     )
     {
         _session = session;
@@ -36,6 +38,7 @@ public abstract class AbstractUserOnDisconnectPlug<TStageUser> : IPipelinePlug<U
         _characterRepository = characterRepository;
         _friendService = friendService;
         _partyService = partyService;
+        _guildService = guildService;
     }
 
     public virtual async Task Handle(IPipelineContext ctx, UserOnDisconnect<TStageUser> message)
@@ -80,6 +83,13 @@ public abstract class AbstractUserOnDisconnectPlug<TStageUser> : IPipelinePlug<U
                         999999999
                     ));
                 }
+
+                if (message.User.Guild != null)
+                    _ = _guildService.UpdateChannel(new GuildUpdateChannelRequest(
+                        message.User.Guild.ID,
+                        message.User.Character.ID,
+                        -2
+                    ));
             }
 
             await _characterRepository.Update(message.User.Character);

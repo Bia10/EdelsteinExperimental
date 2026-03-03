@@ -14,8 +14,9 @@ public class UserOnPacketMigrateInPlug : AbstractUserOnPacketMigrateInPlug<ITrad
         IMigrationService migrationService,
         ISessionService sessionService, 
         IFriendService friendService, 
-        IPartyService partyService
-    ) : base(logger, stage, migrationService, sessionService, friendService, partyService)
+        IPartyService partyService,
+        IGuildService guildService
+    ) : base(logger, stage, migrationService, sessionService, friendService, partyService, guildService)
     {
     }
 

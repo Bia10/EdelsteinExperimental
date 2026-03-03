@@ -16,6 +16,10 @@ public class SocialDbContext : DbContext
     public DbSet<PartyEntity> Parties { get; set; }
     public DbSet<PartyInvitationEntity> PartyInvitations { get; set; }
     public DbSet<PartyMemberEntity> PartyMembers { get; set; }
+    public DbSet<GuildEntity> Guilds { get; set; }
+    public DbSet<GuildMemberEntity> GuildMembers { get; set; }
+    public DbSet<GuildSkillEntity> GuildSkills { get; set; }
+    public DbSet<GuildInvitationEntity> GuildInvitations { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
         => builder.ApplyConfigurationsFromAssembly(typeof(SocialDbContext).Assembly);

@@ -11,5 +11,6 @@ public record GameContextServices(
     IMigrationService Migration,
     
     IFriendService Friend,
-    IPartyService Party
+    IPartyService Party,
+    IGuildService Guild
 );

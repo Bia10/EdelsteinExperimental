@@ -19,6 +19,7 @@ public abstract class AbstractUserOnPacketMigrateInPlug<TStage, TStageUser> : IP
     private readonly ISessionService _sessionService;
     private readonly IFriendService _friendService;
     private readonly IPartyService _partyService;
+    private readonly IGuildService _guildService;
 
     public AbstractUserOnPacketMigrateInPlug(
         ILogger<AbstractUserOnPacketMigrateInPlug<TStage, TStageUser>> logger,
@@ -26,7 +27,8 @@ public abstract class AbstractUserOnPacketMigrateInPlug<TStage, TStageUser> : IP
         IMigrationService migrationService,
         ISessionService sessionService, 
         IFriendService friendService, 
-        IPartyService partyService
+        IPartyService partyService,
+        IGuildService guildService
     )
     {
         _logger = logger;
@@ -35,6 +37,7 @@ public abstract class AbstractUserOnPacketMigrateInPlug<TStage, TStageUser> : IP
         _sessionService = sessionService;
         _friendService = friendService;
         _partyService = partyService;
+        _guildService = guildService;
     }
 
     public async Task Handle(IPipelineContext ctx, UserOnPacketMigrateIn<TStageUser> message)
@@ -91,6 +94,7 @@ public abstract class AbstractUserOnPacketMigrateInPlug<TStage, TStageUser> : IP
 
         message.User.Friends = (await _friendService.Load(new FriendLoadRequest(message.User.Character.ID))).Friends;
         message.User.Party = (await _partyService.Load(new PartyLoadRequest(message.User.Character.ID))).PartyMembership;
+        message.User.Guild = (await _guildService.Load(new GuildLoadRequest(message.User.Character.ID))).GuildMembership;
 
         _logger.LogDebug(
             "Migrated in character {Name} from service {From} to service {To} ",

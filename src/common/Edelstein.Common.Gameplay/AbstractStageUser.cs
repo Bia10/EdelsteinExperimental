@@ -25,6 +25,7 @@ public abstract class AbstractStageUser<TStageUser> : IStageUser<TStageUser>
     
     public IFriendList? Friends { get; set; }
     public IPartyMembership? Party { get; set; }
+    public IGuildMembership? Guild { get; set; }
 
     public long Key { get; set; } = Random.Shared.NextInt64();
 

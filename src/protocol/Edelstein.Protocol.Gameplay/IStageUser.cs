@@ -18,6 +18,7 @@ public interface IStageUser<TStageUser> : IIdentifiable<int>, IAdapter
     
     IFriendList? Friends { get; set; }
     IPartyMembership? Party { get; set; }
+    IGuildMembership? Guild { get; set; }
 
     long Key { get; set; }
 

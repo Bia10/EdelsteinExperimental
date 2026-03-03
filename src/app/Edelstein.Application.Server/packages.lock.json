@@ -670,6 +670,7 @@
         "dependencies": {
           "Edelstein.Common.Constants": "[1.0.0, )",
           "Edelstein.Common.Gameplay": "[1.0.0, )",
+          "Edelstein.Common.Services.Social": "[1.0.0, )",
           "Edelstein.Protocol.Gameplay.Game": "[1.0.0, )",
           "Edelstein.Protocol.Scripting": "[1.0.0, )",
           "Foundatio": "[10.6.1, )",

@@ -41,6 +41,7 @@ public class GameStage : AbstractStage<IGameStageUser>, IGameStage
 
         user.Friends = (await user.Context.Services.Friend.Load(new FriendLoadRequest(user.Character.ID))).Friends;
         user.Party = (await user.Context.Services.Party.Load(new PartyLoadRequest(user.Character.ID))).PartyMembership;
+        user.Guild  = (await user.Context.Services.Guild.Load(new GuildLoadRequest(user.Character.ID))).GuildMembership;
 
         user.FieldUser = fieldUser;
         
@@ -51,6 +52,7 @@ public class GameStage : AbstractStage<IGameStageUser>, IGameStage
         await user.DispatchInitQuickSlotKeys();
         await user.DispatchInitFriends();
         await user.DispatchInitParty();
+        await user.DispatchInitGuild();
         await user.DispatchInitQuestTime();
         
         _ = user.Context.Services.Friend.UpdateChannel(new FriendUpdateChannelRequest(
@@ -63,6 +65,12 @@ public class GameStage : AbstractStage<IGameStageUser>, IGameStage
                 user.Character.ID,
                 user.Context.Options.ChannelID,
                 field.ID
+            ));
+        if (user.Guild != null)
+            _ = user.Context.Services.Guild.UpdateChannel(new GuildUpdateChannelRequest(
+                user.Guild.ID,
+                user.Character.ID,
+                user.Context.Options.ChannelID
             ));
     }
 

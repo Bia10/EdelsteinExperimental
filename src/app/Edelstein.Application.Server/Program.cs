@@ -71,6 +71,7 @@ await Host.CreateDefaultBuilder(args)
         
         services.AddSingleton<IFriendService, FriendService>();
         services.AddSingleton<IPartyService, PartyService>();
+        services.AddSingleton<IGuildService, GuildService>();
     })
     .ConfigureServices((ctx, services) =>
     {

@@ -7,6 +7,7 @@
     <ProjectReference Include="..\..\protocol\Edelstein.Protocol.Scripting\Edelstein.Protocol.Scripting.csproj" />
     <ProjectReference Include="..\Edelstein.Common.Constants\Edelstein.Common.Constants.csproj" />
     <ProjectReference Include="..\Edelstein.Common.Gameplay\Edelstein.Common.Gameplay.csproj" />
+    <ProjectReference Include="..\Edelstein.Common.Services.Social\Edelstein.Common.Services.Social.csproj" />
   </ItemGroup>
 
   <ItemGroup>
