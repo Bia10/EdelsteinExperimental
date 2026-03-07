@@ -52,6 +52,7 @@ public class PluginManager<TContext> : Repository<string, IPluginHost<TContext>>
                     .SetBasePath(directoryPlugin)
                     .AddJsonFile("appsettings.json", true)
                     .AddJsonFile($"appsettings.{_environment.EnvironmentName}.json", true)
+                    .AddJsonFile("appsettings.local.json", true)
                     .Build();
                 
                 await Insert(new PluginHost<TContext>(

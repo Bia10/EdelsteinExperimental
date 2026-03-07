@@ -34,10 +34,13 @@ public class StartServerUpdateBootstrap<TConfig> : IBootstrap, ITickable
     private ITickerManagerContext? Context { get; set; }
     private bool IsRegistered { get; set; }
 
-    public int Priority => BootstrapPriority.Start;
+    public int Priority => BootstrapPriority.Start - 1;
 
-
-    public Task Start() => Task.FromResult(Context = _ticker.Schedule(this, TimeSpan.FromMinutes(2), TimeSpan.Zero));
+    public async Task Start()
+    {
+        Context = _ticker.Schedule(this, TimeSpan.FromMinutes(2), TimeSpan.FromMinutes(2));
+        await UpdateRegistry();
+    }
 
     public async Task Stop()
     {
@@ -53,64 +56,59 @@ public class StartServerUpdateBootstrap<TConfig> : IBootstrap, ITickable
         }
     }
 
-    public Task OnTick(DateTime now)
+    public Task OnTick(DateTime now) => UpdateRegistry();
+
+    private async Task UpdateRegistry()
     {
-        _ = Task.Run(async () =>
+        var response = IsRegistered
+            ? await _service.Ping(new ServerPingRequest(_config.ID))
+            : _config switch
+            {
+                ILoginStageOptions => await _service.RegisterLogin(new ServerRegisterRequest<IServerLogin>(
+                    new ServerLogin(_config.ID, _config.Host, _config.Port))),
+                IGameStageOptions game => await _service.RegisterGame(new ServerRegisterRequest<IServerGame>(
+                    new ServerGame(_config.ID, _config.Host, _config.Port, game.WorldID, game.ChannelID, game.IsAdultChannel))),
+                IShopStageOptions shop => await _service.RegisterShop(new ServerRegisterRequest<IServerShop>(
+                    new ServerShop(_config.ID, _config.Host, _config.Port, shop.WorldID))),
+                ITradeStageOptions trade => await _service.RegisterTrade(new ServerRegisterRequest<IServerTrade>(
+                    new ServerTrade(_config.ID, _config.Host, _config.Port, trade.WorldID))),
+                _ => throw new ArgumentOutOfRangeException()
+            };
+
+        if (response.Result == ServerResult.Success)
         {
-            var response = IsRegistered
-                ? await _service.Ping(new ServerPingRequest(_config.ID))
-                : _config switch
-                {
-                    ILoginStageOptions login => await _service.RegisterLogin(new ServerRegisterRequest<IServerLogin>(
-                        new ServerLogin(_config.ID, _config.Host, _config.Port))),
-                    IGameStageOptions game => await _service.RegisterGame(new ServerRegisterRequest<IServerGame>(
-                        new ServerGame(_config.ID, _config.Host, _config.Port, game.WorldID, game.ChannelID, game.IsAdultChannel))),
-                    IShopStageOptions shop => await _service.RegisterShop(new ServerRegisterRequest<IServerShop>(
-                        new ServerShop(_config.ID, _config.Host, _config.Port, shop.WorldID))),
-                    ITradeStageOptions trade => await _service.RegisterTrade(new ServerRegisterRequest<IServerTrade>(
-                        new ServerTrade(_config.ID, _config.Host, _config.Port, trade.WorldID))),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-            
-            if (response.Result == ServerResult.Success)
+            if (!IsRegistered)
             {
-                if (!IsRegistered)
-                {
-                    IsRegistered = true;
-                    _logger.LogInformation(
-                        "Registered stage {ID} to server registry, updating at {Next}",
-                        _config.ID, Context?.TickNext
-                    );
-                }
-                else
-                {
-                    _logger.LogDebug(
-                        "Updated stage {ID} in server registry, updating at {Next}",
-                        _config.ID, Context?.TickNext
-                    );
-                }
-            }
-            else
-            {
-                if (IsRegistered)
-                {
-                    _logger.LogWarning(
-                        "Failed to update stage {ID} in server registry due to {Reason} retrying at {Next}",
-                        _config.ID, response.Result, Context?.TickNext
-                    );
-
-                    if (response.Result == ServerResult.FailedNotRegistered)
-                        IsRegistered = false;
-                    return;
-                }
-
-                _logger.LogWarning(
-                    "Failed to register stage {ID} to server registry due to {Reason} retrying at {Next}",
-                    _config.ID, response.Result, Context?.TickNext
+                IsRegistered = true;
+                _logger.LogInformation(
+                    "Registered stage {ID} to server registry, updating at {Next}",
+                    _config.ID, Context?.TickNext
                 );
+                return;
             }
-        });
 
-        return Task.CompletedTask;
+            _logger.LogDebug(
+                "Updated stage {ID} in server registry, updating at {Next}",
+                _config.ID, Context?.TickNext
+            );
+            return;
+        }
+
+        if (IsRegistered)
+        {
+            _logger.LogWarning(
+                "Failed to update stage {ID} in server registry due to {Reason} retrying at {Next}",
+                _config.ID, response.Result, Context?.TickNext
+            );
+
+            if (response.Result == ServerResult.FailedNotRegistered)
+                IsRegistered = false;
+            return;
+        }
+
+        _logger.LogWarning(
+            "Failed to register stage {ID} to server registry due to {Reason} retrying at {Next}",
+            _config.ID, response.Result, Context?.TickNext
+        );
     }
 }
