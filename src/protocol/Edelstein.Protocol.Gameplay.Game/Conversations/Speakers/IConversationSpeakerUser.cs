@@ -1,4 +1,4 @@
-﻿using Edelstein.Protocol.Gameplay.Game.Conversations.Speakers.Facades;
+using Edelstein.Protocol.Gameplay.Game.Conversations.Speakers.Facades;
 using Edelstein.Protocol.Utilities.Spatial;
 
 namespace Edelstein.Protocol.Gameplay.Game.Conversations.Speakers;
@@ -60,4 +60,20 @@ public interface IConversationSpeakerUser : IConversationSpeaker
     
     void EffectFieldScreen(string path);
     void EffectFieldTremble(bool isHeavyAndShort, int delay);
+
+    // --- Guild ---
+
+    bool HasGuild { get; }
+    int GuildGrade { get; }
+    string GuildName { get; }
+    int GuildMemberCount { get; }
+    int GuildMaxMemberNum { get; }
+    short GuildMark { get; }
+    bool IsPartyLeader { get; }
+
+    void ShowGuildNameInput();
+    void ShowGuildMarkInput();
+    bool DisbandGuild();
+    bool ExpandGuild();
+    bool DeleteGuildMark();
 }

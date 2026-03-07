@@ -1,4 +1,4 @@
-namespace Edelstein.Common.Services.Social;
+﻿namespace Edelstein.Common.Services.Social;
 
 /// <summary>
 /// Server-side configuration knobs for the guild system.
@@ -38,4 +38,33 @@ public class GuildOptions
     /// How long (in minutes) a pending guild invitation remains valid before it expires.
     /// </summary>
     public int InviteExpiryMinutes { get; set; } = 3;
+
+    /// <summary>
+    /// Hard cap on guild member capacity; expansions cannot exceed this value.
+    /// V95 retail value: 200.
+    /// </summary>
+    public int MaxMemberNum { get; set; } = 200;
+
+    /// <summary>
+    /// Number of member slots added per capacity expansion (paid via <see cref="ExpandFee"/>).
+    /// </summary>
+    public int ExpandStep { get; set; } = 5;
+
+    /// <summary>
+    /// Meso fee deducted from the guild master for each capacity expansion.
+    /// V95 retail value: 500 000.
+    /// </summary>
+    public int ExpandFee { get; set; } = 500_000;
+
+    /// <summary>
+    /// Meso fee deducted from the guild master to create a guild emblem.
+    /// V95 retail value: 5 000 000.
+    /// </summary>
+    public int CreateEmblemFee { get; set; } = 5_000_000;
+
+    /// <summary>
+    /// Meso fee deducted from the guild master to delete the guild emblem.
+    /// V95 retail value: 1 000 000.
+    /// </summary>
+    public int DeleteEmblemFee { get; set; } = 1_000_000;
 }

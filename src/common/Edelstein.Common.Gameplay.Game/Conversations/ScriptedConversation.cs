@@ -19,7 +19,7 @@ public class ScriptedConversation : INamedConversation
     public Task Start(IConversationContext ctx, IConversationSpeaker self, IConversationSpeaker target) =>
         _script.Run(new Dictionary<string, object>
         {
-            ["Self"] = self,
-            ["Target"] = target
+            ["self"] = self,
+            ["target"] = target
         });
 }

@@ -70,10 +70,11 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
     private static HashSet<int>? t_seenIdsPool;
 
     private readonly ITemplateManager<TTemplate> _templates;
-    private readonly UkkonenTrie<int> _trie;
+    private UkkonenTrie<int>? _trie;
     private readonly SemaphoreSlim _indexLock = new(1, 1);
+    private readonly object _trieBuildSync = new();
     private static readonly int TrieBuildConcurrency = Math.Min(MaxConcurrentTrieBuilds, Environment.ProcessorCount);
-    private static readonly SemaphoreSlim TrieBuildLock = new(TrieBuildConcurrency, TrieBuildConcurrency);
+    private static readonly SemaphoreSlim TrieBuildThrottle = new(TrieBuildConcurrency, TrieBuildConcurrency);
 
     private readonly record struct IndexEntry(int ID, string SearchString, TemplateCommandIndexKind Kind);
     private readonly record struct MatchResult(int ID, string? DisplayOverride);
@@ -128,12 +129,10 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
     private IndexingStatus? _indexingStatus;
     private int _isIndexed; // 0 = not indexed, 1 = indexed (using int for Interlocked)
     private int _isTrieBuilt; // 0 = not built, 1 = built (using int for Interlocked)
+    private Task? _trieBuildTask;
 
     protected AbstractTemplateCommand(ITemplateManager<TTemplate> templates)
-    {
-        _templates = templates;
-        _trie = new UkkonenTrie<int>(TrieMinQueryLength);
-    }
+        => _templates = templates;
 
     protected abstract Task<IReadOnlyList<TemplateCommandIndex>> Indices();
     protected abstract Task Execute(IFieldUser user, TTemplate template, TArgs args);
@@ -172,6 +171,7 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
 
             Volatile.Write(ref _isIndexed, 1);
             status.SetCompleted(Name, count);
+            StartTrieBuild();
         }
         finally
         {
@@ -179,15 +179,25 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
         }
     }
 
-    /// <summary>Lazily builds the trie on first search.</summary>
-    private async Task EnsureTrieBuilt()
+    private void StartTrieBuild()
     {
-        if (Volatile.Read(ref _isTrieBuilt) == 1 || _trieDisabled) return;
+        if (Volatile.Read(ref _isIndexed) != 1 || Volatile.Read(ref _isTrieBuilt) == 1 || _trieDisabled) return;
 
-        await TrieBuildLock.WaitAsync().ConfigureAwait(false);
+        lock (_trieBuildSync)
+        {
+            if (Volatile.Read(ref _isIndexed) != 1 || Volatile.Read(ref _isTrieBuilt) == 1 || _trieDisabled || _trieBuildTask != null) return;
+
+            _trieBuildTask = Task.Run(BuildTrieAsync);
+        }
+    }
+
+    /// <summary>Builds a trie snapshot in the background and atomically publishes it when complete.</summary>
+    private async Task BuildTrieAsync()
+    {
+        await TrieBuildThrottle.WaitAsync().ConfigureAwait(false);
         try
         {
-            if (Volatile.Read(ref _isTrieBuilt) == 1 || _trieDisabled) return;
+            if (Volatile.Read(ref _isIndexed) != 1 || Volatile.Read(ref _isTrieBuilt) == 1 || _trieDisabled) return;
 
             _indexingStatus?.SetBuilding(Name, _linearEntries.Length);
 
@@ -203,6 +213,8 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
             var buildStartTick = Environment.TickCount64;
             var count = _linearEntries.Length;
             var uniqueKeySet = new HashSet<string>(Math.Min(count, 32_768), StringComparer.Ordinal);
+            var trie = new UkkonenTrie<int>(TrieMinQueryLength);
+            var trieBuildFailed = false;
 
             for (var i = 0; i < count; i++)
             {
@@ -234,26 +246,36 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
 
                 try
                 {
-                    _trie.Add(keyLower, entry.ID);
+                    trie.Add(keyLower, entry.ID);
                     addedKeys++;
                 }
                 catch (ArgumentOutOfRangeException)
                 {
                     addOutOfRangeExceptions++;
+                    trieBuildFailed = true;
+                    break;
                 }
                 catch (ArgumentException)
                 {
                     addArgumentExceptions++;
+                    trieBuildFailed = true;
+                    break;
                 }
                 catch (NullReferenceException)
                 {
                     addNullReferenceExceptions++;
+                    trieBuildFailed = true;
+                    break;
                 }
             }
 
             var buildElapsedMs = Environment.TickCount64 - buildStartTick;
 
-            _trieEnabled = addedKeys > 0;
+            _trieEnabled = !trieBuildFailed && addedKeys > 0;
+            if (_trieEnabled)
+                Volatile.Write(ref _trie, trie);
+            else if (trieBuildFailed)
+                _trieDisabled = true;
 
             _indexingStatus?.SetTrieTelemetry(new TrieIndexTelemetry(
                 CommandName: Name,
@@ -273,9 +295,16 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
 
             Volatile.Write(ref _isTrieBuilt, 1);
         }
+        catch
+        {
+            _trieEnabled = false;
+            _trieDisabled = true;
+            Volatile.Write(ref _isTrieBuilt, 1);
+        }
         finally
         {
-            TrieBuildLock.Release();
+            _indexingStatus?.SetCompleted(Name, _linearEntries.Length);
+            TrieBuildThrottle.Release();
         }
     }
 
@@ -331,31 +360,34 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
 
         if (canUseTrie)
         {
-            await EnsureTrieBuilt();
-            var trieSearchSucceeded = true;
+            StartTrieBuild();
+            var trieSearchSucceeded = false;
 
-            if (_trieEnabled)
+            if (Volatile.Read(ref _isTrieBuilt) == 1 && _trieEnabled)
             {
+                var trie = Volatile.Read(ref _trie);
+
                 try
                 {
                     var searchLower = ToLowerStackAlloc(normalizedSearch);
 
-                    foreach (var id in _trie.Retrieve(searchLower))
+                    if (trie != null)
                     {
-                        if (seenIds.Add(id))
-                            results.Add(new MatchResult(id, null));
+                        foreach (var id in trie.Retrieve(searchLower))
+                        {
+                            if (seenIds.Add(id))
+                                results.Add(new MatchResult(id, null));
+                        }
+
+                        trieSearchSucceeded = true;
                     }
                 }
                 catch
                 {
-                    trieSearchSucceeded = false;
                     _trieDisabled = true;
+                    _trieEnabled = false;
                     _indexingStatus?.IncrementTrieRetrieveException(Name);
                 }
-            }
-            else
-            {
-                trieSearchSucceeded = false;
             }
 
             // Trie success: only search Description entries; Default entries already in trie

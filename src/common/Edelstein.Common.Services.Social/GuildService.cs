@@ -5,6 +5,7 @@ using Edelstein.Protocol.Services.Social;
 using Edelstein.Protocol.Services.Social.Contracts;
 using Foundatio.Messaging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Edelstein.Common.Services.Social;
 
@@ -14,17 +15,20 @@ public class GuildService : IGuildService
     private readonly IDbContextFactory<SocialDbContext> _dbFactory;
     private readonly IMessageBus _messaging;
     private readonly ICharacterRepository _characterRepository;
+    private readonly ILogger<GuildService> _logger;
 
     public GuildService(
         GuildOptions options,
         IDbContextFactory<SocialDbContext> dbFactory,
         IMessageBus messaging,
-        ICharacterRepository characterRepository)
+        ICharacterRepository characterRepository,
+        ILogger<GuildService> logger)
     {
         _options = options;
         _dbFactory = dbFactory;
         _messaging = messaging;
         _characterRepository = characterRepository;
+        _logger = logger;
     }
 
 
@@ -37,6 +41,7 @@ public class GuildService : IGuildService
                 .ThenInclude(g => g.Members)
             .Include(m => m.Guild)
                 .ThenInclude(g => g.Skills)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(m => m.CharacterID == characterID);
 
         return entity == null ? null : new GuildMembership(entity);
@@ -51,8 +56,9 @@ public class GuildService : IGuildService
             var membership = await LoadMembershipAsync(db, request.CharacterID);
             return new GuildLoadResponse(GuildResult.Success, membership);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Load failed for character {CharacterID}", request.CharacterID);
             return new GuildLoadResponse(GuildResult.FailedUnknown);
         }
     }
@@ -73,8 +79,9 @@ public class GuildService : IGuildService
                 ? GuildResult.FailedNameTaken
                 : GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "CheckName failed for name '{GuildName}'", request.GuildName);
             return new GuildNameCheckResponse(GuildResult.FailedUnknown);
         }
     }
@@ -125,8 +132,9 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Create failed for character {CharacterID} guild '{GuildName}'", request.CharacterID, request.GuildName);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -153,8 +161,9 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Disband failed for guild {GuildID} by character {CharacterID}", request.GuildID, request.CharacterID);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -227,8 +236,9 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Invite failed for guild {GuildID} inviter {InviterID} target '{CharacterName}'", request.GuildID, request.InviterID, request.CharacterName);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -288,8 +298,9 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "InviteAccept failed for character {CharacterID} inviter {InviterID}", request.CharacterID, request.InviterID);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -318,8 +329,9 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "InviteReject failed for character {CharacterID}", request.CharacterID);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -358,8 +370,9 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Leave failed for guild {GuildID} character {CharacterID}", request.GuildID, request.CharacterID);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -400,8 +413,9 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Kick failed for guild {GuildID} master {MasterID} target {CharacterID}", request.GuildID, request.MasterID, request.CharacterID);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -426,8 +440,9 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "SetNotice failed for guild {GuildID}", request.GuildID);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -456,8 +471,9 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "SetGradeNames failed for guild {GuildID}", request.GuildID);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -498,8 +514,9 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "SetMemberGrade failed for guild {GuildID} character {CharacterID} grade {Grade}", request.GuildID, request.CharacterID, request.Grade);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -530,8 +547,43 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "SetMark failed for guild {GuildID}", request.GuildID);
+            return new GuildResponse(GuildResult.FailedUnknown);
+        }
+    }
+
+    public async Task<GuildResponse> IncMaxMemberNum(GuildIncMaxMemberRequest request)
+    {
+        try
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var guild = await db.Guilds
+                .FirstOrDefaultAsync(g =>
+                    g.ID == request.GuildID &&
+                    g.MasterCharacterID == request.CharacterID);
+
+            if (guild == null)
+                return new GuildResponse(GuildResult.FailedNotMaster);
+
+            if (guild.MaxMemberNum >= _options.MaxMemberNum)
+                return new GuildResponse(GuildResult.FailedUnknown);
+
+            var newMax = Math.Min(guild.MaxMemberNum + _options.ExpandStep, _options.MaxMemberNum);
+
+            await db.Guilds
+                .Where(g => g.ID == request.GuildID)
+                .ExecuteUpdateAsync(g => g.SetProperty(e => e.MaxMemberNum, newMax));
+
+            await _messaging.PublishAsync(new NotifyGuildMaxMemberChanged(request.GuildID, newMax));
+
+            return new GuildResponse(GuildResult.Success);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "IncMaxMemberNum failed for guild {GuildID} character {CharacterID}", request.GuildID, request.CharacterID);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -567,8 +619,9 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "UpdateLevelOrJob failed for guild {GuildID} character {CharacterID}", request.GuildID, request.CharacterID);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -592,8 +645,9 @@ public class GuildService : IGuildService
 
             return new GuildResponse(GuildResult.Success);
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "UpdateChannel failed for guild {GuildID} character {CharacterID} channel {ChannelID}", request.GuildID, request.CharacterID, request.ChannelID);
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }

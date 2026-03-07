@@ -55,6 +55,8 @@ public class FieldOnPacketGuildNameCheckRequestPlug : IPipelinePlug<FieldOnPacke
             return;
         }
 
+        // TODO: later propably move to a plugin as configurable override, for v95 6 members of pt are required
+        // however later that requirement is reduced to 1 anyways
         // Step 2 — enforce the required party size (skip when RequiredPartySize <= 1
         // so that solo creation works when the config is set to 1).
         if (_options.RequiredPartySize > 1)

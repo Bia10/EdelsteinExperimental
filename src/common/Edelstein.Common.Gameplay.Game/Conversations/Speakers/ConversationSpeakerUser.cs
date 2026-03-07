@@ -4,11 +4,15 @@ using Edelstein.Common.Gameplay.Game.Objects.User.Effects;
 using Edelstein.Common.Gameplay.Game.Objects.User.Effects.Field;
 using Edelstein.Common.Gameplay.Game.Objects.User.Messages;
 using Edelstein.Common.Gameplay.Game.Rates;
+using Edelstein.Common.Gameplay.Handling;
+using Edelstein.Common.Gameplay.Social;
+using Edelstein.Common.Utilities.Packets;
 using Edelstein.Protocol.Gameplay.Game.Conversations;
 using Edelstein.Protocol.Gameplay.Game.Conversations.Speakers;
 using Edelstein.Protocol.Gameplay.Game.Conversations.Speakers.Facades;
 using Edelstein.Protocol.Gameplay.Game.Objects.User;
 using Edelstein.Protocol.Gameplay.Game.Rates;
+using Edelstein.Protocol.Services.Social.Contracts;
 using Edelstein.Protocol.Utilities.Spatial;
 
 namespace Edelstein.Common.Gameplay.Game.Conversations.Speakers;
@@ -202,7 +206,59 @@ public class ConversationSpeakerUser : ConversationSpeaker, IConversationSpeaker
 
     public void EffectFieldScreen(string path)
         => _user.EffectField(new ScreenFieldEffect(path));
-    
+
     public void EffectFieldTremble(bool isHeavyAndShort, int delay)
         => _user.EffectField(new TrembleFieldEffect(isHeavyAndShort, delay));
+
+    // --- Guild ---
+
+    public bool HasGuild => _user.StageUser.Guild != null;
+    public int GuildGrade => _user.StageUser.Guild?.Grade ?? 0;
+    public string GuildName => _user.StageUser.Guild?.Name ?? string.Empty;
+    public int GuildMemberCount => _user.StageUser.Guild?.Members.Count ?? 0;
+    public int GuildMaxMemberNum => _user.StageUser.Guild?.MaxMemberNum ?? 0;
+    public short GuildMark => _user.StageUser.Guild?.Mark ?? 0;
+    public bool IsPartyLeader => _user.StageUser.Party?.BossCharacterID == _user.Character.ID;
+
+    public void ShowGuildNameInput()
+    {
+        using var packet = new PacketWriter(PacketSendOperations.GuildResult);
+        packet.WriteByte((byte)GuildResultOperations.InputGuildName);
+        _ = _user.Dispatch(packet.Build());
+    }
+
+    public void ShowGuildMarkInput()
+    {
+        if (_user.StageUser.Guild == null) return;
+        using var packet = new PacketWriter(PacketSendOperations.GuildResult);
+        packet.WriteByte((byte)GuildResultOperations.SetGuildMark);
+        _ = _user.Dispatch(packet.Build());
+    }
+
+    public bool DisbandGuild()
+    {
+        var guild = _user.StageUser.Guild;
+        if (guild == null || guild.Grade != 1) return false;
+        var response = _user.StageUser.Context.Services.Guild.Disband(
+            new GuildDisbandRequest(guild.ID, _user.Character.ID)).Result;
+        return response.Result == GuildResult.Success;
+    }
+
+    public bool ExpandGuild()
+    {
+        var guild = _user.StageUser.Guild;
+        if (guild == null || guild.Grade != 1) return false;
+        var response = _user.StageUser.Context.Services.Guild.IncMaxMemberNum(
+            new GuildIncMaxMemberRequest(guild.ID, _user.Character.ID)).Result;
+        return response.Result == GuildResult.Success;
+    }
+
+    public bool DeleteGuildMark()
+    {
+        var guild = _user.StageUser.Guild;
+        if (guild == null || guild.Grade != 1) return false;
+        var response = _user.StageUser.Context.Services.Guild.SetMark(
+            new GuildSetMarkRequest(guild.ID, _user.Character.ID, 0, 0, 0, 0)).Result;
+        return response.Result == GuildResult.Success;
+    }
 }

@@ -46,13 +46,16 @@ public class CleanupRegistryBootstrap : IBootstrap
             .ToHashSet();
         var entries = await db.Servers
             .ToListAsync();
+
+        // Remove entries that are expired OR match current stages (to allow fresh registration)  
         var removable = entries
-            .Where(s => s.DateExpire < now || stageIDs.Contains(s.ID) || s switch
+            .Where(s => s.DateExpire < now || stageIDs.Contains(s.ID))
+            .Where(s => s switch
             {
-                ServerGameEntity game => gameStages.Contains((game.WorldID, game.ChannelID)),
-                ServerShopEntity shop => shopStages.Contains(shop.WorldID),
-                ServerTradeEntity trade => tradeStages.Contains(trade.WorldID),
-                _ => false
+                ServerGameEntity game => !gameStages.Contains((game.WorldID, game.ChannelID)) || stageIDs.Contains(s.ID),
+                ServerShopEntity shop => !shopStages.Contains(shop.WorldID) || stageIDs.Contains(s.ID),
+                ServerTradeEntity trade => !tradeStages.Contains(trade.WorldID) || stageIDs.Contains(s.ID),
+                _ => stageIDs.Contains(s.ID)
             })
             .DistinctBy(static s => s.ID)
             .ToList();
@@ -62,6 +65,10 @@ public class CleanupRegistryBootstrap : IBootstrap
             db.Servers.RemoveRange(removable);
             await db.SaveChangesAsync();
             _logger.LogInformation("Cleaned up {Count} registry entries on init", removable.Count);
+        }
+        else
+        {
+            _logger.LogInformation("No registry entries found for cleanup");
         }
     }
 

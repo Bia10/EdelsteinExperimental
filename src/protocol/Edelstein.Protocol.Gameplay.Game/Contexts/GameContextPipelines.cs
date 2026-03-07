@@ -71,6 +71,7 @@ public record GameContextPipelines(
     IPipeline<NotifyGuildGradeNamesChanged> NotifyGuildGradeNamesChanged,
     IPipeline<NotifyGuildMemberGradeChanged> NotifyGuildMemberGradeChanged,
     IPipeline<NotifyGuildMarkChanged> NotifyGuildMarkChanged,
+    IPipeline<NotifyGuildMaxMemberChanged> NotifyGuildMaxMemberChanged,
     IPipeline<NotifyGuildSkillUpdated> NotifyGuildSkillUpdated,
 
     IPipeline<FieldOnPacketGuildNameCheckRequest> FieldOnPacketGuildNameCheckRequest,

@@ -40,6 +40,7 @@ public interface IGuildService
     Task<GuildResponse> SetMemberGrade(GuildSetMemberGradeRequest request);
     Task<GuildResponse> SetMark(GuildSetMarkRequest request);
 
+    Task<GuildResponse> IncMaxMemberNum(GuildIncMaxMemberRequest request);
 
     Task<GuildResponse> UpdateLevelOrJob(GuildUpdateLevelOrJobRequest request);
 
