@@ -1,4 +1,5 @@
 ﻿using Edelstein.Common.Gameplay.Handling;
+using Edelstein.Common.Gameplay.Social;
 using Edelstein.Common.Utilities.Packets;
 using Edelstein.Protocol.Gameplay.Contracts;
 using Edelstein.Protocol.Gameplay.Game;
@@ -33,10 +34,7 @@ public class NotifyGuildMemberInvitedPlug : IPipelinePlug<NotifyGuildMemberInvit
         var inviterLevel = inviter?.Character?.Level ?? 0;
 
         using var packet = new PacketWriter(PacketSendOperations.GuildResult);
-        // Sub-opcode 0x05 is the raw GuildInvite dispatch value from the V95
-        // OnGuildResult switch (case 5). It has no named entry in
-        // GuildResultOperations because that enum starts at LoadGuild_Done(0x1C).
-        packet.WriteByte(0x05);
+        packet.WriteByte((byte)GuildResultOperations.GuildInvite);
         packet.WriteString(message.InviterName);
         packet.WriteInt(inviterJob);
         packet.WriteInt(inviterLevel);

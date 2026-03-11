@@ -25,7 +25,11 @@ public class NotifyGuildInviteRejectedPlug : IPipelinePlug<NotifyGuildInviteReje
         if (inviter == null) return;
 
         using var packet = new PacketWriter(PacketSendOperations.GuildResult);
-        packet.WriteByte((byte)GuildResultOperations.InviteGuild_Rejected);
+        // 0x38 (AlreadyInvited) → inviter sees chat 0xACF "%s refused" (target was already in guild)
+        // 0x39 (Rejected)       → inviter sees chat 0x15C "%s denied" (explicit decline)
+        packet.WriteByte(message.IsAlreadyInvited
+            ? (byte)GuildResultOperations.InviteGuild_AlreadyInvited
+            : (byte)GuildResultOperations.InviteGuild_Rejected);
         packet.WriteString(message.RejecterName);
         _ = inviter.Dispatch(packet.Build());
     }

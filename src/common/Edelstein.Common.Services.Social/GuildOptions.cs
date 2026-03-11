@@ -15,12 +15,12 @@ public class GuildOptions
     /// <summary>
     /// Minimum number of characters in a guild name (inclusive).
     /// </summary>
-    public int MinNameLength { get; set; } = 2;
+    public int MinNameLength { get; set; } = 4; // DB_GUILDNAME_MIN
 
     /// <summary>
     /// Maximum number of characters in a guild name (inclusive).
     /// </summary>
-    public int MaxNameLength { get; set; } = 12;
+    public int MaxNameLength { get; set; } = 14; // DB_GUILDNAME_MAX
 
     /// <summary>
     /// Number of party members (including the leader) required to found a guild.
@@ -43,7 +43,7 @@ public class GuildOptions
     /// Hard cap on guild member capacity; expansions cannot exceed this value.
     /// V95 retail value: 200.
     /// </summary>
-    public int MaxMemberNum { get; set; } = 200;
+    public int MaxMemberNum { get; set; } = 100; // DB_GUILDMEMBER_MAX
 
     /// <summary>
     /// Number of member slots added per capacity expansion (paid via <see cref="ExpandFee"/>).

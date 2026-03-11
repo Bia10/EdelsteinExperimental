@@ -1,4 +1,4 @@
-using Edelstein.Protocol.Gameplay.Game.Contracts;
+﻿using Edelstein.Protocol.Gameplay.Game.Contracts;
 using Edelstein.Protocol.Services.Social.Contracts;
 using Edelstein.Protocol.Utilities.Pipelines;
 
@@ -21,7 +21,8 @@ public class FieldOnPacketGuildRejectResultPlug : IPipelinePlug<FieldOnPacketGui
             new GuildInviteRejectRequest(
                 0,
                 message.User.Character.ID,
-                message.User.Character.Name
+                message.User.Character.Name,
+                message.IsAlreadyInvited
             ));
     }
 }

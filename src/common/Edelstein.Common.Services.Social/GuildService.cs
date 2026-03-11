@@ -325,7 +325,8 @@ public class GuildService : IGuildService
             // Notify the inviter that their invite was declined.
             await _messaging.PublishAsync(new NotifyGuildInviteRejected(
                 inviterID,
-                request.CharacterName));
+                request.CharacterName,
+                request.IsAlreadyInvited));
 
             return new GuildResponse(GuildResult.Success);
         }
@@ -386,12 +387,13 @@ public class GuildService : IGuildService
             if (request.MasterID == request.CharacterID)
                 return new GuildResponse(GuildResult.FailedSelf);
 
-            var guild = await db.Guilds
-                .FirstOrDefaultAsync(g =>
-                    g.ID == request.GuildID &&
-                    g.MasterCharacterID == request.MasterID);
+            var requester = await db.GuildMembers
+                .FirstOrDefaultAsync(m =>
+                    m.GuildID == request.GuildID &&
+                    m.CharacterID == request.MasterID &&
+                    m.Grade <= 2);
 
-            if (guild == null)
+            if (requester == null)
                 return new GuildResponse(GuildResult.FailedNotMaster);
 
             var target = await db.GuildMembers
@@ -401,6 +403,10 @@ public class GuildService : IGuildService
 
             if (target == null)
                 return new GuildResponse(GuildResult.FailedNotInGuild);
+
+            // Jr. Master (grade 2) may not kick the Master or other Jr. Masters.
+            if (requester.Grade == 2 && target.Grade <= 2)
+                return new GuildResponse(GuildResult.FailedNotMaster);
 
             db.GuildMembers.Remove(target);
             await db.SaveChangesAsync();
@@ -427,6 +433,12 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
+            if (!await db.GuildMembers.AnyAsync(m =>
+                    m.GuildID == request.GuildID &&
+                    m.CharacterID == request.CharacterID &&
+                    m.Grade <= 2))
+                return new GuildResponse(GuildResult.FailedNotMaster);
+
             var updated = await db.Guilds
                 .Where(g => g.ID == request.GuildID)
                 .ExecuteUpdateAsync(g => g.SetProperty(e => e.Notice, request.Notice));
@@ -452,6 +464,12 @@ public class GuildService : IGuildService
         try
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
+
+            if (!await db.GuildMembers.AnyAsync(m =>
+                    m.GuildID == request.GuildID &&
+                    m.CharacterID == request.CharacterID &&
+                    m.Grade == 1))
+                return new GuildResponse(GuildResult.FailedNotMaster);
 
             var updated = await db.Guilds
                 .Where(g => g.ID == request.GuildID)
@@ -526,6 +544,12 @@ public class GuildService : IGuildService
         try
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
+
+            if (!await db.GuildMembers.AnyAsync(m =>
+                    m.GuildID == request.GuildID &&
+                    m.CharacterID == request.CharacterID &&
+                    m.Grade == 1))
+                return new GuildResponse(GuildResult.FailedNotMaster);
 
             var updated = await db.Guilds
                 .Where(g => g.ID == request.GuildID)

@@ -1,4 +1,4 @@
-using Edelstein.Common.Gameplay.Handling;
+﻿using Edelstein.Common.Gameplay.Handling;
 using Edelstein.Common.Gameplay.Social;
 using Edelstein.Common.Utilities.Packets;
 using Edelstein.Protocol.Gameplay.Contracts;
@@ -27,6 +27,7 @@ public class NotifyGuildCreatedPlug : IPipelinePlug<NotifyGuildCreated>
 
         using var packet = new PacketWriter(PacketSendOperations.GuildResult);
         packet.WriteByte((byte)GuildResultOperations.CreateNewGuild_Done);
+        packet.WriteByte(0); // hasData = 0 → full GUILDDATA decode follows (ref §11 case 28)
         packet.WriteGuildData(message.Guild);
         _ = user.Dispatch(packet.Build());
     }

@@ -80,6 +80,7 @@ public static class GameStageUserExtensions
         {
             using var packet = new PacketWriter(PacketSendOperations.GuildResult);
             packet.WriteByte((byte)GuildResultOperations.LoadGuild_Done);
+            packet.WriteByte(0); // hasData = 0 → full GUILDDATA decode follows (ref §11 case 28)
             packet.WriteGuildData(user.Guild);
             await user.Dispatch(packet.Build());
         }

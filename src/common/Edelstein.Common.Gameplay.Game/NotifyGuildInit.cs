@@ -1,4 +1,4 @@
-using Edelstein.Protocol.Gameplay.Contracts;
+﻿using Edelstein.Protocol.Gameplay.Contracts;
 using Edelstein.Protocol.Utilities.Pipelines;
 using Foundatio.Messaging;
 
@@ -26,6 +26,7 @@ public class NotifyGuildInit : IPipelinePlug<StageStart>
     private readonly IPipeline<NotifyGuildMemberGradeChanged> _notifyGuildMemberGradeChanged;
     private readonly IPipeline<NotifyGuildMarkChanged> _notifyGuildMarkChanged;
     private readonly IPipeline<NotifyGuildSkillUpdated> _notifyGuildSkillUpdated;
+    private readonly IPipeline<NotifyGuildMaxMemberChanged> _notifyGuildMaxMemberChanged;
 
     public NotifyGuildInit(
         IMessageBus messaging,
@@ -42,7 +43,8 @@ public class NotifyGuildInit : IPipelinePlug<StageStart>
         IPipeline<NotifyGuildGradeNamesChanged> notifyGuildGradeNamesChanged,
         IPipeline<NotifyGuildMemberGradeChanged> notifyGuildMemberGradeChanged,
         IPipeline<NotifyGuildMarkChanged> notifyGuildMarkChanged,
-        IPipeline<NotifyGuildSkillUpdated> notifyGuildSkillUpdated
+        IPipeline<NotifyGuildSkillUpdated> notifyGuildSkillUpdated,
+        IPipeline<NotifyGuildMaxMemberChanged> notifyGuildMaxMemberChanged
     )
     {
         _messaging = messaging;
@@ -60,6 +62,7 @@ public class NotifyGuildInit : IPipelinePlug<StageStart>
         _notifyGuildMemberGradeChanged = notifyGuildMemberGradeChanged;
         _notifyGuildMarkChanged = notifyGuildMarkChanged;
         _notifyGuildSkillUpdated = notifyGuildSkillUpdated;
+        _notifyGuildMaxMemberChanged = notifyGuildMaxMemberChanged;
     }
 
     public async Task Handle(IPipelineContext ctx, StageStart message)
@@ -105,6 +108,9 @@ public class NotifyGuildInit : IPipelinePlug<StageStart>
         );
         await _messaging.SubscribeAsync<NotifyGuildSkillUpdated>(
             e => _notifyGuildSkillUpdated.Process(e)
+        );
+        await _messaging.SubscribeAsync<NotifyGuildMaxMemberChanged>(
+            e => _notifyGuildMaxMemberChanged.Process(e)
         );
     }
 }
