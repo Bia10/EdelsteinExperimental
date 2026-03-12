@@ -20,6 +20,8 @@ public class SocialDbContext : DbContext
     public DbSet<GuildMemberEntity> GuildMembers { get; set; }
     public DbSet<GuildSkillEntity> GuildSkills { get; set; }
     public DbSet<GuildInvitationEntity> GuildInvitations { get; set; }
+    public DbSet<GuildBBSPostEntity> GuildBBSPosts { get; set; }
+    public DbSet<GuildBBSCommentEntity> GuildBBSComments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
         => builder.ApplyConfigurationsFromAssembly(typeof(SocialDbContext).Assembly);

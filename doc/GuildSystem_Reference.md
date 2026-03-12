@@ -6,6 +6,58 @@
 
 ---
 
+## RE Research Requests
+
+> All items resolved. See Section 13 for full BBS packet layouts.
+
+### BSS-1 [DONE] — `CP_GuildBBS (0xB3)`: client→server sub-opcode enumeration
+
+**Answer:** Six sub-opcodes (0–5). See Section 13 for the complete table.
+
+---
+
+### BSS-2 [DONE] — `LP_GuildBBS (0x3B)` case 6: `OnLoadListResult` packet layout
+
+**Answer:** Confirmed from `CUIGuildBBS::OnLoadListResult` at `game_pseudocode.c:803710`. See Section 13.
+
+---
+
+### BSS-3 [DONE] — `LP_GuildBBS (0x3B)` case 7: `OnViewEntryResult` packet layout
+
+**Answer:** Confirmed from `CUIGuildBBS::OnViewEntryResult` at `game_pseudocode.c:805097`. See Section 13.
+
+---
+
+### BSS-4 [DONE] — `LP_GuildBBS (0x3B)` case 8: `OnEntryNotFound` packet layout
+
+**Answer:** No payload fields at all. Server sends only the sub-opcode byte (8). `CUIGuildBBS::OnEntryNotFound(void)` takes no `CInPacket` parameter — it simply shows StringPool 0xEC7 and clears the current entry. See Section 13.
+
+---
+
+### BSS-5 [DONE] — `CP_RequestGuildBoardAuthKey (0x121)` payload & auth key response format
+
+**Answer: `CP_RequestGuildBoardAuthKey (0x121 = 289)` is a dead opcode** — never sent by the V95 client. `COutPacket(289)` does not appear anywhere in `game_pseudocode.c`. The server pushes the auth key proactively via case 80 (`GuildRes_Authkey_Update`), decoded as a **narrow char string** then converted to UTF-16 for storage in `m_sGuildBoardAuthkey`. The timestamp `m_dwGuildBoardAuthkeyLastUpdated` records receipt time; no client-side request is involved.
+
+---
+
+### BSS-6 [DONE] — `CUIGuildBBS` struct and UI state machine
+
+**Answer:** `CUIGuildBBS` (`game_types.h:32396`) and `CWndGuildBoard` (`game_types.h:47691`) are **completely separate classes** with no shared state. `CUIGuildBBS` is a fully in-game BBS (no web view). Guild tab button ID `0x7FA` calls `CWvsContext::UI_Toggle(0x27, -1)` to open `CUIGuildBBS`. `CWndGuildBoard` is a `CWebWnd` (IE embedded). There is no `nMaskPageType` / `nCodeBoard` in `CUIGuildBBS` — those fields belong exclusively to `CWndGuildBoard`. See Section 13.
+
+---
+
+### BSS-7 [DONE] — Guild Skill activation: `GuildReg_SetSkill (0x1B)` client payload
+
+**Answer:** Dead opcode — see Section 10 and resolved in `GuildSystem_Requests.md R-006`.
+
+---
+
+### BSS-8 [DONE] — `GuildRes_GuildSkillResult (case 79)` full decode
+
+**Answer:** Full server payload: `sub-opcode(1) + nChannel(1) + nResult(4)`. The "temp stat" set is `CTemporaryStatView::SetTemporary(nType=3, nID=1, tLeft=0x7FFFFFFF)` — this is **not** a `CharacterTemporaryStat`/`SecondaryStat` bit; it is a display-category-3 UI overlay entry in the buff bar specific to guild skill channel notifications. Results: 0=ResetTemporary; 1=activated; 2=already active; ≥3=`nResult-1` remaining. See Section 11, case 79.
+
+---
+
 ## Table of Contents
 
 1. [Constants & Limits](#1-constants--limits)
@@ -39,8 +91,10 @@ From `game_types.h`:
 | `DB_GUILDNAME_MAX` | 0x0E | 14 | Max guild name length (chars) |
 | `DB_GUILDNAME_MIN` | 0x04 | 4 | Min guild name length (chars) |
 | `DB_GUILDGRADENAME_MAX` | 0x0A | 10 | Max grade name length (chars) |
-| `DB_GUILDNOTICE_MAX` | 0x64 | 100 | Max notice length (chars) |
+| `DB_GUILDNOTICE_MAX` | 0x64 | 100 | Max **bulletin notice** text length (`m_sGuildNotice` / `SetGuildNotice`) — **not** BBS article content |
 | `DB_ALLIANCE_MAX_MEMBER` | 0x05 | 5 | Max guilds per alliance |
+
+> **No BBS named constants exist.** There are no `DB_GUILDBBS_*`, `BBS_*`, `BOARD_*`, or `ARTICLE_*` symbols anywhere in `game_types.h`. BBS limits are either inferred from UI setup code (see §13 BBS UI Limits) or enforced server-side only.
 | `GUILD_GRADEMAX` | 0x05 | 5 | Maximum grade tiers |
 | `GUILD_INIT_REQUIREDMEMBER` | 0x06 | 6 | Party members required to create guild |
 
@@ -542,10 +596,10 @@ void __thiscall ALLIANCEDATA::Decode(ALLIANCEDATA *this, CInPacket *iPacket)
     for (int i = 0; i < 5; i++)
         CInPacket::DecodeStr(iPacket, &this->asGradeName[i]);
     int nGuildCount = CInPacket::Decode1(iPacket);
-    for (int i = 0; i < nGuildCount; i++) {
-        unsigned int dwGuildID = CInPacket::Decode4(iPacket);
-        ZArray<unsigned long>::InsertBefore(&this->adwGuildID, -1) = dwGuildID;
-    }
+    // ⚠ bulk read — NOT individual Decode4s:
+    ZArray<unsigned long>::_Alloc(&this->adwGuildID, nGuildCount);
+    if (nGuildCount > 0)
+        CInPacket::DecodeBuffer(iPacket, this->adwGuildID.a, 4 * nGuildCount);
     this->nMaxMemberNum = CInPacket::Decode4(iPacket);
     CInPacket::DecodeStr(iPacket, &this->sNotice);
 }
@@ -1132,9 +1186,9 @@ Guild **response** packets use header **150** (`CP_GuildResult`):
 |------|------|----------|
 | 1 | InputGuildName | Prompts guild name input (create flow) |
 | 3 | CreateGuildAgree | **Boss:** no bytes read — NPC 2010007 says start dialog. **Non-boss:** `Decode4(partyID)` guard + `DecodeStr(inviterName)` + `DecodeStr(guildName)` → shows `CCreateGuildAgreeDlg`; result fires `SendCreateGuildAgreeMsg` (sub-op 0x20) |
-| 5 | GuildInvite | Payload: `inviterCharID(4) + inviterName(str) + inviterJob(4) + inviterLevel(4)`. Shows `CUIFadeYesNo::CreateGuildInvite`; auto-declines (sends CP_GuildResult 55 or 56) if blacklisted or already-invited |
+| 5 | GuildInvite | Payload: `inviterCharID(4) + inviterName(str) + inviterLevel(4) + inviterJob(4)`. Level decoded **before** job (`CreateGuildInvite` signature: `(sInviter, nLevel, nJobCode, dwInviterID, bGuildOpt)`). Shows `CUIFadeYesNo::CreateGuildInvite`; auto-declines (sends CP_GuildResult 55 or 56) if blacklisted or already-invited. |
 | 17 | SetGuildMark | Opens `CSetGuildMarkDlg` modal for guild master |
-| 28 | LoadGuild | Payload: `Decode1(hasData)`. If hasData≠1: full guild reload via `GUILDDATA::Clear` + `GUILDDATA::Decode`; updates passive skills; if `nAllianceID≠0` sends AllianceReq_Load (opcode 167 sub 1) |
+| 28 | LoadGuild | Always calls `GUILDDATA::Clear`. `Decode1(hasData)`: if hasData=1 (non-zero): `GUILDDATA::Decode`; if hasData=0: guild stays empty. Either way: `UpdatePassiveSkillData`; if `nAllianceID≠0` (only possible when hasData=1): sends AllianceReq_Load (opcode 167 sub 1); removes own guild from `m_AllianceMember` array. |
 | 30 | GuildNameInUse | Shows "name in use" NPC dialog, re-prompts `InputGuildName` |
 | 33 | GuildCreateError | NPC dialog (StringPool 0xCF3) |
 | 34 | GuildCreated | Full guild decode; master sees "created" NPC dialog; members see chat message (0x15D) |
@@ -1142,7 +1196,7 @@ Guild **response** packets use header **150** (`CP_GuildResult`):
 | 37 | Error | Chat log (0x16A) |
 | 38 | Error | NPC dialog (0xCEE) |
 | 40 | Error | NPC dialog (0xCF4) |
-| 41 | MemberJoin | Decodes guildID + charID. If self: "invited" chat + sends opcode 149/sub 0. If same guild: decodes GUILDMEMBER, inserts |
+| 41 | MemberJoin | Decodes `guildID(4)` + `charID(4)`. **Two different server payloads:** (a) To the **joining player** (charID == self): server sends only these 8 bytes — client shows chat (0x167) and sends CP_GuildRequest sub=0 (bare, no payload). (b) To **existing guild members** (guildID == own): server appends `GUILDMEMBER(37)` — client calls `GUILDMEMBER::Decode` and inserts + shows chat (0x168). |
 | 42 | Error | Chat log (0x169) |
 | 43 | InviteNotAllowed | Chat log (0x16D) |
 | 44 | Error | Chat log (0x177) |
@@ -1168,8 +1222,8 @@ Guild **response** packets use header **150** (`CP_GuildResult`):
 | 76 | GuildRanking | Decodes count + entries; shows `CGuildRankDlg` modal |
 | 77 | SkillError | Chat log (0xDFD) |
 | 78 | SkillError | Chat log (0xDFE) |
-| 79 | GuildSkillResult | Decodes nChannel(1) + nResult(4). 0=reset temp stat; 1,2=set temp stat+msg; ≥3=set+remaining count |
-| 80 | BoardAuthKey | Decodes authkey string; stores as `m_sGuildBoardAuthkey` |
+| 79 | GuildSkillResult | `nChannel(1)` + `nResult(4)`. 0=`ResetTemporary(nType=3,nID=1)`; 1=activated (SP 0xDFF); 2=already-active (SP 0xE00); ≥3=`nResult−1` remaining (SP 0xE01). `nType=3` is `CTemporaryStatView` display-category (NOT `SecondaryStat`/`TEMPORARY_STAT`); `nID=1`, `tLeft=0x7FFFFFFF`. Broadcast to guild members in `nChannel`. |
+| 80 | BoardAuthKey | `sAuthKey(STR, narrow)`. Client decodes via `DecodeStr` then converts to UTF-16 with `ZStrUtil::_Conv`; stores in `m_sGuildBoardAuthkey` (`ZXString<unsigned short>`); timestamps `m_dwGuildBoardAuthkeyLastUpdated`. **Server PUSH only** — `CP_RequestGuildBoardAuthKey (0x121)` is dead, never sent. |
 | 81 | SkillEntryUpdate | Decodes guildID + nSkillID + SKILLENTRY; inserts into mSkillRecord |
 | 82 | GenericMsg | Decode1 flag: 1=decode+show string; 0=show StringPool 0x176 |
 | default | Unknown | Shows StringPool 0x176 |
@@ -1215,7 +1269,16 @@ If `CUIUserList` exists and tab==4: `CUIUserList::ResetInfo`.
 
 ## 13. Guild BBS System
 
-### Packet Dispatch
+Two entirely separate BBS implementations exist in V95:
+
+| Class | UI Type | Opcode | Notes |
+|-------|---------|--------|-------|
+| `CUIGuildBBS` | In-game native | CP/LP\_GuildBBS (179 / 59) | `TSingleton`, no web view |
+| `CWndGuildBoard` | IE embedded web view | Uses auth key from case 80 | Not opened by guild tab buttons in V95 |
+
+Guild tab button ID `0x7FA` (`CTabGuild::OnButtonClicked`) calls `CWvsContext::UI_Toggle(0x27, -1)` to open `CUIGuildBBS`. The `CWndGuildBoard` construction path is absent from the V95 binary; only its destruction is reachable (button 1000 in `CUIUserList::OnButtonClicked`).
+
+### LP_GuildBBS Dispatch (server→client)
 
 ```c
 // game_pseudocode.c:1214917
@@ -1224,45 +1287,245 @@ void CWvsContext::OnGuildBBSPacket(CWvsContext *this, CInPacket *iPacket)
     if (TSingleton<CUIGuildBBS>::ms_pInstance)
         CUIGuildBBS::OnGuildBBSPacket(ms_pInstance, iPacket);
 }
-```
 
-### Sub-Opcodes
-
-```c
 // game_pseudocode.c:806409
-switch (CInPacket::Decode1(iPacket)) {
-    case 6: CUIGuildBBS::OnLoadListResult(this, iPacket); break;
-    case 7: CUIGuildBBS::OnViewEntryResult(this, iPacket); break;
-    case 8: CUIGuildBBS::OnEntryNotFound(this, iPacket); break;
+void CUIGuildBBS::OnGuildBBSPacket(CUIGuildBBS *this, CInPacket *iPacket)
+{
+    switch (CInPacket::Decode1(iPacket)) {
+        case 6: CUIGuildBBS::OnLoadListResult(this, iPacket); break;
+        case 7: CUIGuildBBS::OnViewEntryResult(this, iPacket); break;
+        case 8: CUIGuildBBS::OnEntryNotFound(this);           break; // no iPacket arg
+    }
 }
 ```
 
-### CWndGuildBoard
+### CP_GuildBBS Sub-Opcodes (client→server, `game_pseudocode.c:802961+`)
 
-```cpp
-// game_types.h:47691 — Web-based guild board window
-struct CWndGuildBoard : CWebWnd, TSingleton<CWndGuildBoard>
-{
-    ZRef<CCtrlButton> m_pBtModify, m_pBtDelete, m_pBtComment, m_pBtWrite;
-    int m_bLogined;
-    int m_nMaskPageType, m_nCodeBoard, m_nOidArticle;
-    unsigned int m_dwArticleOwner;
-    unsigned int m_dwLastAuthUpdateRequest;
-    // ...
-};
+All use `COutPacket(179)` + `Encode1(sub)`.
 
-// Button constants:
-ID_CTRL_BT_MODIFY  = 0x0,
-ID_CTRL_BT_DELETE  = 0x1,
-ID_CTRL_BT_COMMENT = 0x2,
-ID_CTRL_BT_WRITE   = 0x3,
+| Sub | Handler | Additional payload (after sub byte) |
+|-----|---------|--------------------------------------|
+| 0 | `OnRegister` — write / modify | `Encode1(bModify)` + *if bModify:* `Encode4(nCurEntryID)` + `Encode1(bNotice)` + `EncodeStr(sTitle)` + `EncodeStr(sText)` + `Encode4(nEmoticonID)` |
+| 1 | `OnDelete` | `Encode4(nCurEntryID)` |
+| 2 | `SendLoadListRequest` | `Encode4(nEntryListStart)` (0-based; 10 entries/page) |
+| 3 | `SendViewEntryRequest` | `Encode4(nViewRequestEntryID)` then immediately also fires sub 2 |
+| 4 | `OnComment` — add comment | `Encode4(nCurEntryID)` + `EncodeStr(sComment)` |
+| 5 | `OnCommentDelete` | `Encode4(nCurEntryID)` + `Encode4(m_nSN)` |
+
+### LP_GuildBBS Case 6: `OnLoadListResult` (`game_pseudocode.c:803710`)
+
+> ⚠ Wire decode order differs from `ENTRYLIST` struct field order: `nCharacterID` is decoded before `sTitle`; `nEmoticon` is decoded before `nComments`.
+
+| Field | Size | Notes |
+|-------|------|-------|
+| `has_notice` | 1 | 1 if a pinned notice exists |
+| *if has\_notice:* | | |
+| `nEntryID` | 4 | Notice entry ID |
+| `nCharacterID` | 4 | Author character ID — decoded **before** sTitle |
+| `sTitle` | STR | Notice title |
+| `ftDate` | 8 | `_FILETIME` |
+| `nEmoticon` | 4 | Emoticon ID — decoded **before** nComments |
+| `nComments` | 4 | Comment count on notice |
+| `nEntryListTotalCount` | 4 | Total articles on the board |
+| `nPageEntryCount` | 4 | Entries in this page (≤10) |
+| *for each page entry (same layout):* | | |
+| `nEntryID` | 4 | |
+| `nCharacterID` | 4 | ← before sTitle |
+| `sTitle` | STR | |
+| `ftDate` | 8 | `_FILETIME` |
+| `nEmoticon` | 4 | ← before nComments |
+| `nComments` | 4 | |
+
+### LP_GuildBBS Case 7: `OnViewEntryResult` (`game_pseudocode.c:805097`)
+
+> ⚠ Wire order: date fields decoded before adjacent string fields in both `CURENTRY` and `COMMENT`.
+
+| Field | Size | Notes |
+|-------|------|-------|
+| `nCurEntryID` | 4 | Entry being viewed |
+| `nCurCharacterID` | 4 | Author character ID |
+| `ftCurDate` | 8 | `_FILETIME` — decoded **before** title/text strings |
+| `sCurTitle` | STR | |
+| `sCurText` | STR | |
+| `nEmoticon` | 4 | |
+| `nCommentCount` | 4 | |
+| *for each comment:* | | |
+| `m_nSN` | 4 | Comment serial number |
+| `m_nCharacterID` | 4 | Commenter character ID |
+| `m_ftDate` | 8 | `_FILETIME` — decoded **before** m\_sComment |
+| `m_sComment` | STR | |
+
+### LP_GuildBBS Case 8: `OnEntryNotFound`
+
+No payload fields. Server sends only the sub-opcode byte (8). `CUIGuildBBS::OnEntryNotFound(void)` takes no `CInPacket` argument — it displays StringPool **0xEC7** and clears `m_CurEntry`.
+
+### Auth Key: Case 80 (`GuildRes_Authkey_Update`)
+
+`CP_RequestGuildBoardAuthKey (0x121 = 289)` **is a dead opcode** — `COutPacket(289)` is never constructed in the V95 binary. The server pushes the auth key proactively:
+
+```c
+// game_pseudocode.c:~1266470 — case 80 in OnGuildResult
+// Server payload: sub-opcode(1) [=80] + sAuthKey(STR, narrow char)
+DecodeStr(iPacket, ...);                        // narrow char string
+ZStrUtil::_Conv(&m_sGuildBoardAuthkey, ...);    // → ZXString<unsigned short> (UTF-16)
+m_dwGuildBoardAuthkeyLastUpdated = ZAPI.timeGetTime();
 ```
 
-### Auth Key Flow
+### `CUIGuildBBS` Struct (`game_types.h:32396`)
 
-1. Client sends `CP_RequestGuildBoardAuthKey` (0x121)
-2. Server responds with case 80 (`GuildRes_Authkey_Update`), decoded as a wide string
-3. Stored in `CWvsContext::m_sGuildBoardAuthkey` with `m_dwGuildBoardAuthkeyLastUpdated` timestamp
+```cpp
+struct __cppobj CUIGuildBBS : CUIWnd, TSingleton<CUIGuildBBS>
+{
+    int                                     m_bViewEntry;
+    int                                     m_nViewRequestEntryID;
+    ZRef<CUIGuildBBS::CURENTRY>             m_CurEntry;
+    int                                     m_nEntryListStart;
+    ZArray<ZRef<CUIGuildBBS::ENTRYLIST>>    m_aEntryList;
+    ZRef<CUIGuildBBS::ENTRYLIST>            m_Notice;
+    int                                     m_bWriteTextBox;
+    int                                     m_nEmoticonIdx;
+    int                                     m_nEmoticonID;
+    ZRef<CCtrlButton>                       m_pBtWrite;
+    ZRef<CCtrlButton>                       m_pBtWriteNotice;
+    ZRef<CCtrlButton>                       m_pBtDelete;
+    ZRef<CCtrlButton>                       m_pBtModify;
+    ZRef<CCtrlButton>                       m_pBtRegister;
+    ZRef<CCtrlButton>                       m_pBtCancel;
+    ZRef<CCtrlButton>                       m_pBtComment;
+    ZRef<CCtrlButton>                       m_pBtCommentDelete[4]; // up to 4 shown
+    ZRef<CCtrlButton>                       m_pBtExit;
+    ZRef<CCtrlButton>                       m_pBtEmoticonLeft;
+    ZRef<CCtrlButton>                       m_pBtEmoticonRight;
+    ZRef<CCtrlEdit>                         m_pEditTitle;
+    ZRef<CCtrlMLEdit>                       m_pEditText;
+    ZRef<CCtrlEdit>                         m_pEditComment;
+    ZRef<CCtrlScrollBar>                    m_pSBComment;
+    ZRef<CCtrlScrollBar>                    m_pSBEdit;
+    ZRef<CCtrlSelector>                     m_pSelector;            // page selector
+    ZArray<long>                            m_aCashEmoticonID;
+    // ... canvas and layer fields ...
+};
+```
+
+### `CUIGuildBBS::ENTRYLIST` (`game_types.h:32240`, 0x28 = 40 bytes)
+
+```cpp
+struct __cppobj CUIGuildBBS::ENTRYLIST : ZRefCounted  // vtbl+nRef+pPrev = 12 bytes
+{
+    int             nEntryID;       // offset 12
+    ZXString<char>  sTitle;         // offset 16
+    int             nCharacterID;   // offset 20
+    _FILETIME       ftDate;         // offset 24 (8 bytes)
+    int             nComments;      // offset 32
+    int             nEmoticon;      // offset 36
+};
+```
+
+### `CUIGuildBBS::CURENTRY` (`game_types.h:32210`, 0x2C = 44 bytes)
+
+```cpp
+struct __cppobj CUIGuildBBS::CURENTRY : ZRefCounted
+{
+    int                                     nCurEntryID;     // offset 12
+    int                                     nCurCharacterID; // offset 16
+    _FILETIME                               ftCurDate;       // offset 20 (8 bytes)
+    ZXString<char>                          sCurTitle;       // offset 28
+    ZXString<char>                          sCurText;        // offset 32
+    int                                     nEmoticon;       // offset 36
+    ZArray<ZRef<CUIGuildBBS::COMMENT>>      aComments;       // offset 40
+};
+```
+
+### `CUIGuildBBS::COMMENT` (`game_types.h:32186`, 0x20 = 32 bytes)
+
+```cpp
+struct __cppobj CUIGuildBBS::COMMENT : ZRefCounted
+{
+    int             m_nSN;          // offset 12
+    int             m_nCharacterID; // offset 16
+    ZXString<char>  m_sComment;     // offset 20
+    _FILETIME       m_ftDate;       // offset 24 (8 bytes)
+};
+```
+
+### `CWndGuildBoard` (`game_types.h:47691`) — Web Guild Board
+
+```cpp
+struct CWndGuildBoard : CWebWnd, TSingleton<CWndGuildBoard>
+{
+    ZRef<CCtrlButton>   m_pBtModify, m_pBtDelete, m_pBtComment, m_pBtWrite;
+    int                 m_bLogined;
+    int                 m_nMaskPageType, m_nCodeBoard, m_nOidArticle;
+    unsigned int        m_dwArticleOwner;
+    unsigned int        m_dwLastAuthUpdateRequest;
+    // ...
+};
+```
+
+`CWndGuildBoard` is not opened by any guild tab button in V95. Its construction is absent from the binary. The `m_nMaskPageType`, `m_nCodeBoard`, `m_nOidArticle` fields are specific to this web view and do not appear in `CUIGuildBBS`.
+
+### BBS UI Limits (inferred from `LoadWriteTextBox`, `game_pseudocode.c:804520`)
+
+No named constants exist. Values are inferred from control-creation parameters:
+
+| Parameter | Value | Source |
+|-----------|-------|--------|
+| Posts per page | **10** | `OnLoadListResult`: `(totalCount-1)/10+1` page calc; `SetSelectorStart(..., 10, ...)` |
+| Posts per guild | **server-enforced** | Not checked client-side |
+| Max title length | **25 chars** (display) | `paramEdit.nHorzMax = 25` set for `m_pEditTitle` (`CCtrlEdit`) |
+| Body row count | **15 rows** (display) | `paramMLEdit.nRowMax = 15` for `m_pEditText` (`CCtrlMLEdit`) |
+| Body line width | **240 px** (display) | `paramMLEdit.nMaxLineWidth = 240` |
+| Comments displayed | **4 visible** | `m_pBtCommentDelete[4]` — 4 delete buttons; `m_pSBComment` scrolls further |
+| Max comment length | **server-enforced** | No `nHorzMax` set on `m_pEditComment` |
+
+> `DB_GUILDNOTICE_MAX = 0x64` (100) is for the guild **bulletin notice** (`sNotice`), **not** BBS content.
+
+### Notice Pinning — Single-Notice Architecture
+
+The protocol sends exactly **one** optional notice record per `OnLoadListResult` (the `has_notice` prefix byte). The client stores it in a single `ZRef<CUIGuildBBS::ENTRYLIST> m_Notice` slot and renders it in a dedicated region (y=103–134) above the entry list (y=134+).
+
+**Enforcement in `OnWrite` (`game_pseudocode.c:804964`):**
+
+```c
+void __thiscall CUIGuildBBS::OnWrite(CUIGuildBBS *this, int bModify, int bNotice)
+{
+    if (this->m_Notice.p && bNotice) {
+        // StringPool 0xEB3: "A notice already exists."
+        CUtilDlg::Notice(StringPool::GetString(0xEB3), ...);
+        return;  // ← blocks write UI; user must delete old notice first
+    }
+    // ... open write text box ...
+}
+```
+
+**Server responsibility:** When the server receives `CP_GuildBBS sub=0, bModify=0, bNotice=1`, it must automatically clear `IsNotice` on the existing notice post before inserting the new one. The client sends **no demote instruction** — it simply refuses to open the UI if a notice exists, trusting that if it got past the guard, there was no existing notice.
+
+**There is no `DB_GUILDBBS_NOTICE_MAX` constant.** The limit of 1 is enforced entirely by the UI guard above.
+
+**Consequence for server implementation:** Allow at most one BBS post per guild with `IsNotice = true`. When `sub=0, bNotice=1` is received, demote the existing notice automatically. Do **not** allow multiple notice posts — the `m_Notice` slot is a single `ZRef`, and the wire format has no room for more than one notice record.
+
+### `CUIGuildBBS` Button IDs (`game_pseudocode.c:806335`)
+
+| Button ID | Decimal | Action | Packet emitted |
+|-----------|---------|--------|----------------|
+| 0x7D0 | 2000 | Write (new article) | opens write UI — no packet until Register |
+| 0x7D1 | 2001 | Write Notice | opens write UI for notice (blocked if notice exists: SP 0xEB3) |
+| 0x7D2 | 2002 | Delete | `OnDelete` → sub 1 + `Encode4(nCurEntryID)` |
+| 0x7D3 | 2003 | Modify | opens edit UI — no packet until Register |
+| 0x7D4 | 2004 | Register (new) | `OnRegister(0,0)` → sub 0, `bModify=0, bNotice=0` |
+| 0x7D5 | 2005 | Register (edit) | `OnRegister(1,0)` → sub 0, `bModify=1, bNotice=0` |
+| 0x7D6 | 2006 | Register (notice) | `OnRegister(0,1)` → sub 0, `bModify=0, bNotice=1` |
+| 0x7D7 | 2007 | Cancel | no packet; calls `SendViewEntryRequest` |
+| 0x7D8 | 2008 | Comment | `OnComment` → sub 4 + `Encode4(nCurEntryID)` + `EncodeStr(sComment)` |
+| 0x7D9 | 2009 | Delete Comment [0] | `OnCommentDelete(0)` → sub 5 + `Encode4(nCurEntryID)` + `Encode4(m_nSN)` |
+| 0x7DA | 2010 | Delete Comment [1] | `OnCommentDelete(1)` → sub 5 |
+| 0x7DB | 2011 | Delete Comment [2] | `OnCommentDelete(2)` → sub 5 |
+| 0x7DC | 2012 | Delete Comment [3] | `OnCommentDelete(3)` → sub 5 |
+| 0x7DD | 2013 | Exit | `UI_Close(UI_GUILDBBS)` — no packet |
+| 0x7DE | 2014 | Emoticon ← | `MoveEmoticon(-1)` |
+| 0x7DF | 2015 | Emoticon → | `MoveEmoticon(+1)` |
+
+Clicking the notice area or a list entry sets `m_nViewRequestEntryID` and triggers `SendViewEntryRequest` (sub 3 + `Encode4(entryID)`) followed immediately by an automatic `SendLoadListRequest` (sub 2 + `Encode4(nEntryListStart)`).
 
 ---
 
@@ -1512,13 +1775,13 @@ kGuildArrange_Level_Width = 39, kGuildArrange_Grade_Width = 62,
 | 149 | 0x0E | SendSetMemberGradeMsg | Change member grade |
 | 149 | 0x0F | SendSetGuildMarkMsg | Set guild mark |
 | 149 | 0x10 | SendSetGuildNoticeMsg | Set notice |
-| 149 | 0x1B | GuildReg_SetSkill | Purchase/activate guild skill |
+| 149 | ~~0x1B~~ | ~~GuildReg_SetSkill~~ | **DEAD — never sent by client** (NPC-script-server driven) |
 | 149 | 0x20 | SendCreateGuildAgreeMsg | Agree/disagree creation |
 | 150 | 55/56 | (invite response) | Auto-decline guild invite |
 | 167 | 0x01 | (alliance request) | Request alliance info |
 | 168 | 20/21 | (alliance invite resp) | Auto-respond alliance invite |
 | 179 | — | GuildBBS | Guild BBS operations |
-| 289 | — | RequestGuildBoardAuthKey | Web board auth key request |
+| ~~289~~ | — | ~~RequestGuildBoardAuthKey~~ | **DEAD — `COutPacket(289)` never constructed; server PUSH only via case 80** |
 
 ### Server → Client (CWvsContext::ProcessPacket dispatch)
 
@@ -1583,6 +1846,11 @@ kGuildArrange_Level_Width = 39, kGuildArrange_Grade_Width = 62,
 | 0xDFF | "Guild skill activated in channel %s." |
 | 0xE00 | "Guild skill already active in channel %s." |
 | 0xE01 | "Guild skill: %d remaining." |
+| 0xEB1 | "Please enter content." (empty title or body guard in `OnRegister`/`OnComment`) |
+| 0xEB2 | "Are you sure you want to delete?" (YesNo confirm in `OnDelete` / `OnCommentDelete`) |
+| 0xEB3 | "A notice already exists." (shown by `OnWrite` when `m_Notice.p != 0 && bNotice`) |
+| 0xEC7 | Entry not found (shown by `CUIGuildBBS::OnEntryNotFound`) |
+| 0x1A15 | Page number format `"Page %d"` (used by `OnLoadListResult` to populate `CCtrlSelector` labels) |
 | 0x1881 | "Joined alliance %s." |
 | 0x1882 | "Guild %s has joined the alliance." |
 | 0x1897 | "Left the alliance." |

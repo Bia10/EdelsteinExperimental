@@ -1,4 +1,4 @@
-namespace Edelstein.Protocol.Services.Social.Contracts;
+﻿namespace Edelstein.Protocol.Services.Social.Contracts;
 
 /// <summary>Categorised result codes returned by all guild service operations.</summary>
 public enum GuildResult
@@ -18,4 +18,7 @@ public enum GuildResult
     FailedBeginner,
     FailedNotEnoughGP,
     FailedGuildNotFound,
+    FailedPostNotFound,
+    FailedCommentNotFound,
+    FailedPermission,
 }

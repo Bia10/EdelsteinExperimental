@@ -67,4 +67,27 @@ public class GuildOptions
     /// V95 retail value: 1 000 000.
     /// </summary>
     public int DeleteEmblemFee { get; set; } = 1_000_000;
+
+    // ── BBS ──────────────────────────────────────────────────────────────
+
+    /// <summary>Maximum total BBS posts allowed per guild.</summary>
+    public int BBSMaxPosts { get; set; } = 50;
+
+    /// <summary>Maximum comments per BBS post.</summary>
+    public int BBSMaxCommentsPerPost { get; set; } = 10;
+
+    /// <summary>Number of posts returned per page in the list view.</summary>
+    public int BBSPostsPerPage { get; set; } = 10;
+
+    /// <summary>
+    /// Maximum characters in a BBS post title.
+    /// Matches the client's <c>nHorzMax = 25</c> on the title <c>CCtrlEdit</c>.
+    /// </summary>
+    public int BBSMaxTitleLength { get; set; } = 25;
+
+    /// <summary>Maximum characters in a BBS post body.</summary>
+    public int BBSMaxContentLength { get; set; } = 255;
+
+    /// <summary>Maximum characters in a BBS comment.</summary>
+    public int BBSMaxCommentLength { get; set; } = 255;
 }

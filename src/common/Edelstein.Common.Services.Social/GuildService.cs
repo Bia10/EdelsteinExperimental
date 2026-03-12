@@ -675,4 +675,264 @@ public class GuildService : IGuildService
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
+
+    // ── BBS ──────────────────────────────────────────────────────────────────
+
+    public async Task<GuildBBSLoadResponse> BBSLoad(GuildBBSLoadRequest request)
+    {
+        try
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            // The notice is a single optional pinned post, separate from the paged list.
+            var notice = await db.GuildBBSPosts
+                .Where(p => p.GuildID == request.GuildID && p.IsNotice)
+                .FirstOrDefaultAsync();
+
+            // Pagination and total count cover only non-notice posts.
+            var totalCount = await db.GuildBBSPosts
+                .CountAsync(p => p.GuildID == request.GuildID && !p.IsNotice);
+
+            var posts = await db.GuildBBSPosts
+                .Where(p => p.GuildID == request.GuildID && !p.IsNotice)
+                .OrderByDescending(p => p.CreatedAt)
+                .Skip(request.EntryListStart)
+                .Take(_options.BBSPostsPerPage)
+                .ToListAsync();
+
+            return new GuildBBSLoadResponse(
+                GuildResult.Success,
+                notice != null ? new GuildBBSPost(notice) : null,
+                posts.Select(p => (IGuildBBSPost)new GuildBBSPost(p)).ToList().AsReadOnly(),
+                totalCount);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "BBSLoad failed for guild {GuildID}", request.GuildID);
+            return new GuildBBSLoadResponse(GuildResult.FailedUnknown);
+        }
+    }
+
+    public async Task<GuildBBSViewResponse> BBSView(GuildBBSViewRequest request)
+    {
+        try
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var post = await db.GuildBBSPosts
+                .Include(p => p.Comments.OrderBy(c => c.CreatedAt))
+                .FirstOrDefaultAsync(p => p.ID == request.PostID && p.GuildID == request.GuildID);
+
+            if (post == null)
+                return new GuildBBSViewResponse(GuildResult.FailedPostNotFound);
+
+            return new GuildBBSViewResponse(
+                GuildResult.Success,
+                new GuildBBSPost(post),
+                post.Comments.Select(c => (IGuildBBSComment)new GuildBBSComment(c)).ToList().AsReadOnly());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "BBSView failed for guild {GuildID} post {PostID}", request.GuildID, request.PostID);
+            return new GuildBBSViewResponse(GuildResult.FailedUnknown);
+        }
+    }
+
+    public async Task<GuildBBSViewResponse> BBSWrite(GuildBBSWriteRequest request)
+    {
+        try
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            // Cap applies only to non-notice posts (the notice slot is separate).
+            var totalPosts = await db.GuildBBSPosts
+                .CountAsync(p => p.GuildID == request.GuildID && !p.IsNotice);
+            if (totalPosts >= _options.BBSMaxPosts)
+                return new GuildBBSViewResponse(GuildResult.FailedFull);
+
+            // Only one notice is allowed per guild (single m_Notice slot on client).
+            // Demote the existing notice before inserting a new one.
+            if (request.IsNotice)
+            {
+                await db.GuildBBSPosts
+                    .Where(p => p.GuildID == request.GuildID && p.IsNotice)
+                    .ExecuteUpdateAsync(p => p.SetProperty(e => e.IsNotice, false));
+            }
+
+            var entity = new Entities.GuildBBSPostEntity
+            {
+                GuildID = request.GuildID,
+                AuthorID = request.AuthorID,
+                AuthorName = request.AuthorName,
+                IsNotice = request.IsNotice,
+                Title = request.Title[..Math.Min(request.Title.Length, _options.BBSMaxTitleLength)],
+                Content = request.Content[..Math.Min(request.Content.Length, _options.BBSMaxContentLength)],
+                EmoticonID = request.EmoticonID,
+                CreatedAt = DateTime.UtcNow,
+                CommentCount = 0,
+            };
+
+            db.GuildBBSPosts.Add(entity);
+            await db.SaveChangesAsync();
+
+            return new GuildBBSViewResponse(GuildResult.Success, new GuildBBSPost(entity), []);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "BBSWrite failed for guild {GuildID} author {AuthorID}", request.GuildID, request.AuthorID);
+            return new GuildBBSViewResponse(GuildResult.FailedUnknown);
+        }
+    }
+
+    public async Task<GuildBBSViewResponse> BBSEdit(GuildBBSEditRequest request)
+    {
+        try
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var post = await db.GuildBBSPosts
+                .Include(p => p.Comments.OrderBy(c => c.CreatedAt))
+                .FirstOrDefaultAsync(p => p.ID == request.PostID && p.GuildID == request.GuildID);
+
+            if (post == null)
+                return new GuildBBSViewResponse(GuildResult.FailedPostNotFound);
+
+            // Only the author or the guild master (grade 1) may edit.
+            var isMaster = await db.GuildMembers.AnyAsync(m =>
+                m.GuildID == request.GuildID && m.CharacterID == request.RequesterID && m.Grade == 1);
+            if (post.AuthorID != request.RequesterID && !isMaster)
+                return new GuildBBSViewResponse(GuildResult.FailedPermission);
+
+            post.IsNotice = request.IsNotice;
+            post.Title = request.Title[..Math.Min(request.Title.Length, _options.BBSMaxTitleLength)];
+            post.Content = request.Content[..Math.Min(request.Content.Length, _options.BBSMaxContentLength)];
+            post.EmoticonID = request.EmoticonID;
+
+            await db.SaveChangesAsync();
+
+            return new GuildBBSViewResponse(
+                GuildResult.Success,
+                new GuildBBSPost(post),
+                post.Comments.Select(c => (IGuildBBSComment)new GuildBBSComment(c)).ToList().AsReadOnly());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "BBSEdit failed for guild {GuildID} post {PostID}", request.GuildID, request.PostID);
+            return new GuildBBSViewResponse(GuildResult.FailedUnknown);
+        }
+    }
+
+    public async Task<GuildResponse> BBSDelete(GuildBBSDeleteRequest request)
+    {
+        try
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var post = await db.GuildBBSPosts
+                .FirstOrDefaultAsync(p => p.ID == request.PostID && p.GuildID == request.GuildID);
+
+            if (post == null)
+                return new GuildResponse(GuildResult.FailedPostNotFound);
+
+            var isMaster = await db.GuildMembers.AnyAsync(m =>
+                m.GuildID == request.GuildID && m.CharacterID == request.RequesterID && m.Grade == 1);
+            if (post.AuthorID != request.RequesterID && !isMaster)
+                return new GuildResponse(GuildResult.FailedPermission);
+
+            db.GuildBBSPosts.Remove(post);
+            await db.SaveChangesAsync();
+
+            return new GuildResponse(GuildResult.Success);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "BBSDelete failed for guild {GuildID} post {PostID}", request.GuildID, request.PostID);
+            return new GuildResponse(GuildResult.FailedUnknown);
+        }
+    }
+
+    public async Task<GuildBBSViewResponse> BBSWriteComment(GuildBBSWriteCommentRequest request)
+    {
+        try
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var post = await db.GuildBBSPosts
+                .Include(p => p.Comments.OrderBy(c => c.CreatedAt))
+                .FirstOrDefaultAsync(p => p.ID == request.PostID && p.GuildID == request.GuildID);
+
+            if (post == null)
+                return new GuildBBSViewResponse(GuildResult.FailedPostNotFound);
+
+            if (post.Comments.Count >= _options.BBSMaxCommentsPerPost)
+                return new GuildBBSViewResponse(GuildResult.FailedFull);
+
+            var comment = new Entities.GuildBBSCommentEntity
+            {
+                PostID = request.PostID,
+                GuildID = request.GuildID,
+                AuthorID = request.AuthorID,
+                AuthorName = request.AuthorName,
+                Content = request.Content[..Math.Min(request.Content.Length, _options.BBSMaxCommentLength)],
+                CreatedAt = DateTime.UtcNow,
+            };
+
+            db.GuildBBSComments.Add(comment);
+
+            post.CommentCount = post.Comments.Count + 1;
+
+            await db.SaveChangesAsync();
+
+            return new GuildBBSViewResponse(
+                GuildResult.Success,
+                new GuildBBSPost(post),
+                post.Comments.Append(comment).Select(c => (IGuildBBSComment)new GuildBBSComment(c)).ToList().AsReadOnly());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "BBSWriteComment failed for guild {GuildID} post {PostID}", request.GuildID, request.PostID);
+            return new GuildBBSViewResponse(GuildResult.FailedUnknown);
+        }
+    }
+
+    public async Task<GuildBBSViewResponse> BBSDeleteComment(GuildBBSDeleteCommentRequest request)
+    {
+        try
+        {
+            await using var db = await _dbFactory.CreateDbContextAsync();
+
+            var post = await db.GuildBBSPosts
+                .Include(p => p.Comments.OrderBy(c => c.CreatedAt))
+                .FirstOrDefaultAsync(p => p.ID == request.PostID && p.GuildID == request.GuildID);
+
+            if (post == null)
+                return new GuildBBSViewResponse(GuildResult.FailedPostNotFound);
+
+            var comment = post.Comments.FirstOrDefault(c => c.ID == request.CommentID);
+            if (comment == null)
+                return new GuildBBSViewResponse(GuildResult.FailedCommentNotFound);
+
+            var isMaster = await db.GuildMembers.AnyAsync(m =>
+                m.GuildID == request.GuildID && m.CharacterID == request.RequesterID && m.Grade == 1);
+            if (comment.AuthorID != request.RequesterID && !isMaster)
+                return new GuildBBSViewResponse(GuildResult.FailedPermission);
+
+            db.GuildBBSComments.Remove(comment);
+
+            var remainingComments = post.Comments.Where(c => c.ID != request.CommentID).ToList();
+            post.CommentCount = remainingComments.Count;
+
+            await db.SaveChangesAsync();
+
+            return new GuildBBSViewResponse(
+                GuildResult.Success,
+                new GuildBBSPost(post),
+                remainingComments.Select(c => (IGuildBBSComment)new GuildBBSComment(c)).ToList().AsReadOnly());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "BBSDeleteComment failed for guild {GuildID} post {PostID} comment {CommentID}", request.GuildID, request.PostID, request.CommentID);
+            return new GuildBBSViewResponse(GuildResult.FailedUnknown);
+        }
+    }
 }
