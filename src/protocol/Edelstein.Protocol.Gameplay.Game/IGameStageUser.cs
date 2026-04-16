@@ -9,4 +9,6 @@ public interface IGameStageUser : IStageUser<IGameStageUser>
 
     IField? Field { get; }
     IFieldUser? FieldUser { get; set; }
+
+    int CrcKey { get; set; }
 }

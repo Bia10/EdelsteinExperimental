@@ -33,18 +33,26 @@ public class GameStage : AbstractStage<IGameStageUser>, IGameStage
             return;
         }
 
-        await user.Context.Services.Friend.UpdateProfile(new FriendUpdateProfileRequest(
-            user.Character.ID,
-            user.Character.FriendMax,
-            user.Account.GradeCode > 0 || user.Account.SubGradeCode > 0
-        ));
+        await user.Context.Services.Friend.UpdateProfile(
+            new FriendUpdateProfileRequest(
+                user.Character.ID,
+                user.Character.FriendMax,
+                user.Account.GradeCode > 0 || user.Account.SubGradeCode > 0
+            )
+        );
 
-        user.Friends = (await user.Context.Services.Friend.Load(new FriendLoadRequest(user.Character.ID))).Friends;
-        user.Party = (await user.Context.Services.Party.Load(new PartyLoadRequest(user.Character.ID))).PartyMembership;
-        user.Guild  = (await user.Context.Services.Guild.Load(new GuildLoadRequest(user.Character.ID))).GuildMembership;
+        user.Friends = (
+            await user.Context.Services.Friend.Load(new FriendLoadRequest(user.Character.ID))
+        ).Friends;
+        user.Party = (
+            await user.Context.Services.Party.Load(new PartyLoadRequest(user.Character.ID))
+        ).PartyMembership;
+        user.Guild = (
+            await user.Context.Services.Guild.Load(new GuildLoadRequest(user.Character.ID))
+        ).GuildMembership;
 
         user.FieldUser = fieldUser;
-        
+
         await field.Enter(fieldUser);
         await base.Enter(user);
 
@@ -54,24 +62,28 @@ public class GameStage : AbstractStage<IGameStageUser>, IGameStage
         await user.DispatchInitParty();
         await user.DispatchInitGuild();
         await user.DispatchInitQuestTime();
-        
-        _ = user.Context.Services.Friend.UpdateChannel(new FriendUpdateChannelRequest(
-            user.Character.ID,
-            user.Context.Options.ChannelID
-        ));
+        await user.DispatchMobCrcKeyChanged();
+
+        _ = user.Context.Services.Friend.UpdateChannel(
+            new FriendUpdateChannelRequest(user.Character.ID, user.Context.Options.ChannelID)
+        );
         if (user.Party != null)
-            _ = user.Context.Services.Party.UpdateChannelOrField(new PartyUpdateChannelOrFieldRequest(
-                user.Party.ID,
-                user.Character.ID,
-                user.Context.Options.ChannelID,
-                field.ID
-            ));
+            _ = user.Context.Services.Party.UpdateChannelOrField(
+                new PartyUpdateChannelOrFieldRequest(
+                    user.Party.ID,
+                    user.Character.ID,
+                    user.Context.Options.ChannelID,
+                    field.ID
+                )
+            );
         if (user.Guild != null)
-            _ = user.Context.Services.Guild.UpdateChannel(new GuildUpdateChannelRequest(
-                user.Guild.ID,
-                user.Character.ID,
-                user.Context.Options.ChannelID
-            ));
+            _ = user.Context.Services.Guild.UpdateChannel(
+                new GuildUpdateChannelRequest(
+                    user.Guild.ID,
+                    user.Character.ID,
+                    user.Context.Options.ChannelID
+                )
+            );
     }
 
     public new async Task Leave(IGameStageUser user)

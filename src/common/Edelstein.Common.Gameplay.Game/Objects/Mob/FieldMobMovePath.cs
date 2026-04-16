@@ -13,11 +13,14 @@ public class FieldMobMovePath : AbstractMovePath<IFieldMobMoveAction>, IFieldMob
     private readonly ICollection<int> _randTimeForAreaAttack = new List<int>();
 
     public short MobCtrlSN { get; private set; }
-    
+
     public bool NextAttackPossible => (v7 & 0xF) != 0;
 
     public int Action => centerSplit >> 1;
     public int Data { get; private set; }
+
+    public int HackedCode { get; private set; }
+    public int HackedCodeCrc { get; private set; }
 
     public override void ReadFrom(IPacketReader reader)
     {
@@ -27,21 +30,21 @@ public class FieldMobMovePath : AbstractMovePath<IFieldMobMoveAction>, IFieldMob
 
         centerSplit = reader.ReadByte();
         Data = reader.ReadInt();
-        
+
         v8 = reader.ReadByte();
-        
+
         var multiTargetForBall = reader.ReadInt();
-        for (var i = 0; i < multiTargetForBall; i++) 
+        for (var i = 0; i < multiTargetForBall; i++)
             _multiTargetForBall.Add(reader.ReadLong()); // int, int
 
         var randTimeForAreaAttack = reader.ReadInt();
-        for (var i = 0; i < randTimeForAreaAttack; i++) 
+        for (var i = 0; i < randTimeForAreaAttack; i++)
             _randTimeForAreaAttack.Add(reader.ReadInt());
-        
-        reader.ReadInt(); // HackedCode
-        reader.ReadInt(); // idk
-        reader.ReadInt(); // HackedCodeCrc
-        reader.ReadInt(); // idk
+
+        HackedCode = reader.ReadInt();
+        _ = reader.ReadInt(); // idk
+        HackedCodeCrc = reader.ReadInt();
+        _ = reader.ReadInt(); // idk
 
         base.ReadFrom(reader);
     }
@@ -61,9 +64,10 @@ public class FieldMobMovePath : AbstractMovePath<IFieldMobMoveAction>, IFieldMob
         writer.WriteInt(_randTimeForAreaAttack.Count);
         foreach (var i in _randTimeForAreaAttack)
             writer.WriteInt(i);
-        
+
         base.WriteTo(writer);
     }
 
-    protected override IFieldMobMoveAction GetActionFromRaw(byte raw) => new FieldMobMoveAction(raw);
+    protected override IFieldMobMoveAction GetActionFromRaw(byte raw) =>
+        new FieldMobMoveAction(raw);
 }

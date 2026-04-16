@@ -7,10 +7,18 @@ namespace Edelstein.Common.Gameplay.Game;
 
 public static class GameStageUserExtensions
 {
+    public static Task DispatchMobCrcKeyChanged(this IGameStageUser user, int objectID = 0)
+    {
+        using var packet = new PacketWriter(PacketSendOperations.MobCrcKeyChanged);
+        packet.WriteInt(objectID);
+        packet.WriteInt(user.CrcKey);
+        return user.Dispatch(packet.Build());
+    }
+
     public static Task DispatchInitFuncKeys(this IGameStageUser user)
     {
         using var packet = new PacketWriter(PacketSendOperations.FuncKeyMappedInit);
-        
+
         packet.WriteBool(user.Character?.FuncKeys.Records.Count == 0);
         if (user.Character?.FuncKeys.Records.Count > 0)
         {
@@ -31,22 +39,21 @@ public static class GameStageUserExtensions
 
         return user.Dispatch(packet.Build());
     }
-    
+
     public static Task DispatchInitQuickSlotKeys(this IGameStageUser user)
     {
         using var packet = new PacketWriter(PacketSendOperations.QuickslotMappedInit);
-        
+
         packet.WriteBool(user.Character?.QuickslotKeys.Records.Count > 0);
         if (user.Character?.QuickslotKeys.Records.Count > 0)
             for (byte i = 0; i < 8; i++)
-                packet.WriteInt(user.Character.QuickslotKeys.Records.TryGetValue(i, out var value) 
-                    ? value 
-                    : 0
+                packet.WriteInt(
+                    user.Character.QuickslotKeys.Records.TryGetValue(i, out var value) ? value : 0
                 );
         return user.Dispatch(packet.Build());
     }
-    
-    public async static Task DispatchInitFriends(this IGameStageUser user)
+
+    public static async Task DispatchInitFriends(this IGameStageUser user)
     {
         if (user.Friends != null)
         {
@@ -61,8 +68,8 @@ public static class GameStageUserExtensions
             await user.Dispatch(packet.Build());
         }
     }
-    
-    public async static Task DispatchInitParty(this IGameStageUser user)
+
+    public static async Task DispatchInitParty(this IGameStageUser user)
     {
         if (user.Party != null)
         {
@@ -74,7 +81,7 @@ public static class GameStageUserExtensions
         }
     }
 
-    public async static Task DispatchInitGuild(this IGameStageUser user)
+    public static async Task DispatchInitGuild(this IGameStageUser user)
     {
         if (user.Guild != null)
         {
@@ -86,7 +93,7 @@ public static class GameStageUserExtensions
         }
     }
 
-    public async static Task DispatchInitQuestTime(this IGameStageUser user)
+    public static async Task DispatchInitQuestTime(this IGameStageUser user)
     {
         var records = await user.Context.Managers.QuestTime.RetrieveAll();
         using var packet = new PacketWriter(PacketSendOperations.SetQuestTime);
