@@ -17,25 +17,28 @@ public class AttackMobEntry : IAttackMobEntry, IPacketReadable
     }
 
     public int MobID { get; private set; }
-    
+
     public byte ActionHit { get; private set; }
     public byte ActionForeAndDir { get; private set; }
     public byte FrameIdx { get; private set; }
-    
+
     public byte Option { get; private set; }
-    
+
     public IPoint2D PositionHit { get; private set; }
     public IPoint2D PositionPrev { get; private set; }
-    
+
     public short Delay { get; private set; }
-    
+
     public int[] Damage { get; private set; }
-    
+
+    public int MobCrc { get; private set; }
+
     public void ReadFrom(IPacketReader reader)
     {
         MobID = reader.ReadInt();
 
-        if (_isSummonedAttack) reader.ReadInt();
+        if (_isSummonedAttack)
+            reader.ReadInt();
 
         ActionHit = reader.ReadByte();
         ActionForeAndDir = reader.ReadByte();
@@ -53,6 +56,6 @@ public class AttackMobEntry : IAttackMobEntry, IPacketReadable
             Damage[i] = reader.ReadInt();
 
         if (!_isSummonedAttack)
-            _ = reader.ReadInt();
+            MobCrc = reader.ReadInt();
     }
 }

@@ -8,56 +8,63 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Damage;
 
 public class Attack : IAttack, IPacketReadable
 {
-    public Attack(AttackType type) 
-        => Type = type;
+    public Attack(AttackType type) => Type = type;
 
     public AttackType Type { get; }
-    
+
     public byte DamagePerMob { get; private set; }
     public byte MobCount { get; private set; }
-    
+
     public int SkillID { get; private set; }
     public bool IsCombatOrders { get; private set; }
     public int Keydown { get; private set; }
-    
+
     public byte Option { get; private set; }
-    
+
     public bool IsNextShootJablin { get; private set; }
-    
+
     public short AttackActionAndDir { get; private set; }
     public AttackActionType AttackActionType { get; private set; }
     public byte AttackSpeed { get; private set; }
     public int AttackTime { get; private set; }
-    
+
     public int Phase { get; private set; }
-    
+
     public short BulletItemPos { get; private set; }
     public short BulletItemPosCash { get; private set; }
     public byte ShootRange { get; private set; }
     public int SpiritJavelinItemID { get; private set; }
-    
+
     public IAttackMobEntry[] MobEntries { get; private set; }
 
     public IPoint2D Position { get; private set; }
-    
+
+    public byte FieldKey { get; private set; }
+    public int Dr0 { get; private set; }
+    public int Dr1 { get; private set; }
+    public int Dr2 { get; private set; }
+    public int Dr3 { get; private set; }
+    public int DrRand { get; private set; }
+    public int AttackCrc { get; private set; }
+
     public void ReadFrom(IPacketReader reader)
     {
-        _ = reader.ReadByte(); // bCurFieldKey
-        _ = reader.ReadInt(); // dr0
-        _ = reader.ReadInt(); // dr1
+        FieldKey = reader.ReadByte();
+        Dr0 = reader.ReadInt();
+        Dr1 = reader.ReadInt();
 
         var v6 = reader.ReadByte();
         DamagePerMob = (byte)(v6 >> 0 & 0xF);
         MobCount = (byte)(v6 >> 4 & 0xF);
-        
-        _ = reader.ReadInt(); // dr2
-        _ = reader.ReadInt(); // dr3
+
+        Dr2 = reader.ReadInt();
+        Dr3 = reader.ReadInt();
 
         SkillID = reader.ReadInt();
         IsCombatOrders = reader.ReadBool();
-        
-        _ = reader.ReadInt(); // dr rand
-        _ = reader.ReadInt(); // crc
+
+        DrRand = reader.ReadInt();
+        AttackCrc = reader.ReadInt();
 
         switch (Type)
         {
@@ -79,24 +86,22 @@ public class Attack : IAttack, IPacketReadable
                 _ = reader.ReadInt();
                 break;
         }
-        
-        Keydown = SkillConstants.IsKeydownSkill(SkillID)
-            ? reader.ReadInt()
-            : 0;
-        
+
+        Keydown = SkillConstants.IsKeydownSkill(SkillID) ? reader.ReadInt() : 0;
+
         Option = reader.ReadByte();
-        
+
         if (Type == AttackType.Shoot)
             IsNextShootJablin = reader.ReadBool();
-        
+
         AttackActionAndDir = reader.ReadShort();
-        _ = reader.ReadInt(); 
+        _ = reader.ReadInt();
         AttackActionType = (AttackActionType)reader.ReadByte();
         AttackSpeed = reader.ReadByte();
         AttackTime = reader.ReadInt();
-        
+
         Phase = reader.ReadInt();
-        
+
         if (Type == AttackType.Shoot)
         {
             BulletItemPos = reader.ReadShort();

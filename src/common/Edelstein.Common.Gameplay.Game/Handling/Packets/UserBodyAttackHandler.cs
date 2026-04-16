@@ -2,6 +2,7 @@
 using Edelstein.Protocol.Gameplay.Game.Combat.Damage;
 using Edelstein.Protocol.Gameplay.Game.Contracts;
 using Edelstein.Protocol.Utilities.Pipelines;
+using Microsoft.Extensions.Logging;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
@@ -9,8 +10,10 @@ public class UserBodyAttackHandler : AbstractUserAttackHandler
 {
     public override short Operation => (short)PacketRecvOperations.UserBodyAttack;
     protected override AttackType Type => AttackType.Body;
-    
-    public UserBodyAttackHandler(IPipeline<FieldOnPacketUserAttack> pipeline) : base(pipeline)
-    {
-    }
+
+    public UserBodyAttackHandler(
+        IPipeline<FieldOnPacketUserAttack> pipeline,
+        ILogger<UserBodyAttackHandler> logger
+    )
+        : base(pipeline, logger) { }
 }
