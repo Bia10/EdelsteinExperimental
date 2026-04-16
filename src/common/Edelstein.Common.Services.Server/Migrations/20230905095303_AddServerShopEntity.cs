@@ -14,15 +14,14 @@ namespace Edelstein.Common.Services.Server.Migrations
                 name: "ServerShopEntity_WorldID",
                 table: "servers",
                 type: "integer",
-                nullable: true);
+                nullable: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "ServerShopEntity_WorldID",
-                table: "servers");
+            migrationBuilder.DropColumn(name: "ServerShopEntity_WorldID", table: "servers");
         }
     }
 }

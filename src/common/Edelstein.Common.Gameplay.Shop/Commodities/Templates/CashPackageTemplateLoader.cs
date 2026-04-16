@@ -9,8 +9,11 @@ public class CashPackageTemplateLoader : ITemplateLoader
 {
     private readonly IDataNamespace _data;
     private readonly ITemplateManager<ICashPackageTemplate> _manager;
-    
-    public CashPackageTemplateLoader(IDataNamespace data, ITemplateManager<ICashPackageTemplate> manager)
+
+    public CashPackageTemplateLoader(
+        IDataNamespace data,
+        ITemplateManager<ICashPackageTemplate> manager
+    )
     {
         _data = data;
         _manager = manager;
@@ -18,15 +21,21 @@ public class CashPackageTemplateLoader : ITemplateLoader
 
     public async Task<int> Load()
     {
-        await Task.WhenAll(_data.ResolvePath("Etc/CashPackage.img")?.Children
-            .Select(async n =>
-            {
-                var sn = Convert.ToInt32(n.Name);
-                await _manager.Insert(new TemplateProviderLazy<ICashPackageTemplate>(
-                    sn,
-                    () => new CashPackageTemplate(sn, n.Cache())
-                ));
-            }) ?? Array.Empty<Task>());
+        await Task.WhenAll(
+            _data
+                .ResolvePath("Etc/CashPackage.img")
+                ?.Children.Select(async n =>
+                {
+                    var sn = Convert.ToInt32(n.Name);
+                    await _manager.Insert(
+                        new TemplateProviderLazy<ICashPackageTemplate>(
+                            sn,
+                            () => new CashPackageTemplate(sn, n.Cache())
+                        )
+                    );
+                })
+                ?? Array.Empty<Task>()
+        );
 
         _manager.Freeze();
         return _manager.Count;

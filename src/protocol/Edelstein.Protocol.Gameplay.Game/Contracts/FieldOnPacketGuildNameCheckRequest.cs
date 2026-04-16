@@ -1,4 +1,4 @@
-using Edelstein.Protocol.Gameplay.Game.Objects.User;
+﻿using Edelstein.Protocol.Gameplay.Game.Objects.User;
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
@@ -7,7 +7,4 @@ namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 /// validate a proposed guild name before committing to creation.
 /// Wire: Encode1(2) + EncodeStr(guildName).
 /// </summary>
-public record FieldOnPacketGuildNameCheckRequest(
-    IFieldUser User,
-    string GuildName
-);
+public record FieldOnPacketGuildNameCheckRequest(IFieldUser User, string GuildName);

@@ -9,7 +9,12 @@ public interface IModifySkillContext : IPacketWritable
     void Add(ISkillTemplate template, int increment = 1);
 
     void Set(int templateID, int level, int? masterLevel = null, DateTime? dateExpire = null);
-    void Set(ISkillTemplate template, int level, int? masterLevel = null, DateTime? dateExpire = null);
+    void Set(
+        ISkillTemplate template,
+        int level,
+        int? masterLevel = null,
+        DateTime? dateExpire = null
+    );
 
     void ResetByTemplate(int templateID);
     void ResetByTemplate(ISkillTemplate template);

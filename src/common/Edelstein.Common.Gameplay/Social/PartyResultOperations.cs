@@ -50,7 +50,7 @@ public enum PartyResultOperations
     FailToRequestPQReward = 0x2B,
     CanNotInThisField = 0x2C,
     ServerMsg = 0x2D,
-    
+
     TownPortalChanged = 0x2E,
     OpenGate = 0x2F,
 }

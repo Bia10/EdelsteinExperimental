@@ -37,15 +37,15 @@ public interface IItemOptionTemplateLevel
     short IncPDDr { get; }
     short IncMDDr { get; }
     short IncCr { get; }
-    
+
     short IncAllSkill { get; }
-    
+
     short RecoveryHP { get; }
     short RecoveryMP { get; }
     short RecoveryUP { get; }
     short MPConReduce { get; }
     short MPConRestore { get; }
-    
+
     short IgnoreTargetDEF { get; }
     short IgnoreDAM { get; }
     short IgnoreDAMr { get; }
@@ -54,9 +54,9 @@ public interface IItemOptionTemplateLevel
     short AttackType { get; }
     int IncMesoProb { get; }
     int IncRewardProb { get; }
-    
+
     short Level { get; }
     short Boss { get; }
-    
+
     // Emotion
 }

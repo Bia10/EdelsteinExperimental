@@ -1,4 +1,4 @@
-using Edelstein.Protocol.Services.Social;
+﻿using Edelstein.Protocol.Services.Social;
 
 namespace Edelstein.Protocol.Gameplay.Contracts;
 
@@ -7,7 +7,4 @@ namespace Edelstein.Protocol.Gameplay.Contracts;
 /// Wire: LP_GuildResult GuildRes_SetSkill_Done (0x51).
 /// Payload: guildID(4) + skillID(4) + SKILLENTRY (level(2) + dateExpire(8) + buyerName(str)).
 /// </summary>
-public record NotifyGuildSkillUpdated(
-    int GuildID,
-    IGuildSkillRecord Skill
-);
+public record NotifyGuildSkillUpdated(int GuildID, IGuildSkillRecord Skill);

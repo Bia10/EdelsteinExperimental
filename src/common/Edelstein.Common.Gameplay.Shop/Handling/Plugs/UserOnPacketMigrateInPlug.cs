@@ -6,20 +6,28 @@ using Microsoft.Extensions.Logging;
 
 namespace Edelstein.Common.Gameplay.Shop.Handling.Plugs;
 
-public class UserOnPacketMigrateInPlug : AbstractUserOnPacketMigrateInPlug<IShopStage, IShopStageUser>
+public class UserOnPacketMigrateInPlug
+    : AbstractUserOnPacketMigrateInPlug<IShopStage, IShopStageUser>
 {
     public UserOnPacketMigrateInPlug(
         ILogger<AbstractUserOnPacketMigrateInPlug<IShopStage, IShopStageUser>> logger,
         IShopStage stage,
         IMigrationService migrationService,
-        ISessionService sessionService, 
-        IFriendService friendService, 
+        ISessionService sessionService,
+        IFriendService friendService,
         IPartyService partyService,
         IGuildService guildService
-    ) : base(logger, stage, migrationService, sessionService, friendService, partyService, guildService)
-    {
-    }
+    )
+        : base(
+            logger,
+            stage,
+            migrationService,
+            sessionService,
+            friendService,
+            partyService,
+            guildService
+        ) { }
 
-    public override void SetValues(IShopStageUser user, IMigration migration)
-        => user.FromServerID = migration.FromServerID;
+    public override void SetValues(IShopStageUser user, IMigration migration) =>
+        user.FromServerID = migration.FromServerID;
 }

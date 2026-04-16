@@ -16,5 +16,5 @@ public enum MessageType
     QuestRecordExMessage = 0xB,
     ItemProtectExpireMessage = 0xC,
     ItemExpireReplaceMessage = 0xD,
-    SkillExpireMessage = 0xE
+    SkillExpireMessage = 0xE,
 }

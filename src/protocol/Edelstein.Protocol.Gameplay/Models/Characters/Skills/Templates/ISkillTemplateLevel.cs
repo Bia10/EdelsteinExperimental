@@ -6,7 +6,7 @@ namespace Edelstein.Protocol.Gameplay.Models.Characters.Skills.Templates;
 public interface ISkillTemplateLevel : ITemplate
 {
     int Level { get; }
-    
+
     short HP { get; }
     short MP { get; }
 

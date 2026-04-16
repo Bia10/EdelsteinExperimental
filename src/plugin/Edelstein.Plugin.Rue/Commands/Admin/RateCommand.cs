@@ -49,7 +49,8 @@ public class RateCommand : AbstractCommand<RateCommandArgs>
             {
                 foreach (var modifier in modifiers.OrderByDescending(m => m.Priority ?? 0))
                 {
-                    output += $"  [{modifier.Source}] {modifier.Multiplier:F2}x (priority: {modifier.Priority ?? 0}){newline}";
+                    output +=
+                        $"  [{modifier.Source}] {modifier.Multiplier:F2}x (priority: {modifier.Priority ?? 0}){newline}";
                 }
             }
 

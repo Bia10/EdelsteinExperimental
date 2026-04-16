@@ -1,4 +1,4 @@
-using Edelstein.Common.Gameplay.Handling;
+﻿using Edelstein.Common.Gameplay.Handling;
 using Edelstein.Common.Gameplay.Social;
 using Edelstein.Protocol.Gameplay.Game.Contracts;
 using Edelstein.Protocol.Gameplay.Game.Objects.User;
@@ -35,7 +35,8 @@ public class GuildResultHandler : AbstractFieldHandler
                 var inviterName = reader.ReadString();
                 reader.ReadString(); // myName — redundant; we trust the session
                 return user.StageUser.Context.Pipelines.FieldOnPacketGuildRejectResult.Process(
-                    new FieldOnPacketGuildRejectResult(user, inviterName, false));
+                    new FieldOnPacketGuildRejectResult(user, inviterName, false)
+                );
             }
 
             // 0x38 — Player was already in a guild or already had a pending invite.
@@ -44,7 +45,8 @@ public class GuildResultHandler : AbstractFieldHandler
                 var inviterName = reader.ReadString();
                 reader.ReadString(); // myName — redundant
                 return user.StageUser.Context.Pipelines.FieldOnPacketGuildRejectResult.Process(
-                    new FieldOnPacketGuildRejectResult(user, inviterName, true));
+                    new FieldOnPacketGuildRejectResult(user, inviterName, true)
+                );
             }
 
             default:

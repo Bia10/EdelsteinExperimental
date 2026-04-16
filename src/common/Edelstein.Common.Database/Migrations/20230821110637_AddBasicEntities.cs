@@ -17,31 +17,40 @@ namespace Edelstein.Common.Database.Migrations
                 name: "accounts",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ID = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     Username = table.Column<string>(type: "text", nullable: false),
                     PIN = table.Column<string>(type: "text", nullable: true),
                     SPW = table.Column<string>(type: "text", nullable: true),
                     GradeCode = table.Column<byte>(type: "smallint", nullable: false),
                     SubGradeCode = table.Column<short>(type: "smallint", nullable: false),
-                    Gender = table.Column<byte>(type: "smallint", nullable: true)
+                    Gender = table.Column<byte>(type: "smallint", nullable: true),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_accounts", x => x.ID);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "account_worlds",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ID = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     AccountID = table.Column<int>(type: "integer", nullable: false),
                     WorldID = table.Column<int>(type: "integer", nullable: false),
                     Locker = table.Column<IItemLocker>(type: "jsonb", nullable: false),
                     Trunk = table.Column<IItemTrunk>(type: "jsonb", nullable: false),
-                    CharacterSlotMax = table.Column<int>(type: "integer", nullable: false)
+                    CharacterSlotMax = table.Column<int>(type: "integer", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -51,15 +60,21 @@ namespace Edelstein.Common.Database.Migrations
                         column: x => x.AccountID,
                         principalTable: "accounts",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "characters",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ID = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     AccountWorldID = table.Column<int>(type: "integer", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Gender = table.Column<byte>(type: "smallint", nullable: false),
@@ -86,7 +101,10 @@ namespace Edelstein.Common.Database.Migrations
                     FieldPortal = table.Column<byte>(type: "smallint", nullable: false),
                     PlayTime = table.Column<int>(type: "integer", nullable: false),
                     SubJob = table.Column<short>(type: "smallint", nullable: false),
-                    Inventories = table.Column<IDictionary<ItemInventoryType, IItemInventory>>(type: "jsonb", nullable: false)
+                    Inventories = table.Column<IDictionary<ItemInventoryType, IItemInventory>>(
+                        type: "jsonb",
+                        nullable: false
+                    ),
                 },
                 constraints: table =>
                 {
@@ -96,37 +114,39 @@ namespace Edelstein.Common.Database.Migrations
                         column: x => x.AccountWorldID,
                         principalTable: "account_worlds",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_account_worlds_AccountID",
                 table: "account_worlds",
-                column: "AccountID");
+                column: "AccountID"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_accounts_Username",
                 table: "accounts",
                 column: "Username",
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_characters_AccountWorldID",
                 table: "characters",
-                column: "AccountWorldID");
+                column: "AccountWorldID"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "characters");
+            migrationBuilder.DropTable(name: "characters");
 
-            migrationBuilder.DropTable(
-                name: "account_worlds");
+            migrationBuilder.DropTable(name: "account_worlds");
 
-            migrationBuilder.DropTable(
-                name: "accounts");
+            migrationBuilder.DropTable(name: "accounts");
         }
     }
 }

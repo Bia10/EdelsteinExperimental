@@ -11,12 +11,14 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
 public class SummonedAttackHandler : AbstractPipedFieldSummonedHandler<FieldOnPacketSummonedAttack>
 {
-    public SummonedAttackHandler(IPipeline<FieldOnPacketSummonedAttack> pipeline) : base(pipeline)
-    {
-    }
+    public SummonedAttackHandler(IPipeline<FieldOnPacketSummonedAttack> pipeline)
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.SummonedAttack;
 
-    protected override FieldOnPacketSummonedAttack? Serialize(IFieldUser user, IFieldSummoned summoned, IPacketReader reader)
-        => new(user, summoned, reader.Read(new SummonedAttack()));
+    protected override FieldOnPacketSummonedAttack? Serialize(
+        IFieldUser user,
+        IFieldSummoned summoned,
+        IPacketReader reader
+    ) => new(user, summoned, reader.Read(new SummonedAttack()));
 }

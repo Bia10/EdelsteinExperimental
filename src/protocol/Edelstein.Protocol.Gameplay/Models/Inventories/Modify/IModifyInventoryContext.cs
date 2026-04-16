@@ -3,7 +3,8 @@ using Edelstein.Protocol.Gameplay.Models.Inventories.Templates;
 
 namespace Edelstein.Protocol.Gameplay.Models.Inventories.Modify;
 
-public interface IModifyInventoryContext<TSlot> : IModifyInventory<TSlot> where TSlot : IItemSlot
+public interface IModifyInventoryContext<TSlot> : IModifyInventory<TSlot>
+    where TSlot : IItemSlot
 {
     TSlot? this[short slot] { get; }
     IReadOnlyDictionary<short, TSlot> Items { get; }

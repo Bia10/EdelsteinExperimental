@@ -11,19 +11,23 @@ public class FieldOnPacketPartyKickRequestPlug : IPipelinePlug<FieldOnPacketPart
 {
     public async Task Handle(IPipelineContext ctx, FieldOnPacketPartyKickRequest message)
     {
-        if (message.User.StageUser.Party == null) return;
-        
-        var response = await message.User.StageUser.Context.Services.Party.Kick(new PartyKickRequest(
-            message.User.Character.ID,
-            message.User.StageUser.Party.ID,
-            message.CharacterID
-        ));
-        
-        if (response.Result == PartyResult.Success) return;
-        
+        if (message.User.StageUser.Party == null)
+            return;
+
+        var response = await message.User.StageUser.Context.Services.Party.Kick(
+            new PartyKickRequest(
+                message.User.Character.ID,
+                message.User.StageUser.Party.ID,
+                message.CharacterID
+            )
+        );
+
+        if (response.Result == PartyResult.Success)
+            return;
+
         var result = response.Result switch
         {
-            _ => PartyResultOperations.WithdrawPartyUnknown
+            _ => PartyResultOperations.WithdrawPartyUnknown,
         };
         using var packet = new PacketWriter(PacketSendOperations.PartyResult);
         packet.WriteByte((byte)result);

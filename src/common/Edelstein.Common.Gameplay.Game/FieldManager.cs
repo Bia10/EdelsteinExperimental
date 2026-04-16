@@ -35,7 +35,8 @@ public class FieldManager : IFieldManager
         var field = _fields.TryGetValue(key, out var result) ? result : null;
         var template = await _fieldTemplates.Retrieve(key);
 
-        if (field != null || template == null) return field;
+        if (field != null || template == null)
+            return field;
 
         field = new Field(this, template);
 
@@ -48,17 +49,20 @@ public class FieldManager : IFieldManager
                 case FieldLifeType.NPC:
                 {
                     var npc = await _npcTemplates.Retrieve(life.ID);
-                    if (npc == null) continue;
+                    if (npc == null)
+                        continue;
                     npcUnits.Add(new FieldGeneratorNPCUnit(field, life, npc));
                     break;
                 }
                 case FieldLifeType.Monster:
                 {
                     var mob = await _mobTemplates.Retrieve(life.ID);
-                    if (mob == null) continue;
-                    mobUnits.Add(life.MobTime > 0
-                        ? new FieldGeneratorMobTimedUnit(field, life, mob)
-                        : new FieldGeneratorMobNormalUnit(field, life, mob)
+                    if (mob == null)
+                        continue;
+                    mobUnits.Add(
+                        life.MobTime > 0
+                            ? new FieldGeneratorMobTimedUnit(field, life, mob)
+                            : new FieldGeneratorMobNormalUnit(field, life, mob)
                     );
                     break;
                 }

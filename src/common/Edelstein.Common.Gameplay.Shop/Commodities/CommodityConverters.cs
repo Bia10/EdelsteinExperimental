@@ -9,7 +9,10 @@ namespace Edelstein.Common.Gameplay.Shop.Commodities;
 
 public static class CommodityConverters
 {
-    public static IItemLockerSlot ToItemLockerSlot(this ICommodity commodity, IItemTemplate template)
+    public static IItemLockerSlot ToItemLockerSlot(
+        this ICommodity commodity,
+        IItemTemplate template
+    )
     {
         var item = template.ToItemSlot();
         var slot = new ItemLockerSlot { Item = item };

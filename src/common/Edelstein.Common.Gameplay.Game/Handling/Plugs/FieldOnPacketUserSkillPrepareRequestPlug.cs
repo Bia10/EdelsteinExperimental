@@ -5,7 +5,8 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class FieldOnPacketUserSkillPrepareRequestPlug : IPipelinePlug<FieldOnPacketUserSkillPrepareRequest>
+public class FieldOnPacketUserSkillPrepareRequestPlug
+    : IPipelinePlug<FieldOnPacketUserSkillPrepareRequest>
 {
     public async Task Handle(IPipelineContext ctx, FieldOnPacketUserSkillPrepareRequest message)
     {

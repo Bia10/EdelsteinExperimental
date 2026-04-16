@@ -34,5 +34,5 @@ public enum EffectType
     IncDecHPEffect_EX = 0x1D,
     DeliveryQuestItemUse = 0x1E,
     RepeatEffectRemove = 0x1F,
-    EvolRing = 0x20
+    EvolRing = 0x20,
 }

@@ -3,7 +3,7 @@
 public interface INPCShopItem
 {
     int Order { get; }
-    
+
     int TemplateID { get; }
 
     int Price { get; }
@@ -15,7 +15,7 @@ public interface INPCShopItem
     int ItemPeriod { get; }
     int LevelLimited { get; }
     double UnitPrice { get; }
-    
+
     short MaxPerSlot { get; }
     int Quantity { get; }
 }

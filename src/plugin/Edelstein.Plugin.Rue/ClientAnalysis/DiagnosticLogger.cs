@@ -7,15 +7,21 @@ public sealed class DiagnosticLogger(ILogger inner, bool diagnosticsEnabled) : I
     private readonly ILogger _inner = inner ?? throw new ArgumentNullException(nameof(inner));
     private readonly bool _diagnosticsEnabled = diagnosticsEnabled;
 
-    public IDisposable BeginScope<TState>(TState state) where TState : notnull
-        => _inner.BeginScope(state) ?? NullScope.Instance;
+    public IDisposable BeginScope<TState>(TState state)
+        where TState : notnull => _inner.BeginScope(state) ?? NullScope.Instance;
 
-    public bool IsEnabled(LogLevel logLevel)
-        => _diagnosticsEnabled
+    public bool IsEnabled(LogLevel logLevel) =>
+        _diagnosticsEnabled
             ? _inner.IsEnabled(logLevel)
             : logLevel >= LogLevel.Warning && _inner.IsEnabled(logLevel);
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
+    public void Log<TState>(
+        LogLevel logLevel,
+        EventId eventId,
+        TState state,
+        Exception? exception,
+        Func<TState, Exception?, string> formatter
+    )
     {
         if (!_diagnosticsEnabled && logLevel < LogLevel.Warning)
             return;
@@ -30,8 +36,6 @@ public sealed class DiagnosticLogger(ILogger inner, bool diagnosticsEnabled) : I
     {
         public static readonly NullScope Instance = new();
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
     }
 }

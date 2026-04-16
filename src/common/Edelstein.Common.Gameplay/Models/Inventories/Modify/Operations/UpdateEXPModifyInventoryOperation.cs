@@ -7,13 +7,8 @@ public class UpdateEXPModifyInventoryOperation : AbstractModifyInventoryOperatio
 {
     private readonly int _exp;
 
-    public UpdateEXPModifyInventoryOperation(
-        ItemInventoryType inventory,
-        short slot,
-        int exp
-    ) : base(ModifyInventoryOperationType.UpdateEXP, inventory, slot) =>
-        _exp = exp;
+    public UpdateEXPModifyInventoryOperation(ItemInventoryType inventory, short slot, int exp)
+        : base(ModifyInventoryOperationType.UpdateEXP, inventory, slot) => _exp = exp;
 
-    protected override void WriteData(IPacketWriter writer) =>
-        writer.WriteInt(_exp);
+    protected override void WriteData(IPacketWriter writer) => writer.WriteInt(_exp);
 }

@@ -21,12 +21,12 @@ public record QuestTemplateActItem : IQuestTemplateActItem
         Prob = node.ResolveInt("prop");
         Variation = (ItemVariationOption?)node.ResolveInt("var");
     }
-    
+
     public int Order { get; }
-    
+
     public int ItemID { get; }
     public int Count { get; }
-    
+
     public bool? IsNamed { get; }
     public int? Period { get; }
     public QuestJobFlags? JobFlags { get; }

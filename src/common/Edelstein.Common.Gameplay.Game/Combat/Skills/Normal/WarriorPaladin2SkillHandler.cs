@@ -27,7 +27,7 @@ public class WarriorPaladin2SkillHandler : Warrior1SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.PowerGuard, context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

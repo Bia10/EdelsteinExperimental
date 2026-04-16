@@ -12,22 +12,23 @@ public class NotifyPartyCreatedPlug : IPipelinePlug<NotifyPartyCreated>
     private readonly IGameStage _stage;
 
     public NotifyPartyCreatedPlug(IGameStage stage) => _stage = stage;
-    
+
     public async Task Handle(IPipelineContext ctx, NotifyPartyCreated message)
     {
         var user = await _stage.Users.Retrieve(message.CharacterID);
-        if (user == null) return;
-        
+        if (user == null)
+            return;
+
         user.Party = message.Party;
-        
+
         using var packet = new PacketWriter(PacketSendOperations.PartyResult);
         packet.WriteByte((byte)PartyResultOperations.CreateNewPartyDone);
         packet.WriteInt(message.Party.ID);
-        
+
         packet.WriteInt(0);
         packet.WriteInt(0);
         packet.WriteInt(0);
-        
+
         packet.WriteShort(0);
         packet.WriteShort(0);
         _ = user.Dispatch(packet.Build());

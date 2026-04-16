@@ -15,5 +15,5 @@ public enum FieldPortalType
     Hidden = 0xA,
     ScriptHidden = 0xB,
     CollisionVerticalJump = 0xC,
-    OllisionCustomImpact = 0xD
+    OllisionCustomImpact = 0xD,
 }

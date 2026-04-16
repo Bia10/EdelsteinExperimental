@@ -16,7 +16,8 @@ public sealed class NativeAllocator(ProcessHandle process, MemoryAccessor memory
             IntPtr.Zero,
             (uint)size,
             Win32Api.AllocationType.Commit | Win32Api.AllocationType.Reserve,
-            Win32Api.MemoryProtection.ReadWrite);
+            Win32Api.MemoryProtection.ReadWrite
+        );
 
         if (allocated != IntPtr.Zero)
             _allocations.Add(allocated);

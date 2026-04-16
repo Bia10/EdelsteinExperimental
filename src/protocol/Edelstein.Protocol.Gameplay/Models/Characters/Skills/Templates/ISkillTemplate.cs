@@ -13,12 +13,12 @@ public interface ISkillTemplate : ITemplate
     bool IsSummon { get; }
     bool IsInvisible { get; }
     bool IsCombatOrders { get; }
-    
+
     Element Element { get; }
-    
+
     int Delay { get; }
 
     ICollection<int> PsdSkill { get; }
-    IDictionary<int, int> ReqSkill { get; } 
+    IDictionary<int, int> ReqSkill { get; }
     ITemplateCollection<ISkillTemplateLevel> Levels { get; }
 }

@@ -24,5 +24,5 @@ public enum NPCShopResultOperations
     CantBuyAnymore = 0x10,
     TradeBlocked = 0x11,
     BuyLimit = 0x12,
-    ServerMsg = 0x13
+    ServerMsg = 0x13,
 }

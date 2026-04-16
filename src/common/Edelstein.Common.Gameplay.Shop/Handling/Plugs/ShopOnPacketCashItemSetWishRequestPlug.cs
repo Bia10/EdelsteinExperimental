@@ -6,12 +6,14 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Shop.Handling.Plugs;
 
-public class ShopOnPacketCashItemSetWishRequestPlug : IPipelinePlug<ShopOnPacketCashItemSetWishRequest>
+public class ShopOnPacketCashItemSetWishRequestPlug
+    : IPipelinePlug<ShopOnPacketCashItemSetWishRequest>
 {
     public async Task Handle(IPipelineContext ctx, ShopOnPacketCashItemSetWishRequest message)
     {
-        if (message.User.Character == null) return;
-        
+        if (message.User.Character == null)
+            return;
+
         message.User.Character.Wishlist.Records.Clear();
         for (var i = 0; i < 10; i++)
             message.User.Character.Wishlist.Records.Add(message.Wishlist[i]);

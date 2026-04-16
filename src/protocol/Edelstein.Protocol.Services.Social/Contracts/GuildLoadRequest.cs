@@ -1,5 +1,3 @@
-namespace Edelstein.Protocol.Services.Social.Contracts;
+﻿namespace Edelstein.Protocol.Services.Social.Contracts;
 
-public record GuildLoadRequest(
-    int CharacterID
-);
+public record GuildLoadRequest(int CharacterID);

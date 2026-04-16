@@ -10,7 +10,6 @@ namespace Edelstein.Common.Services.Social;
 /// </summary>
 public class GuildMembership : IGuildMembership
 {
-
     public int ID { get; set; }
     public string Name { get; set; } = string.Empty;
     public string GradeName1 { get; set; } = string.Empty;
@@ -29,7 +28,6 @@ public class GuildMembership : IGuildMembership
     public byte GuildLevel { get; set; }
     public int AllianceID { get; set; }
 
-
     public int GuildID { get; set; }
     public int CharacterID { get; set; }
     public string CharacterName { get; set; } = string.Empty;
@@ -40,8 +38,10 @@ public class GuildMembership : IGuildMembership
     public int Commitment { get; set; }
     public int AllianceGrade { get; set; }
 
-    public IDictionary<int, IGuildMember> Members { get; set; } = new Dictionary<int, IGuildMember>();
-    public IDictionary<int, IGuildSkillRecord> Skills { get; set; } = new Dictionary<int, IGuildSkillRecord>();
+    public IDictionary<int, IGuildMember> Members { get; set; } =
+        new Dictionary<int, IGuildMember>();
+    public IDictionary<int, IGuildSkillRecord> Skills { get; set; } =
+        new Dictionary<int, IGuildSkillRecord>();
 
     public GuildMembership() { }
 
@@ -53,7 +53,6 @@ public class GuildMembership : IGuildMembership
     public GuildMembership(GuildMemberEntity guildMember)
     {
         var guild = guildMember.Guild;
-
 
         ID = guild.ID;
         Name = guild.Name;
@@ -73,7 +72,6 @@ public class GuildMembership : IGuildMembership
         GuildLevel = guild.GuildLevel;
         AllianceID = guild.AllianceID;
 
-
         GuildID = guildMember.GuildID;
         CharacterID = guildMember.CharacterID;
         CharacterName = guildMember.CharacterName;
@@ -84,16 +82,14 @@ public class GuildMembership : IGuildMembership
         Commitment = guildMember.Commitment;
         AllianceGrade = guildMember.AllianceGrade;
 
+        Members = guild.Members.ToDictionary(
+            m => m.CharacterID,
+            m => (IGuildMember)new GuildMembershipMember(m)
+        );
 
-        Members = guild.Members
-            .ToDictionary(
-                m => m.CharacterID,
-                m => (IGuildMember)new GuildMembershipMember(m));
-
-
-        Skills = guild.Skills
-            .ToDictionary(
-                s => s.SkillID,
-                s => (IGuildSkillRecord)new GuildMembershipSkill(s));
+        Skills = guild.Skills.ToDictionary(
+            s => s.SkillID,
+            s => (IGuildSkillRecord)new GuildMembershipSkill(s)
+        );
     }
 }

@@ -20,7 +20,7 @@ public class Striker2SkillHandler : Striker1SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.WeaponCharge, context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

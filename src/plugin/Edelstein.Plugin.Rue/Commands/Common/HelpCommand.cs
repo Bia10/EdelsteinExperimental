@@ -20,8 +20,10 @@ public class HelpCommand : AbstractCommand
     public override async Task Execute(IFieldUser user, string[] args)
     {
         await user.Message("Available commands:");
-        await Task.WhenAll((await _processor.RetrieveAll())
-            .Where(c => c.Check(user))
-            .Select(c => user.Message($"{c.Name} - {c.Description}")));
+        await Task.WhenAll(
+            (await _processor.RetrieveAll())
+                .Where(c => c.Check(user))
+                .Select(c => user.Message($"{c.Name} - {c.Description}"))
+        );
     }
 }

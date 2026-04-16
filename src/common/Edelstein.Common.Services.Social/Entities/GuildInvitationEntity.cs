@@ -1,4 +1,4 @@
-using Edelstein.Protocol.Utilities.Repositories;
+﻿using Edelstein.Protocol.Utilities.Repositories;
 
 namespace Edelstein.Common.Services.Social.Entities;
 

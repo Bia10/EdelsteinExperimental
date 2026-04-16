@@ -1,4 +1,4 @@
-using Duey.Abstractions;
+﻿using Duey.Abstractions;
 using Edelstein.Common.Utilities.Templates;
 using Edelstein.Protocol.Gameplay.Game.Objects.NPC.Templates;
 using Edelstein.Protocol.Utilities.Templates;
@@ -20,21 +20,21 @@ public class NPCTemplateLoader : ITemplateLoader
     {
         var directory = _data.ResolvePath("Npc")?.Cache();
 
-        if (directory == null) return 0;
+        if (directory == null)
+            return 0;
 
-        await Task.WhenAll(directory.Children
-            .Select(async n =>
+        await Task.WhenAll(
+            directory.Children.Select(async n =>
             {
                 var id = Convert.ToInt32(n.Name.Split(".")[0]);
-                await _manager.Insert(new TemplateProviderLazy<INPCTemplate>(
-                    id,
-                    () => new NPCTemplate(
+                await _manager.Insert(
+                    new TemplateProviderLazy<INPCTemplate>(
                         id,
-                        n.Cache(),
-                        n.ResolvePath("info")!.Cache()
+                        () => new NPCTemplate(id, n.Cache(), n.ResolvePath("info")!.Cache())
                     )
-                ));
-            }));
+                );
+            })
+        );
 
         _manager.Freeze();
         return _manager.Count;

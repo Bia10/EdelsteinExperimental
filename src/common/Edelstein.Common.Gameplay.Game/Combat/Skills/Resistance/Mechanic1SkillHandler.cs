@@ -7,7 +7,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Resistance;
 public class Mechanic1SkillHandler : CitizenSkillHandler
 {
     public override int ID => Job.Mechanic;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -16,7 +16,7 @@ public class Mechanic1SkillHandler : CitizenSkillHandler
                 context.SetTwoStateRideVehicle(1932016);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 

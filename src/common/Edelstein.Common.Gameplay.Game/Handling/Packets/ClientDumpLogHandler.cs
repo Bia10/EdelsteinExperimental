@@ -8,12 +8,13 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 public class ClientDumpLogHandler : IPacketHandler<IGameStageUser>
 {
     private ILogger _logger;
-    
+
     public ClientDumpLogHandler(ILogger<ClientDumpLogHandler> logger) => _logger = logger;
-    
+
     public short Operation => (short)PacketRecvOperations.ClientDumpLog;
 
     public bool Check(IGameStageUser user) => true;
+
     public Task Handle(IGameStageUser user, IPacketReader reader)
     {
         var callType = reader.ReadShort();
@@ -26,9 +27,9 @@ public class ClientDumpLogHandler : IPacketHandler<IGameStageUser>
         _logger.LogWarning(
             "Received client dump log of type {Type} with buffer {Buffer}",
             (PacketSendOperations)type,
-            Convert.ToHexString(backupBuffer )
+            Convert.ToHexString(backupBuffer)
         );
-        
+
         return Task.CompletedTask;
     }
 }

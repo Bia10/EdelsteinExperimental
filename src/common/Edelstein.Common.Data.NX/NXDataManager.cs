@@ -16,13 +16,15 @@ public class NXDataManager : IDataManager
                 d => (INXNode)new NXFile(d).Root
             );
 
-    public T? Resolve<T>(string? path = null) where T : struct
+    public T? Resolve<T>(string? path = null)
+        where T : struct
     {
         var node = Resolve(path);
         return node?.Resolve<T>();
     }
 
-    public T? ResolveOrDefault<T>(string? path = null) where T : class
+    public T? ResolveOrDefault<T>(string? path = null)
+        where T : class
     {
         var node = Resolve(path);
         return node?.ResolveOrDefault<T>();
@@ -30,7 +32,8 @@ public class NXDataManager : IDataManager
 
     public IDataNode? Resolve(string? path = null)
     {
-        if (string.IsNullOrEmpty(path)) return null;
+        if (string.IsNullOrEmpty(path))
+            return null;
         var split = path.Split('/');
         return _nodes.TryGetValue(split[0], out var value)
             ? new NXDataNode(value.ResolvePath(string.Join("/", split.Skip(1).ToArray())))

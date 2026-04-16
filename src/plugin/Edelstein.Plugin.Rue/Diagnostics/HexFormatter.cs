@@ -6,8 +6,8 @@ public static class HexFormatter
 {
     private static ReadOnlySpan<char> HexDigits => "0123456789ABCDEF";
 
-    public static string FormatHexDump(byte[] buffer, int bytesPerLine = 16)
-        => FormatHexDump(buffer.AsSpan(), bytesPerLine);
+    public static string FormatHexDump(byte[] buffer, int bytesPerLine = 16) =>
+        FormatHexDump(buffer.AsSpan(), bytesPerLine);
 
     public static string FormatHexDump(ReadOnlySpan<byte> buffer, int bytesPerLine = 16)
     {
@@ -17,13 +17,22 @@ public static class HexFormatter
     }
 
     public static void AppendHexDump(
-        StringBuilder sb, byte[] bytes, uint baseAddress,
-        int maxBytes = int.MaxValue, string indent = "    ", int bytesPerLine = 16)
-        => AppendHexDump(sb, bytes.AsSpan(), baseAddress, maxBytes, indent, bytesPerLine);
+        StringBuilder sb,
+        byte[] bytes,
+        uint baseAddress,
+        int maxBytes = int.MaxValue,
+        string indent = "    ",
+        int bytesPerLine = 16
+    ) => AppendHexDump(sb, bytes.AsSpan(), baseAddress, maxBytes, indent, bytesPerLine);
 
     public static void AppendHexDump(
-        StringBuilder sb, ReadOnlySpan<byte> buffer, uint baseAddress,
-        int maxBytes = int.MaxValue, string indent = "    ", int bytesPerLine = 16)
+        StringBuilder sb,
+        ReadOnlySpan<byte> buffer,
+        uint baseAddress,
+        int maxBytes = int.MaxValue,
+        string indent = "    ",
+        int bytesPerLine = 16
+    )
     {
         var len = Math.Min(buffer.Length, maxBytes);
         var slice = buffer[..len];
@@ -52,12 +61,13 @@ public static class HexFormatter
             sb.AppendLine($"{indent}... ({buffer.Length - maxBytes} more bytes)");
     }
 
-    public static string FormatAsciiDump(byte[] buffer, int bytesPerLine = 16)
-        => FormatAsciiDump(buffer.AsSpan(), bytesPerLine);
+    public static string FormatAsciiDump(byte[] buffer, int bytesPerLine = 16) =>
+        FormatAsciiDump(buffer.AsSpan(), bytesPerLine);
 
     public static string FormatAsciiDump(ReadOnlySpan<byte> buffer, int bytesPerLine = 16)
     {
-        if (buffer.Length == 0) return "(empty)";
+        if (buffer.Length == 0)
+            return "(empty)";
 
         var sb = new StringBuilder();
         Span<char> hexBuffer = stackalloc char[(bytesPerLine * 3) + 1];
@@ -81,13 +91,18 @@ public static class HexFormatter
         return sb.ToString();
     }
 
-    private static void FillHexBuffer(Span<char> buffer, ReadOnlySpan<byte> lineBytes, int bytesPerLine)
+    private static void FillHexBuffer(
+        Span<char> buffer,
+        ReadOnlySpan<byte> lineBytes,
+        int bytesPerLine
+    )
     {
         buffer.Fill(' ');
 
         for (var j = 0; j < bytesPerLine; j++)
         {
-            if (j >= lineBytes.Length) continue;
+            if (j >= lineBytes.Length)
+                continue;
 
             var b = lineBytes[j];
             var offset = (j * 3) + (j > 7 ? 1 : 0);
@@ -97,7 +112,11 @@ public static class HexFormatter
         }
     }
 
-    private static int FillAsciiBuffer(Span<char> buffer, ReadOnlySpan<byte> lineBytes, int bytesPerLine)
+    private static int FillAsciiBuffer(
+        Span<char> buffer,
+        ReadOnlySpan<byte> lineBytes,
+        int bytesPerLine
+    )
     {
         var count = Math.Min(bytesPerLine, lineBytes.Length);
 

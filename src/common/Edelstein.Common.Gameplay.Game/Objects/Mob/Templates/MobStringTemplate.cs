@@ -7,7 +7,7 @@ public record MobStringTemplate : IMobStringTemplate
 {
     public int ID { get; }
     public string Name { get; }
-    
+
     public MobStringTemplate(int id, IDataNode node)
     {
         ID = id;

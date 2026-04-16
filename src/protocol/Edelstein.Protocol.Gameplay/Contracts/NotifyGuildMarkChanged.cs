@@ -1,4 +1,4 @@
-namespace Edelstein.Protocol.Gameplay.Contracts;
+﻿namespace Edelstein.Protocol.Gameplay.Contracts;
 
 /// <summary>
 /// Broadcast when the guild emblem (mark) is updated.

@@ -11,8 +11,8 @@ public class MobCommand : AbstractTemplateCommand<IMobTemplate>
     public MobCommand(
         ITemplateManager<IMobTemplate> templates,
         ITemplateManager<IMobStringTemplate> strings
-    ) : base(templates)
-        => _strings = strings;
+    )
+        : base(templates) => _strings = strings;
 
     public override string Name => "Mob";
     public override string Description => "Searches a specified mob";
@@ -32,6 +32,9 @@ public class MobCommand : AbstractTemplateCommand<IMobTemplate>
         return result;
     }
 
-    protected override Task Execute(IFieldUser user, IMobTemplate template, TemplateCommandArgs args)
-        => Task.CompletedTask;
+    protected override Task Execute(
+        IFieldUser user,
+        IMobTemplate template,
+        TemplateCommandArgs args
+    ) => Task.CompletedTask;
 }

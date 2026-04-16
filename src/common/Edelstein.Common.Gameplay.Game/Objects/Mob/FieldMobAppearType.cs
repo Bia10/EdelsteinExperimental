@@ -7,5 +7,5 @@ public enum FieldMobAppearType
     Revived = -0x3,
     Suspended = -0x4,
     Delay = -0x5,
-    Effect = 0x0
+    Effect = 0x0,
 }

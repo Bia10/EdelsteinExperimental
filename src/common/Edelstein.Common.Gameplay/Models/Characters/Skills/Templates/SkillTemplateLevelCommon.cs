@@ -9,9 +9,9 @@ namespace Edelstein.Common.Gameplay.Models.Characters.Skills.Templates;
 public class SkillTemplateLevelCommon : ISkillTemplateLevel
 {
     public int ID => Level;
-    
+
     public int Level { get; }
-    
+
     public short HP { get; }
     public short MP { get; }
 
@@ -132,7 +132,7 @@ public class SkillTemplateLevelCommon : ISkillTemplateLevel
     public SkillTemplateLevelCommon(int level, IDataNode node)
     {
         Level = level;
-        
+
         var x = new Argument("x", level);
 
         var u = new Function("u", "ceil(x)", "x");
@@ -261,7 +261,8 @@ public class SkillTemplateLevelCommon : ISkillTemplateLevel
 
     private static short ResolveExpression(string? expression, params PrimitiveElement[] elements)
     {
-        if (expression == null) return 0;
+        if (expression == null)
+            return 0;
         return (short)new Expression(expression, elements).calculate();
     }
 }

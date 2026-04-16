@@ -36,26 +36,28 @@ public class UserOnPacketSelectWorldPlug : IPipelinePlug<UserOnPacketSelectWorld
         try
         {
             var gameStage = await _server.GetGameByWorldAndChannel(
-                new ServerGetGameByWorldAndChannelRequest(
-                    message.WorldID,
-                    message.ChannelID
-                )
+                new ServerGetGameByWorldAndChannelRequest(message.WorldID, message.ChannelID)
             );
-            var result = gameStage.Result == ServerResult.Success || gameStage.Server == null
-                ? LoginResult.Success
-                : LoginResult.DBFail;
-            var accountWorld = await _accountWorldRepository.RetrieveByAccountAndWorld(
-                message.User.Account!.ID,
-                gameStage.Server!.WorldID
-            ) ?? await _accountWorldRepository.Insert(new AccountWorld
-            {
-                AccountID = message.User.Account.ID,
-                WorldID = gameStage.Server!.WorldID
-            });
+            var result =
+                gameStage.Result == ServerResult.Success || gameStage.Server == null
+                    ? LoginResult.Success
+                    : LoginResult.DBFail;
+            var accountWorld =
+                await _accountWorldRepository.RetrieveByAccountAndWorld(
+                    message.User.Account!.ID,
+                    gameStage.Server!.WorldID
+                )
+                ?? await _accountWorldRepository.Insert(
+                    new AccountWorld
+                    {
+                        AccountID = message.User.Account.ID,
+                        WorldID = gameStage.Server!.WorldID,
+                    }
+                );
 
-            var characters = (await _characterRepository
-                    .RetrieveAllByAccountWorld(accountWorld.ID))
-                .ToImmutableArray();
+            var characters = (
+                await _characterRepository.RetrieveAllByAccountWorld(accountWorld.ID)
+            ).ToImmutableArray();
             using var packet = new PacketWriter(PacketSendOperations.SelectWorldResult);
 
             packet.WriteByte((byte)result);

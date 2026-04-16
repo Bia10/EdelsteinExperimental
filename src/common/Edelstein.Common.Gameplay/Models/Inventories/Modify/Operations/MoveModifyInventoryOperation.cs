@@ -7,13 +7,8 @@ public class MoveModifyInventoryOperation : AbstractModifyInventoryOperation
 {
     public short ToSlot { get; }
 
-    public MoveModifyInventoryOperation(
-        ItemInventoryType inventory,
-        short slot,
-        short toSlot
-    ) : base(ModifyInventoryOperationType.Move, inventory, slot) =>
-        ToSlot = toSlot;
+    public MoveModifyInventoryOperation(ItemInventoryType inventory, short slot, short toSlot)
+        : base(ModifyInventoryOperationType.Move, inventory, slot) => ToSlot = toSlot;
 
-    protected override void WriteData(IPacketWriter writer) =>
-        writer.WriteShort(ToSlot);
+    protected override void WriteData(IPacketWriter writer) => writer.WriteShort(ToSlot);
 }

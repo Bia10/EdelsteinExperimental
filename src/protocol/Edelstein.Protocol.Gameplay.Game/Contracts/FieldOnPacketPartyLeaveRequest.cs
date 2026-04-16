@@ -2,6 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketPartyLeaveRequest(
-    IFieldUser User
-);
+public record FieldOnPacketPartyLeaveRequest(IFieldUser User);

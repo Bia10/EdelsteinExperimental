@@ -5,16 +5,23 @@ namespace Edelstein.Common.Gameplay.Models.Inventories.Items;
 
 public static class ItemConverters
 {
-    public static IItemSlot ToItemSlot(this IItemTemplate template, ItemVariationOption option = ItemVariationOption.None) => template switch
-    {
-        IItemEquipTemplate equip => equip.ToItemSlotEquip(),
-        IItemBundleTemplate bundle => bundle.ToItemSlotBundle(),
-        IItemPetTemplate pet => pet.ToItemSlotPet(),
-        _ => new ItemSlot { ID = template.ID }
-    };
+    public static IItemSlot ToItemSlot(
+        this IItemTemplate template,
+        ItemVariationOption option = ItemVariationOption.None
+    ) =>
+        template switch
+        {
+            IItemEquipTemplate equip => equip.ToItemSlotEquip(),
+            IItemBundleTemplate bundle => bundle.ToItemSlotBundle(),
+            IItemPetTemplate pet => pet.ToItemSlotPet(),
+            _ => new ItemSlot { ID = template.ID },
+        };
 
-    public static IItemSlotEquip ToItemSlotEquip(this IItemEquipTemplate template, ItemVariationOption option = ItemVariationOption.None)
-        => new ItemSlotEquip
+    public static IItemSlotEquip ToItemSlotEquip(
+        this IItemEquipTemplate template,
+        ItemVariationOption option = ItemVariationOption.None
+    ) =>
+        new ItemSlotEquip
         {
             ID = template.ID,
 
@@ -33,23 +40,23 @@ public static class ItemConverters
             EVA = (short)GetVariation(template.IncEVA, option),
             Craft = (short)GetVariation(template.IncCraft, option),
             Speed = (short)GetVariation(template.IncSpeed, option),
-            Jump = (short)GetVariation(template.IncJump, option)
+            Jump = (short)GetVariation(template.IncJump, option),
         };
 
-    public static IItemSlotBundle ToItemSlotBundle(this IItemBundleTemplate template, short count = 1)
-        => new ItemSlotBundle
-        {
-            ID = template.ID,
-            Number = count
-        };
+    public static IItemSlotBundle ToItemSlotBundle(
+        this IItemBundleTemplate template,
+        short count = 1
+    ) => new ItemSlotBundle { ID = template.ID, Number = count };
 
-    public static IItemSlotPet ToItemSlotPet(this IItemPetTemplate template)
-        => new ItemSlotPet { ID = template.ID };
+    public static IItemSlotPet ToItemSlotPet(this IItemPetTemplate template) =>
+        new ItemSlotPet { ID = template.ID };
 
     public static int GetVariation(int value, ItemVariationOption option)
     {
-        if (value <= 0) return value;
-        if (option == ItemVariationOption.None) return value;
+        if (value <= 0)
+            return value;
+        if (option == ItemVariationOption.None)
+            return value;
         var rand = new Random();
         if (option != ItemVariationOption.Gachapon)
         {
@@ -60,13 +67,15 @@ public static class ItemConverters
             var v11 = rand.Next(v10);
             var v12 = (byte)v11;
             var v13 = v11 >> 1;
-            var v14 = (v13 >> 3 & 1) +
-                      (v13 >> 2 & 1) +
-                      (v13 >> 1 & 1) +
-                      (v13 & 1) +
-                      (v12 & 1) - 2 +
-                      (v13 >> 4 & 1) +
-                      (v13 >> 5 & 1);
+            var v14 =
+                (v13 >> 3 & 1)
+                + (v13 >> 2 & 1)
+                + (v13 >> 1 & 1)
+                + (v13 & 1)
+                + (v12 & 1)
+                - 2
+                + (v13 >> 4 & 1)
+                + (v13 >> 5 & 1);
             if (v14 <= 0)
                 v14 = 0;
             if (option == ItemVariationOption.Normal)
@@ -104,8 +113,7 @@ public static class ItemConverters
                 v7 += v5 & 1;
                 v5 >>= 1;
                 v6--;
-            }
-            while (v6 > 0);
+            } while (v6 > 0);
         }
         if ((rand.Next() & 1) != 0)
             return value + v7;

@@ -38,5 +38,5 @@ public enum MovePathFragmentType
     MobStopNodeStart = 0x21,
     MobBeforeNode = 0x22,
     MobAttackRush = 0x23,
-    MobAttackRushStop = 0x24
+    MobAttackRushStop = 0x24,
 }

@@ -18,15 +18,12 @@ public class NotifyGuildGradeNamesChangedPlug : IPipelinePlug<NotifyGuildGradeNa
 {
     private readonly IGameStage _stage;
 
-    public NotifyGuildGradeNamesChangedPlug(IGameStage stage) =>
-        _stage = stage;
+    public NotifyGuildGradeNamesChangedPlug(IGameStage stage) => _stage = stage;
 
     public async Task Handle(IPipelineContext ctx, NotifyGuildGradeNamesChanged message)
     {
         var users = await _stage.Users.RetrieveAll();
-        var affected = users
-            .Where(u => u.Guild?.ID == message.GuildID)
-            .ToImmutableArray();
+        var affected = users.Where(u => u.Guild?.ID == message.GuildID).ToImmutableArray();
 
         foreach (var user in affected)
         {

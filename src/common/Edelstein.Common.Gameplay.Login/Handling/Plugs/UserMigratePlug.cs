@@ -11,7 +11,6 @@ public class UserMigratePlug : AbstractUserMigratePlug<ILoginStage, ILoginStageU
         ILogger<AbstractUserMigratePlug<ILoginStage, ILoginStageUser>> logger,
         ILoginStage stage,
         IMigrationService migrationService
-    ) : base(logger, stage, migrationService)
-    {
-    }
+    )
+        : base(logger, stage, migrationService) { }
 }

@@ -14,112 +14,124 @@ public class InventoryManager : IInventoryManager
     private readonly ITemplateManager<IItemTemplate> _templates;
 
     public InventoryManager(ITemplateManager<IItemTemplate> templates) => _templates = templates;
-    
-    private ItemInventoryType GetTypeByID(int id)
-        => (ItemInventoryType)(id / 1_000_000);
 
-    public int CountItem(ICharacterInventories inventory, int templateID)
-        => CountItem(inventory[GetTypeByID(templateID)], templateID);
-    
-    public int CountItem(ICharacterInventories inventory, IItemTemplate template)
-        => CountItem(inventory[GetTypeByID(template.ID)], template.ID);
-    
-    public bool HasItem(ICharacterInventories inventory, int templateID)
-        => HasItem(inventory[GetTypeByID(templateID)], templateID);
-    
-    public bool HasItem(ICharacterInventories inventory, int templateID, short count) 
-        => HasItem(inventory[GetTypeByID(templateID)], templateID, count);
-    
-    public bool HasItem(ICharacterInventories inventory, IItemTemplate template)
-        => HasItem(inventory[GetTypeByID(template.ID)], template.ID);
-    
-    public bool HasItem(ICharacterInventories inventory, IItemTemplate template, short count)
-        => HasItem(inventory[GetTypeByID(template.ID)], template.ID, count);
-    
-    public bool HasEquipped(ICharacterInventories inventory, int templateID)
-        => HasEquipped(inventory[GetTypeByID(templateID)], templateID);
-    
-    public bool HasEquipped(ICharacterInventories inventory, IItemTemplate template)
-        => HasEquipped(inventory[GetTypeByID(template.ID)], template.ID);
+    private ItemInventoryType GetTypeByID(int id) => (ItemInventoryType)(id / 1_000_000);
 
-    public bool HasSlotFor(ICharacterInventories inventory, int templateID)
-        => HasSlotFor(inventory[GetTypeByID(templateID)], templateID);
-    
-    public bool HasSlotFor(ICharacterInventories inventory, int templateID, short count)
-        => HasSlotFor(inventory[GetTypeByID(templateID)], templateID, count);
-    
-    public bool HasSlotFor(ICharacterInventories inventory, ICollection<Tuple<int, short>> templates) 
-        => templates
+    public int CountItem(ICharacterInventories inventory, int templateID) =>
+        CountItem(inventory[GetTypeByID(templateID)], templateID);
+
+    public int CountItem(ICharacterInventories inventory, IItemTemplate template) =>
+        CountItem(inventory[GetTypeByID(template.ID)], template.ID);
+
+    public bool HasItem(ICharacterInventories inventory, int templateID) =>
+        HasItem(inventory[GetTypeByID(templateID)], templateID);
+
+    public bool HasItem(ICharacterInventories inventory, int templateID, short count) =>
+        HasItem(inventory[GetTypeByID(templateID)], templateID, count);
+
+    public bool HasItem(ICharacterInventories inventory, IItemTemplate template) =>
+        HasItem(inventory[GetTypeByID(template.ID)], template.ID);
+
+    public bool HasItem(ICharacterInventories inventory, IItemTemplate template, short count) =>
+        HasItem(inventory[GetTypeByID(template.ID)], template.ID, count);
+
+    public bool HasEquipped(ICharacterInventories inventory, int templateID) =>
+        HasEquipped(inventory[GetTypeByID(templateID)], templateID);
+
+    public bool HasEquipped(ICharacterInventories inventory, IItemTemplate template) =>
+        HasEquipped(inventory[GetTypeByID(template.ID)], template.ID);
+
+    public bool HasSlotFor(ICharacterInventories inventory, int templateID) =>
+        HasSlotFor(inventory[GetTypeByID(templateID)], templateID);
+
+    public bool HasSlotFor(ICharacterInventories inventory, int templateID, short count) =>
+        HasSlotFor(inventory[GetTypeByID(templateID)], templateID, count);
+
+    public bool HasSlotFor(
+        ICharacterInventories inventory,
+        ICollection<Tuple<int, short>> templates
+    ) =>
+        templates
             .GroupBy(t => GetTypeByID(t.Item1))
             .All(g => HasSlotFor(inventory[g.Key], g.ToImmutableArray()));
-    
-    public bool HasSlotFor(ICharacterInventories inventory, IItemTemplate template) 
-        => HasSlotFor(inventory[GetTypeByID(template.ID)], template.ID);
-    
-    public bool HasSlotFor(ICharacterInventories inventory, IItemTemplate template, short count)
-        => HasSlotFor(inventory[GetTypeByID(template.ID)], template.ID, count);
-    
-    public bool HasSlotFor(ICharacterInventories inventory, ICollection<Tuple<IItemTemplate, short>> templates)
-        => templates
+
+    public bool HasSlotFor(ICharacterInventories inventory, IItemTemplate template) =>
+        HasSlotFor(inventory[GetTypeByID(template.ID)], template.ID);
+
+    public bool HasSlotFor(ICharacterInventories inventory, IItemTemplate template, short count) =>
+        HasSlotFor(inventory[GetTypeByID(template.ID)], template.ID, count);
+
+    public bool HasSlotFor(
+        ICharacterInventories inventory,
+        ICollection<Tuple<IItemTemplate, short>> templates
+    ) =>
+        templates
             .GroupBy(t => GetTypeByID(t.Item1.ID))
             .All(g => HasSlotFor(inventory[g.Key], g.ToImmutableArray()));
-    
-    public bool HasSlotFor(ICharacterInventories inventory, IItemSlot item)
-        => HasSlotFor(inventory[GetTypeByID(item.ID)], item);
-    
-    public bool HasSlotFor(ICharacterInventories inventory, ICollection<IItemSlot> items)
-        => items
+
+    public bool HasSlotFor(ICharacterInventories inventory, IItemSlot item) =>
+        HasSlotFor(inventory[GetTypeByID(item.ID)], item);
+
+    public bool HasSlotFor(ICharacterInventories inventory, ICollection<IItemSlot> items) =>
+        items
             .GroupBy(t => GetTypeByID(t.ID))
             .All(g => HasSlotFor(inventory[g.Key], g.ToImmutableArray()));
-    
-    public int CountItem(IItemInventory? inventory, int templateID) 
-        => inventory?.Items
-            .Where(kv => kv.Key > 0)
+
+    public int CountItem(IItemInventory? inventory, int templateID) =>
+        inventory
+            ?.Items.Where(kv => kv.Key > 0)
             .Where(i => i.Value.ID == templateID)
-            .Sum(i => i.Value is IItemSlotBundle bundle ? bundle.Number : 1) ?? 0;
+            .Sum(i => i.Value is IItemSlotBundle bundle ? bundle.Number : 1)
+        ?? 0;
 
-    public int CountItem(IItemInventory? inventory, IItemTemplate template)
-        => CountItem(inventory, template.ID);
+    public int CountItem(IItemInventory? inventory, IItemTemplate template) =>
+        CountItem(inventory, template.ID);
 
-    public bool HasItem(IItemInventory? inventory, int templateID)
-        => HasItem(inventory, templateID, 1);
-    
-    public bool HasItem(IItemInventory? inventory, int templateID, short count) 
-        => inventory != null && CountItem(inventory, templateID) >= count;
+    public bool HasItem(IItemInventory? inventory, int templateID) =>
+        HasItem(inventory, templateID, 1);
 
-    public bool HasItem(IItemInventory? inventory, IItemTemplate template)
-        => HasItem(inventory, template.ID);
-    
-    public bool HasItem(IItemInventory? inventory, IItemTemplate template, short count)
-        => HasItem(inventory, template.ID, count);
+    public bool HasItem(IItemInventory? inventory, int templateID, short count) =>
+        inventory != null && CountItem(inventory, templateID) >= count;
 
-    public bool HasEquipped(IItemInventory? inventory, int templateID)
-        => inventory?.Items
-            .Where(kv => kv.Key < 0)
-            .Count(i => i.Value.ID == templateID) > 0;
+    public bool HasItem(IItemInventory? inventory, IItemTemplate template) =>
+        HasItem(inventory, template.ID);
 
-    public bool HasEquipped(IItemInventory? inventory, IItemTemplate template)
-        => HasEquipped(inventory, template.ID);
+    public bool HasItem(IItemInventory? inventory, IItemTemplate template, short count) =>
+        HasItem(inventory, template.ID, count);
 
-    public bool HasSlotFor(IItemInventory? inventory, int templateID) 
-        => HasSlotFor(inventory, templateID, 1);
-    
-    public bool HasSlotFor(IItemInventory? inventory, int templateID, short count)
-        => HasSlotFor(inventory, ImmutableList.Create(Tuple.Create(templateID, count)));
-    
-    public bool HasSlotFor(IItemInventory? inventory, ICollection<Tuple<int, short>> templates) 
-        => HasSlotFor(inventory, templates
+    public bool HasEquipped(IItemInventory? inventory, int templateID) =>
+        inventory?.Items.Where(kv => kv.Key < 0).Count(i => i.Value.ID == templateID) > 0;
+
+    public bool HasEquipped(IItemInventory? inventory, IItemTemplate template) =>
+        HasEquipped(inventory, template.ID);
+
+    public bool HasSlotFor(IItemInventory? inventory, int templateID) =>
+        HasSlotFor(inventory, templateID, 1);
+
+    public bool HasSlotFor(IItemInventory? inventory, int templateID, short count) =>
+        HasSlotFor(inventory, ImmutableList.Create(Tuple.Create(templateID, count)));
+
+    public bool HasSlotFor(IItemInventory? inventory, ICollection<Tuple<int, short>> templates) =>
+        HasSlotFor(
+            inventory,
+            templates
                 .Select(t => Tuple.Create(_templates.Retrieve(t.Item1).Result!, t.Item2))
-                .ToImmutableArray());
-    
-    public bool HasSlotFor(IItemInventory? inventory, IItemTemplate template)
-        => HasSlotFor(inventory, template, 1);
-    
-    public bool HasSlotFor(IItemInventory? inventory, IItemTemplate template, short count)
-        => HasSlotFor(inventory, ImmutableList.Create(Tuple.Create(template, count)));
-    
-    public bool HasSlotFor(IItemInventory? inventory, ICollection<Tuple<IItemTemplate, short>> templates) 
-        => HasSlotFor(inventory, templates
+                .ToImmutableArray()
+        );
+
+    public bool HasSlotFor(IItemInventory? inventory, IItemTemplate template) =>
+        HasSlotFor(inventory, template, 1);
+
+    public bool HasSlotFor(IItemInventory? inventory, IItemTemplate template, short count) =>
+        HasSlotFor(inventory, ImmutableList.Create(Tuple.Create(template, count)));
+
+    public bool HasSlotFor(
+        IItemInventory? inventory,
+        ICollection<Tuple<IItemTemplate, short>> templates
+    ) =>
+        HasSlotFor(
+            inventory,
+            templates
                 .Select(t =>
                 {
                     var items = new List<IItemSlot>();
@@ -131,7 +143,7 @@ public class InventoryManager : IInventoryManager
                         while (total > 0)
                         {
                             var count = Math.Min(total, bundle.MaxPerSlot);
-                        
+
                             total -= count;
                             items.Add(bundle.ToItemSlotBundle(count));
                         }
@@ -139,40 +151,43 @@ public class InventoryManager : IInventoryManager
                     else
                         for (var i = 0; i < t.Item2; i++)
                             items.Add(t.Item1.ToItemSlot());
-                
+
                     return items;
                 })
                 .SelectMany(i => i)
-                .ToImmutableArray());
-    
-    public bool HasSlotFor(IItemInventory? inventory, IItemSlot item) 
-        => HasSlotFor(inventory, ImmutableList.Create(item));
-    
+                .ToImmutableArray()
+        );
+
+    public bool HasSlotFor(IItemInventory? inventory, IItemSlot item) =>
+        HasSlotFor(inventory, ImmutableList.Create(item));
+
     public bool HasSlotFor(IItemInventory? inventory, ICollection<IItemSlot> items)
     {
-        if (inventory == null) return false;
-        
+        if (inventory == null)
+            return false;
+
         var bundles = items
             .OfType<IItemSlotBundle>()
             .Where(b => !ItemConstants.IsRechargeableItem(b.ID))
             .ToImmutableArray();
         var bundlesMerged = new List<IItemSlotBundle>();
-        
+
         foreach (var bundle in bundles)
         {
-            var mergeable = bundlesMerged
-                .FirstOrDefault(i => i.MergeableWith(bundle));
+            var mergeable = bundlesMerged.FirstOrDefault(i => i.MergeableWith(bundle));
 
             if (mergeable == null)
             {
-                bundlesMerged.Add(new ItemSlotBundle
-                {
-                    ID = bundle.ID,
-                    DateExpire = bundle.DateExpire,
-                    Number = bundle.Number,
-                    Attribute = bundle.Attribute,
-                    Title = bundle.Title
-                });
+                bundlesMerged.Add(
+                    new ItemSlotBundle
+                    {
+                        ID = bundle.ID,
+                        DateExpire = bundle.DateExpire,
+                        Number = bundle.Number,
+                        Attribute = bundle.Attribute,
+                        Title = bundle.Title,
+                    }
+                );
                 continue;
             }
 
@@ -180,27 +195,30 @@ public class InventoryManager : IInventoryManager
         }
 
         var cache = new Dictionary<IItemSlotBundle, int>();
-        var totalSlots = items
-            .Except(bundles)
-            .Count();
-        
+        var totalSlots = items.Except(bundles).Count();
+
         foreach (var bundle in bundlesMerged)
         {
             var count = (int)bundle.Number;
             var template = (IItemBundleTemplate)_templates.Retrieve(bundle.ID).Result!;
-            
-            count = inventory.Items.Values
-                .OfType<IItemSlotBundle>()
+
+            count = inventory
+                .Items.Values.OfType<IItemSlotBundle>()
                 .Where(i => i.MergeableWith(bundle))
-                .Where(i => (cache.TryGetValue(i, out var number) ? number : i.Number) < template.MaxPerSlot)
-                .Aggregate(count, (current, merge) =>
-                {
-                    cache.Add(merge, template.MaxPerSlot);
-                    return current - Math.Min(current, template.MaxPerSlot - merge.Number);
-                });
+                .Where(i =>
+                    (cache.TryGetValue(i, out var number) ? number : i.Number) < template.MaxPerSlot
+                )
+                .Aggregate(
+                    count,
+                    (current, merge) =>
+                    {
+                        cache.Add(merge, template.MaxPerSlot);
+                        return current - Math.Min(current, template.MaxPerSlot - merge.Number);
+                    }
+                );
             totalSlots += (int)Math.Ceiling(count / (double)template.MaxPerSlot);
         }
-        
+
         return inventory.Items.Count(kv => kv.Key > 0) + totalSlots <= inventory.SlotMax;
     }
 }

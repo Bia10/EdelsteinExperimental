@@ -12,14 +12,10 @@ public class GuildBBSCommentConfiguration : IEntityTypeConfiguration<GuildBBSCom
 
         builder.HasKey(c => c.ID);
 
-        builder
-            .HasIndex(c => c.PostID);
+        builder.HasIndex(c => c.PostID);
 
-        builder
-            .HasIndex(c => c.GuildID);
+        builder.HasIndex(c => c.GuildID);
 
-        builder
-            .Property(c => c.Content)
-            .HasMaxLength(255);
+        builder.Property(c => c.Content).HasMaxLength(255);
     }
 }

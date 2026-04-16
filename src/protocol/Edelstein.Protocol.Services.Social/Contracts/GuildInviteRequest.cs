@@ -1,4 +1,4 @@
-namespace Edelstein.Protocol.Services.Social.Contracts;
+﻿namespace Edelstein.Protocol.Services.Social.Contracts;
 
 public record GuildInviteRequest(
     int InviterID,

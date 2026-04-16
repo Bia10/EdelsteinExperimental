@@ -10,7 +10,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Third;
 public class Aran2SkillHandler : Aran1SkillHandler
 {
     public override int ID => Job.Aran2;
-    
+
     public override Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
     {
         switch (context.Skill?.ID)
@@ -20,10 +20,10 @@ public class Aran2SkillHandler : Aran1SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

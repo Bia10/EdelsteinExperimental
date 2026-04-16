@@ -8,7 +8,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class MagicianBishop2SkillHandler : Magician1SkillHandler
 {
     public override int ID => Job.Cleric;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

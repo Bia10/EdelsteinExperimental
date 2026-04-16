@@ -16,19 +16,22 @@ namespace Edelstein.Common.Database.Migrations
                 type: "json",
                 nullable: true,
                 oldClrType: typeof(string),
-                oldType: "json");
+                oldType: "json"
+            );
 
             migrationBuilder.AddColumn<string>(
                 name: "ExtendSP",
                 table: "characters",
                 type: "json",
-                nullable: true);
+                nullable: true
+            );
 
             migrationBuilder.AddColumn<string>(
                 name: "Skills",
                 table: "characters",
                 type: "json",
-                nullable: true);
+                nullable: true
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Trunk",
@@ -36,7 +39,8 @@ namespace Edelstein.Common.Database.Migrations
                 type: "json",
                 nullable: true,
                 oldClrType: typeof(string),
-                oldType: "json");
+                oldType: "json"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Locker",
@@ -44,19 +48,16 @@ namespace Edelstein.Common.Database.Migrations
                 type: "json",
                 nullable: true,
                 oldClrType: typeof(string),
-                oldType: "json");
+                oldType: "json"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "ExtendSP",
-                table: "characters");
+            migrationBuilder.DropColumn(name: "ExtendSP", table: "characters");
 
-            migrationBuilder.DropColumn(
-                name: "Skills",
-                table: "characters");
+            migrationBuilder.DropColumn(name: "Skills", table: "characters");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Inventories",
@@ -66,7 +67,8 @@ namespace Edelstein.Common.Database.Migrations
                 defaultValue: "",
                 oldClrType: typeof(string),
                 oldType: "json",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Trunk",
@@ -76,7 +78,8 @@ namespace Edelstein.Common.Database.Migrations
                 defaultValue: "",
                 oldClrType: typeof(string),
                 oldType: "json",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Locker",
@@ -86,7 +89,8 @@ namespace Edelstein.Common.Database.Migrations
                 defaultValue: "",
                 oldClrType: typeof(string),
                 oldType: "json",
-                oldNullable: true);
+                oldNullable: true
+            );
         }
     }
 }

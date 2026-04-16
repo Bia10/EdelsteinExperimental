@@ -1,4 +1,4 @@
-namespace Edelstein.Protocol.Services.Social;
+﻿namespace Edelstein.Protocol.Services.Social;
 
 /// <summary>
 /// Per-member data stored in the guild roster, corresponding to a single row in

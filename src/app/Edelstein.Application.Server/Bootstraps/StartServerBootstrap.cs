@@ -16,19 +16,24 @@ public class StartServerBootstrap : IBootstrap, ITickable
         ILogger<StartServerBootstrap> logger,
         ITickerManager ticker,
         ITransportAcceptor acceptor,
-        ProgramConfigStage config)
+        ProgramConfigStage config
+    )
     {
         _logger = logger;
         _ticker = ticker;
         _acceptor = acceptor;
         _config = config;
     }
+
     private ITickerManagerContext? TickerContext { get; set; }
     private ITransportContext? TransportContext { get; set; }
 
     public int Priority => BootstrapPriority.Start;
 
-    public Task Start() => Task.FromResult(TickerContext = _ticker.Schedule(this, TimeSpan.FromMinutes(10), TimeSpan.Zero));
+    public Task Start() =>
+        Task.FromResult(
+            TickerContext = _ticker.Schedule(this, TimeSpan.FromMinutes(10), TimeSpan.Zero)
+        );
 
     public async Task Stop()
     {
@@ -39,10 +44,7 @@ public class StartServerBootstrap : IBootstrap, ITickable
         TickerContext?.Cancel();
         if (TransportContext != null)
             await TransportContext.Close();
-        _logger.LogInformation(
-            "{ID} socket acceptor finished shutting down",
-            _config.ID
-        );
+        _logger.LogInformation("{ID} socket acceptor finished shutting down", _config.ID);
     }
 
     public async Task OnTick(DateTime now)
@@ -53,8 +55,11 @@ public class StartServerBootstrap : IBootstrap, ITickable
             _logger.LogInformation(
                 "{ID} socket acceptor for v{Version}.{Patch} (Locale {Locale}) bound at {Host}:{Port}",
                 _config.ID,
-                _config.Version, _config.Patch, _config.Locale,
-                _config.Host, _config.Port
+                _config.Version,
+                _config.Patch,
+                _config.Locale,
+                _config.Host,
+                _config.Port
             );
         }
     }

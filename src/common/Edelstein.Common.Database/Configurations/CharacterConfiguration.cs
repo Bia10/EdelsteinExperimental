@@ -14,7 +14,8 @@ public class CharacterConfiguration : IEntityTypeConfiguration<CharacterEntity>
         builder.ToTable("characters");
 
         builder.HasKey(e => e.ID);
-        builder.HasOne(e => e.AccountWorld)
+        builder
+            .HasOne(e => e.AccountWorld)
             .WithMany(p => p.Characters)
             .HasForeignKey(e => e.AccountWorldID)
             .OnDelete(DeleteBehavior.Cascade);
@@ -24,7 +25,7 @@ public class CharacterConfiguration : IEntityTypeConfiguration<CharacterEntity>
             .HasColumnType("json")
             .HasConversion<JsonConverter<ICharacterExtendSP>>()
             .HasDefaultValue(new CharacterExtendSP());
-        
+
         builder
             .Property(e => e.FuncKeys)
             .HasColumnType("json")
@@ -35,13 +36,13 @@ public class CharacterConfiguration : IEntityTypeConfiguration<CharacterEntity>
             .HasColumnType("json")
             .HasConversion<JsonConverter<ICharacterQuickslotKeys>>()
             .HasDefaultValue(new CharacterQuickslotKeys());
-        
+
         builder
             .Property(e => e.Wishlist)
             .HasColumnType("json")
             .HasConversion<JsonConverter<ICharacterWishlist>>()
             .HasDefaultValue(new CharacterWishlist());
-        
+
         builder
             .Property(e => e.Inventories)
             .HasColumnType("json")
@@ -67,7 +68,7 @@ public class CharacterConfiguration : IEntityTypeConfiguration<CharacterEntity>
             .HasColumnType("json")
             .HasConversion<JsonConverter<ICharacterQuestRecordsEx>>()
             .HasDefaultValue(new CharacterQuestRecordsEx());
-        
+
         builder
             .Property(e => e.WildHunterInfo)
             .HasColumnType("json")

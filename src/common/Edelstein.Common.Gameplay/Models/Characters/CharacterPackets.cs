@@ -30,20 +30,31 @@ public static class CharacterPackets
             writer.WriteBool(false);
         }
 
-        if (flags.HasFlag(DbFlags.Money)) writer.WriteInt(character.Money);
+        if (flags.HasFlag(DbFlags.Money))
+            writer.WriteInt(character.Money);
 
         if (flags.HasFlag(DbFlags.InventorySize))
         {
             if (flags.HasFlag(DbFlags.ItemSlotEquip))
-                writer.WriteByte((byte)(character.Inventories[ItemInventoryType.Equip]?.SlotMax ?? 24));
+                writer.WriteByte(
+                    (byte)(character.Inventories[ItemInventoryType.Equip]?.SlotMax ?? 24)
+                );
             if (flags.HasFlag(DbFlags.ItemSlotConsume))
-                writer.WriteByte((byte)(character.Inventories[ItemInventoryType.Consume]?.SlotMax ?? 24));
+                writer.WriteByte(
+                    (byte)(character.Inventories[ItemInventoryType.Consume]?.SlotMax ?? 24)
+                );
             if (flags.HasFlag(DbFlags.ItemSlotInstall))
-                writer.WriteByte((byte)(character.Inventories[ItemInventoryType.Install]?.SlotMax ?? 24));
+                writer.WriteByte(
+                    (byte)(character.Inventories[ItemInventoryType.Install]?.SlotMax ?? 24)
+                );
             if (flags.HasFlag(DbFlags.ItemSlotEtc))
-                writer.WriteByte((byte)(character.Inventories[ItemInventoryType.Etc]?.SlotMax ?? 24));
+                writer.WriteByte(
+                    (byte)(character.Inventories[ItemInventoryType.Etc]?.SlotMax ?? 24)
+                );
             if (flags.HasFlag(DbFlags.ItemSlotCash))
-                writer.WriteByte((byte)(character.Inventories[ItemInventoryType.Cash]?.SlotMax ?? 24));
+                writer.WriteByte(
+                    (byte)(character.Inventories[ItemInventoryType.Cash]?.SlotMax ?? 24)
+                );
         }
 
         if (flags.HasFlag(DbFlags.AdminShopCount))
@@ -54,7 +65,9 @@ public static class CharacterPackets
 
         if (flags.HasFlag(DbFlags.ItemSlotEquip))
         {
-            var inventory = character.Inventories[ItemInventoryType.Equip]?.Items ?? new Dictionary<short, IItemSlot>();
+            var inventory =
+                character.Inventories[ItemInventoryType.Equip]?.Items
+                ?? new Dictionary<short, IItemSlot>();
             var equip = inventory.Where(kv => kv.Key >= 0);
             var equipped = inventory.Where(kv => kv.Key is >= -100 and < 0);
             var equipped2 = inventory.Where(kv => kv.Key is >= -1000 and < -100);
@@ -73,14 +86,15 @@ public static class CharacterPackets
             }
         }
 
-        foreach (var t in new List<(DbFlags, ItemInventoryType)>
-                     {
-                         (DbFlags.ItemSlotConsume, ItemInventoryType.Consume),
-                         (DbFlags.ItemSlotInstall, ItemInventoryType.Install),
-                         (DbFlags.ItemSlotEtc, ItemInventoryType.Etc),
-                         (DbFlags.ItemSlotCash, ItemInventoryType.Cash)
-                     }
-                     .Where(t => flags.HasFlag(t.Item1)))
+        foreach (
+            var t in new List<(DbFlags, ItemInventoryType)>
+            {
+                (DbFlags.ItemSlotConsume, ItemInventoryType.Consume),
+                (DbFlags.ItemSlotInstall, ItemInventoryType.Install),
+                (DbFlags.ItemSlotEtc, ItemInventoryType.Etc),
+                (DbFlags.ItemSlotCash, ItemInventoryType.Cash),
+            }.Where(t => flags.HasFlag(t.Item1))
+        )
         {
             var items = character.Inventories[t.Item2]?.Items ?? new Dictionary<short, IItemSlot>();
 
@@ -96,19 +110,22 @@ public static class CharacterPackets
         if (flags.HasFlag(DbFlags.SkillRecord))
         {
             writer.WriteShort((short)character.Skills.Records.Count);
-            
+
             foreach (var record in character.Skills.Records)
             {
                 writer.WriteInt(record.Key);
                 writer.WriteInt(record.Value.Level);
-                writer.WriteDateTime(record.Value.DateExpire ?? DateTime.FromFileTimeUtc(150842304000000000));
+                writer.WriteDateTime(
+                    record.Value.DateExpire ?? DateTime.FromFileTimeUtc(150842304000000000)
+                );
 
                 if (SkillConstants.IsSkillNeedMasterLevel(record.Key))
                     writer.WriteInt(record.Value.MasterLevel ?? 0);
             }
         }
 
-        if (flags.HasFlag(DbFlags.SkillCooltime)) writer.WriteShort(0);
+        if (flags.HasFlag(DbFlags.SkillCooltime))
+            writer.WriteShort(0);
 
         if (flags.HasFlag(DbFlags.QuestRecord))
         {
@@ -130,7 +147,8 @@ public static class CharacterPackets
             }
         }
 
-        if (flags.HasFlag(DbFlags.MinigameRecord)) writer.WriteShort(0);
+        if (flags.HasFlag(DbFlags.MinigameRecord))
+            writer.WriteShort(0);
 
         if (flags.HasFlag(DbFlags.CoupleRecord))
         {
@@ -141,11 +159,14 @@ public static class CharacterPackets
 
         if (flags.HasFlag(DbFlags.MapTransfer))
         {
-            for (var i = 0; i < 5; i++) writer.WriteInt(0);
-            for (var i = 0; i < 10; i++) writer.WriteInt(0);
+            for (var i = 0; i < 5; i++)
+                writer.WriteInt(0);
+            for (var i = 0; i < 10; i++)
+                writer.WriteInt(0);
         }
 
-        if (flags.HasFlag(DbFlags.NewYearCard)) writer.WriteShort(0);
+        if (flags.HasFlag(DbFlags.NewYearCard))
+            writer.WriteShort(0);
 
         if (flags.HasFlag(DbFlags.QuestRecordEx))
         {
@@ -158,22 +179,24 @@ public static class CharacterPackets
         }
 
         if (flags.HasFlag(DbFlags.WildHunterInfo))
-            if (JobConstants.GetJobRace(character.Job) == 3 && JobConstants.GetJobType(character.Job) == 3)
+            if (
+                JobConstants.GetJobRace(character.Job) == 3
+                && JobConstants.GetJobType(character.Job) == 3
+            )
             {
                 writer.WriteByte(character.WildHunterInfo.RidingType);
-                for (var i = 0; i < 5; i++) 
+                for (var i = 0; i < 5; i++)
                     writer.WriteInt(character.WildHunterInfo.CaptureMob.ElementAtOrDefault(i));
             }
 
-        if (flags.HasFlag(DbFlags.QuestCompleteOld)) writer.WriteShort(0);
+        if (flags.HasFlag(DbFlags.QuestCompleteOld))
+            writer.WriteShort(0);
 
-        if (flags.HasFlag(DbFlags.VisitorLog)) writer.WriteShort(0);
+        if (flags.HasFlag(DbFlags.VisitorLog))
+            writer.WriteShort(0);
     }
 
-    public static void WriteCharacterStats(
-        this IPacketWriter writer,
-        ICharacter character
-    )
+    public static void WriteCharacterStats(this IPacketWriter writer, ICharacter character)
     {
         writer.WriteInt(character.ID);
         writer.WriteString(character.Name, 13);
@@ -201,7 +224,7 @@ public static class CharacterPackets
         writer.WriteShort(character.AP);
         if (JobConstants.IsExtendSPJob(character.Job))
             writer.WriteCharacterExtendSP(character.ExtendSP);
-        else 
+        else
             writer.WriteShort(character.SP);
 
         writer.WriteInt(character.EXP);
@@ -214,10 +237,7 @@ public static class CharacterPackets
         writer.WriteShort(character.SubJob);
     }
 
-    public static void WriteCharacterLooks(
-        this IPacketWriter writer,
-        ICharacter character
-    )
+    public static void WriteCharacterLooks(this IPacketWriter writer, ICharacter character)
     {
         writer.WriteByte(character.Gender);
         writer.WriteByte(character.Skin);
@@ -226,51 +246,65 @@ public static class CharacterPackets
         writer.WriteBool(false);
         writer.WriteInt(character.Hair);
 
-        var inventory = character.Inventories[ItemInventoryType.Equip]?.Items ?? ImmutableDictionary<short, IItemSlot>.Empty;
+        var inventory =
+            character.Inventories[ItemInventoryType.Equip]?.Items
+            ?? ImmutableDictionary<short, IItemSlot>.Empty;
         var unseen = new int[60];
         var equip = new int[60];
 
-        if ((character.Job == Job.EvanJr || JobConstants.GetJobRace(character.Job) == 2 && JobConstants.GetJobType(character.Job) == 2) &&
-            character.QuestCompletes[QuestRecords.EvanGlove] != null)
+        if (
+            (
+                character.Job == Job.EvanJr
+                || JobConstants.GetJobRace(character.Job) == 2
+                    && JobConstants.GetJobType(character.Job) == 2
+            )
+            && character.QuestCompletes[QuestRecords.EvanGlove] != null
+        )
             equip[(int)BodyPart.Gloves] = 1082262;
-        
+
         foreach (var kv in inventory.Where(kv => kv.Key < -100))
         {
             var id = Math.Abs(kv.Key) - 100;
-            if (id == (int)BodyPart.Weapon) continue;
+            if (id == (int)BodyPart.Weapon)
+                continue;
             equip[id] = kv.Value.ID;
         }
-        
+
         foreach (var kv in inventory.Where(kv => kv.Key is < 0 and > -100))
         {
             var id = Math.Abs(kv.Key);
-            if (equip[id] == 0) equip[id] = kv.Value.ID;
-            else unseen[id] = kv.Value.ID;
+            if (equip[id] == 0)
+                equip[id] = kv.Value.ID;
+            else
+                unseen[id] = kv.Value.ID;
         }
 
         for (byte i = 0; i < equip.Length; i++)
         {
             var value = equip[i];
-            if (value == 0) continue;
+            if (value == 0)
+                continue;
 
             writer.WriteByte(i);
             writer.WriteInt(value);
         }
         writer.WriteByte(0xFF);
-        
+
         for (byte i = 0; i < unseen.Length; i++)
         {
             var value = unseen[i];
-            if (value == 0) continue;
+            if (value == 0)
+                continue;
 
             writer.WriteByte(i);
             writer.WriteInt(value);
         }
         writer.WriteByte(0xFF);
-        
-        writer.WriteInt(inventory.TryGetValue(-((int)BodyPart.Weapon + 100), out var weaponSticker) 
-            ? weaponSticker.ID
-            : 0
+
+        writer.WriteInt(
+            inventory.TryGetValue(-((int)BodyPart.Weapon + 100), out var weaponSticker)
+                ? weaponSticker.ID
+                : 0
         );
 
         for (var i = 0; i < 3; i++)

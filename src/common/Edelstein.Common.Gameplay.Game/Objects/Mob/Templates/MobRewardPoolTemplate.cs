@@ -10,12 +10,12 @@ public class MobRewardPoolTemplate : ITemplate
 {
     public int ID { get; }
     public ICollection<MobRewardTemplate> Items { get; }
-    
+
     public MobRewardPoolTemplate(int id, IDataNode property)
     {
         ID = id;
-        Items = property.Children
-            .Select(p => new MobRewardTemplate(Convert.ToInt32(p.Name), p.Cache()))
+        Items = property
+            .Children.Select(p => new MobRewardTemplate(Convert.ToInt32(p.Name), p.Cache()))
             .ToImmutableArray();
     }
 }

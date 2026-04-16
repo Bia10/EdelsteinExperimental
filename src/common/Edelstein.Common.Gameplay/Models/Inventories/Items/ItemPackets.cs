@@ -29,7 +29,7 @@ public static class ItemPackets
     private static void WriteItemBase(this IPacketWriter writer, IItemSlot item)
     {
         var itemBase = item as IItemSlotBase;
-        
+
         writer.WriteInt(item.ID);
         writer.WriteBool(itemBase?.CashItemSN != null);
         if (itemBase?.CashItemSN != null)
@@ -83,7 +83,7 @@ public static class ItemPackets
 
         if (!equip.CashItemSN.HasValue)
             writer.WriteLong(0);
-        
+
         writer.WriteLong(0);
         writer.WriteInt(0);
     }
@@ -113,8 +113,10 @@ public static class ItemPackets
         writer.WriteShort(pet.Tameness);
         writer.WriteByte(pet.Repleteness);
 
-        if (pet.DateDead != null) writer.WriteDateTime(pet.DateDead.Value);
-        else writer.WriteLong(0);
+        if (pet.DateDead != null)
+            writer.WriteDateTime(pet.DateDead.Value);
+        else
+            writer.WriteLong(0);
 
         writer.WriteShort(pet.PetAttribute);
         writer.WriteShort(pet.PetSkill);
@@ -125,7 +127,7 @@ public static class ItemPackets
     public static void WriteItemLockerData(this IPacketWriter writer, IItemLockerSlot item)
     {
         var itemBase = item.Item as IItemSlotBase;
-        
+
         writer.WriteLong(itemBase?.CashItemSN ?? 0);
         writer.WriteInt(item.AccountID);
         writer.WriteInt(item.CharacterID);
@@ -134,9 +136,11 @@ public static class ItemPackets
         writer.WriteShort((short)(item.Item is IItemSlotBundle bundle ? bundle.Number : 1));
         writer.WriteString(item.BuyCharacterName ?? string.Empty, 13);
 
-        if (itemBase?.DateExpire != null) writer.WriteDateTime(itemBase.DateExpire.Value);
-        else writer.WriteLong(0);
-        
+        if (itemBase?.DateExpire != null)
+            writer.WriteDateTime(itemBase.DateExpire.Value);
+        else
+            writer.WriteLong(0);
+
         writer.WriteInt(item.PaybackRate);
         writer.WriteInt(item.DiscountRate);
     }

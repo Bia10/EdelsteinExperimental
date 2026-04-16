@@ -10,8 +10,8 @@ public record ItemSlotBundle : ItemSlotBase, IItemSlotBundle
     public string? Title { get; set; }
 
     public bool MergeableWith(IItemSlotBundle bundle) =>
-        ID == bundle.ID &&
-        Attribute == bundle.Attribute &&
-        Title == bundle.Title &&
-        DateExpire == bundle.DateExpire;
+        ID == bundle.ID
+        && Attribute == bundle.Attribute
+        && Title == bundle.Title
+        && DateExpire == bundle.DateExpire;
 }

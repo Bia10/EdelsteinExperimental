@@ -11,5 +11,6 @@ public class Rotational<T>
     }
 
     public T Next() => Array[Index++ % Array.Length];
+
     public int Skip(int count = 1) => Index += count;
 }

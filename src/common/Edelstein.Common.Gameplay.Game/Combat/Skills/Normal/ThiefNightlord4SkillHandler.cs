@@ -10,9 +10,7 @@ public class ThiefNightlord4SkillHandler : ThiefNightlord3SkillHandler
 
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
-        switch (context.Skill?.ID)
-        {
-        }
+        switch (context.Skill?.ID) { }
 
         return base.HandleSkillUse(context, user);
     }

@@ -13,21 +13,21 @@ public class SkillTemplate : ISkillTemplate
     public ISkillTemplateLevel? this[int level] => Levels.Retrieve(level).Result;
 
     public short MaxLevel { get; }
-    
+
     public bool IsPSD { get; }
     public bool IsPrepared { get; }
     public bool IsSummon { get; }
     public bool IsInvisible { get; }
     public bool IsCombatOrders { get; }
-    
+
     public Element Element { get; }
-    
+
     public int Delay { get; }
-    
+
     public ICollection<int> PsdSkill { get; }
     public IDictionary<int, int> ReqSkill { get; }
     public ITemplateCollection<ISkillTemplateLevel> Levels { get; }
-    
+
     public SkillTemplate(int id, IDataNode node)
     {
         ID = id;
@@ -52,19 +52,21 @@ public class SkillTemplate : ISkillTemplate
                 'H' => Element.Holy,
                 'D' => Element.Dark,
                 'U' => Element.Undead,
-                _ => Element.Physical
+                _ => Element.Physical,
             };
 
         Delay = node.ResolvePath("effect")?.Children.Sum(c => c.ResolveInt("delay") ?? 0) ?? 0;
 
-        PsdSkill = node.ResolvePath("psdSkill")?
-            .Select(c => Convert.ToInt32(c.Name))
-            .ToFrozenSet() ?? FrozenSet<int>.Empty;
-        ReqSkill = node.ResolvePath("req")?.Children
-            .ToFrozenDictionary(
-                c => Convert.ToInt32(c.Name),
-                c => c.ResolveInt() ?? 0
-            ) ?? FrozenDictionary<int, int>.Empty;
+        PsdSkill =
+            node.ResolvePath("psdSkill")?.Select(c => Convert.ToInt32(c.Name)).ToFrozenSet()
+            ?? FrozenSet<int>.Empty;
+        ReqSkill =
+            node.ResolvePath("req")
+                ?.Children.ToFrozenDictionary(
+                    c => Convert.ToInt32(c.Name),
+                    c => c.ResolveInt() ?? 0
+                )
+            ?? FrozenDictionary<int, int>.Empty;
 
         var common = node.ResolvePath("common");
 
@@ -77,16 +79,20 @@ public class SkillTemplate : ISkillTemplate
             // Fixes Advanced Yellow Aura
             if (maxLevelStr != null)
                 maxLevel = Convert.ToInt32(maxLevelStr);
-            
-            Levels = new TemplateCollectionProvider<ISkillTemplateLevel>(Enumerable
-                .Range(1, maxLevel + (IsCombatOrders ? 2 : 0))
-                .ToFrozenDictionary(
-                    i => i,
-                    i => (ITemplateProvider<ISkillTemplateLevel>)new TemplateProviderLazy<ISkillTemplateLevel>(
-                        i,
-                        () => new SkillTemplateLevelCommon(i, common.Cache())
+
+            Levels = new TemplateCollectionProvider<ISkillTemplateLevel>(
+                Enumerable
+                    .Range(1, maxLevel + (IsCombatOrders ? 2 : 0))
+                    .ToFrozenDictionary(
+                        i => i,
+                        i =>
+                            (ITemplateProvider<ISkillTemplateLevel>)
+                                new TemplateProviderLazy<ISkillTemplateLevel>(
+                                    i,
+                                    () => new SkillTemplateLevelCommon(i, common.Cache())
+                                )
                     )
-                ));
+            );
             MaxLevel = (short)maxLevel;
         }
         else
@@ -96,11 +102,15 @@ public class SkillTemplate : ISkillTemplate
             Levels = new TemplateCollectionProvider<ISkillTemplateLevel>(
                 level?.Children.ToFrozenDictionary(
                     c => Convert.ToInt32(c.Name),
-                    c => (ITemplateProvider<ISkillTemplateLevel>)new TemplateProviderEager<ISkillTemplateLevel>(
-                        Convert.ToInt32(c.Name),
-                        new SkillTemplateLevel(Convert.ToInt32(c.Name), c.Cache()))
-                    ) ?? FrozenDictionary<int, ITemplateProvider<ISkillTemplateLevel>>.Empty
-                );
+                    c =>
+                        (ITemplateProvider<ISkillTemplateLevel>)
+                            new TemplateProviderEager<ISkillTemplateLevel>(
+                                Convert.ToInt32(c.Name),
+                                new SkillTemplateLevel(Convert.ToInt32(c.Name), c.Cache())
+                            )
+                )
+                    ?? FrozenDictionary<int, ITemplateProvider<ISkillTemplateLevel>>.Empty
+            );
             MaxLevel = (short)(Levels?.Count ?? 0);
         }
     }

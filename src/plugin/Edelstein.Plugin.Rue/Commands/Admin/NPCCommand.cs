@@ -11,8 +11,8 @@ public class NPCCommand : AbstractTemplateCommand<INPCTemplate>
     public NPCCommand(
         ITemplateManager<INPCTemplate> templates,
         ITemplateManager<INPCStringTemplate> strings
-    ) : base(templates)
-        => _strings = strings;
+    )
+        : base(templates) => _strings = strings;
 
     public override string Name => "NPC";
     public override string Description => "Searches a specified NPC";
@@ -34,6 +34,9 @@ public class NPCCommand : AbstractTemplateCommand<INPCTemplate>
         return result;
     }
 
-    protected override Task Execute(IFieldUser user, INPCTemplate template, TemplateCommandArgs args)
-        => Task.CompletedTask;
+    protected override Task Execute(
+        IFieldUser user,
+        INPCTemplate template,
+        TemplateCommandArgs args
+    ) => Task.CompletedTask;
 }

@@ -20,26 +20,32 @@ public class FieldTemplateLoader : ITemplateLoader
     {
         var directory = _data.ResolvePath("Map/Map");
 
-        if (directory == null) return 0;
+        if (directory == null)
+            return 0;
 
-        await Task.WhenAll(directory.Children
-            .Where(n => n.Name.StartsWith("Map"))
-            .SelectMany(n => n.Children)
-            .Select(async n =>
-            {
-                var id = Convert.ToInt32(n.Name.Split(".")[0]);
-                await _manager.Insert(new TemplateProviderLazy<IFieldTemplate>(
-                    id,
-                    () => new FieldTemplate(
-                        id,
-                        n.ResolvePath("foothold")!.Cache(),
-                        n.ResolvePath("portal")!.Cache(),
-                        n.ResolvePath("ladderRope")!.Cache(),
-                        n.ResolvePath("life")!.Cache(),
-                        n.ResolvePath("info")!.Cache()
-                    )
-                ));
-            }));
+        await Task.WhenAll(
+            directory
+                .Children.Where(n => n.Name.StartsWith("Map"))
+                .SelectMany(n => n.Children)
+                .Select(async n =>
+                {
+                    var id = Convert.ToInt32(n.Name.Split(".")[0]);
+                    await _manager.Insert(
+                        new TemplateProviderLazy<IFieldTemplate>(
+                            id,
+                            () =>
+                                new FieldTemplate(
+                                    id,
+                                    n.ResolvePath("foothold")!.Cache(),
+                                    n.ResolvePath("portal")!.Cache(),
+                                    n.ResolvePath("ladderRope")!.Cache(),
+                                    n.ResolvePath("life")!.Cache(),
+                                    n.ResolvePath("info")!.Cache()
+                                )
+                        )
+                    );
+                })
+        );
 
         _manager.Freeze();
         return _manager.Count;

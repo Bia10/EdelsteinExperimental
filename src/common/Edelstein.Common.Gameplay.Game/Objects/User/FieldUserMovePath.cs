@@ -5,5 +5,6 @@ namespace Edelstein.Common.Gameplay.Game.Objects.User;
 
 public class FieldUserMovePath : AbstractMovePath<IFieldUserMoveAction>, IFieldUserMovePath
 {
-    protected override IFieldUserMoveAction GetActionFromRaw(byte raw) => new FieldUserMoveAction(raw);
+    protected override IFieldUserMoveAction GetActionFromRaw(byte raw) =>
+        new FieldUserMoveAction(raw);
 }

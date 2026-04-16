@@ -23,26 +23,36 @@ public sealed class SingletonResolver(ProcessHandle process, MemoryAccessor memo
         if (!_process.IsAttached || _process.HasExited)
             return false;
 
-        var ptrAddress = new IntPtr(unchecked((int)V95ClientStructs.Addresses.CWvsContextSingletonPtr));
+        var ptrAddress = new IntPtr(
+            unchecked((int)V95ClientStructs.Addresses.CWvsContextSingletonPtr)
+        );
         if (!_memory.TryReadInt32(ptrAddress, out var value, out var error))
         {
             if (_process.TryMarkExitedFromError(error))
                 return false;
-            _logger?.LogDebug("[Rue-CMemory] Failed to read CWvsContext pointer. Error: {Error}", error);
+            _logger?.LogDebug(
+                "[Rue-CMemory] Failed to read CWvsContext pointer. Error: {Error}",
+                error
+            );
             return false;
         }
 
         var newBase = new IntPtr(value);
         if (newBase == IntPtr.Zero)
         {
-            _logger?.LogDebug("[Rue-CMemory] CWvsContext pointer is NULL - context not yet created");
+            _logger?.LogDebug(
+                "[Rue-CMemory] CWvsContext pointer is NULL - context not yet created"
+            );
             return false;
         }
 
         if (_cwvsContextBase != newBase)
         {
             _cwvsContextBase = newBase;
-            _logger?.LogDebug("[Rue-CMemory] Found CWvsContext at 0x{Address:X8}", _cwvsContextBase.ToInt32());
+            _logger?.LogDebug(
+                "[Rue-CMemory] Found CWvsContext at 0x{Address:X8}",
+                _cwvsContextBase.ToInt32()
+            );
         }
 
         return true;
@@ -53,8 +63,14 @@ public sealed class SingletonResolver(ProcessHandle process, MemoryAccessor memo
         if (!_process.IsAttached || _process.HasExited)
             return false;
 
-        var ptrAddress = new IntPtr(unchecked((int)V95ClientStructs.Addresses.CUIChannelSelectSingletonPtr));
-        return TryResolveCLoginViaPointer(ptrAddress, V95ClientStructs.Offsets.CUIChannelSelect.Login, "CUIChannelSelect");
+        var ptrAddress = new IntPtr(
+            unchecked((int)V95ClientStructs.Addresses.CUIChannelSelectSingletonPtr)
+        );
+        return TryResolveCLoginViaPointer(
+            ptrAddress,
+            V95ClientStructs.Offsets.CUIChannelSelect.Login,
+            "CUIChannelSelect"
+        );
     }
 
     public bool FindCUIChannelSelect()
@@ -62,7 +78,9 @@ public sealed class SingletonResolver(ProcessHandle process, MemoryAccessor memo
         if (!_process.IsAttached)
             return false;
 
-        var ptrAddress = new IntPtr(unchecked((int)V95ClientStructs.Addresses.CUIChannelSelectSingletonPtr));
+        var ptrAddress = new IntPtr(
+            unchecked((int)V95ClientStructs.Addresses.CUIChannelSelectSingletonPtr)
+        );
         if (!_memory.TryReadInt32(ptrAddress, out var value))
             return false;
 
@@ -75,7 +93,9 @@ public sealed class SingletonResolver(ProcessHandle process, MemoryAccessor memo
         if (!_process.IsAttached)
             return false;
 
-        var ptrAddress = new IntPtr(unchecked((int)V95ClientStructs.Addresses.CUIWorldSelectSingletonPtr));
+        var ptrAddress = new IntPtr(
+            unchecked((int)V95ClientStructs.Addresses.CUIWorldSelectSingletonPtr)
+        );
         if (!_memory.TryReadInt32(ptrAddress, out var value))
             return false;
 
@@ -88,7 +108,9 @@ public sealed class SingletonResolver(ProcessHandle process, MemoryAccessor memo
         if (!_process.IsAttached)
             return null;
 
-        var ptrAddress = new IntPtr(unchecked((int)V95ClientStructs.Addresses.CUIChannelSelectSingletonPtr));
+        var ptrAddress = new IntPtr(
+            unchecked((int)V95ClientStructs.Addresses.CUIChannelSelectSingletonPtr)
+        );
         if (!_memory.TryReadInt32(ptrAddress, out var value))
             return null;
 
@@ -100,7 +122,9 @@ public sealed class SingletonResolver(ProcessHandle process, MemoryAccessor memo
         if (!_process.IsAttached)
             return null;
 
-        var ptrAddress = new IntPtr(unchecked((int)V95ClientStructs.Addresses.CUIWorldSelectSingletonPtr));
+        var ptrAddress = new IntPtr(
+            unchecked((int)V95ClientStructs.Addresses.CUIWorldSelectSingletonPtr)
+        );
         if (!_memory.TryReadInt32(ptrAddress, out var value))
             return null;
 
@@ -112,7 +136,9 @@ public sealed class SingletonResolver(ProcessHandle process, MemoryAccessor memo
         if (!_process.IsAttached)
             return null;
 
-        var ptrAddress = new IntPtr(unchecked((int)V95ClientStructs.Addresses.CLoginGradeWndSingletonPtr));
+        var ptrAddress = new IntPtr(
+            unchecked((int)V95ClientStructs.Addresses.CLoginGradeWndSingletonPtr)
+        );
         if (!_memory.TryReadInt32(ptrAddress, out var value))
             return null;
 
@@ -128,7 +154,11 @@ public sealed class SingletonResolver(ProcessHandle process, MemoryAccessor memo
         FindCLogin();
     }
 
-    private bool TryResolveCLoginViaPointer(IntPtr singletonPtrAddress, int loginOffset, string sourceName)
+    private bool TryResolveCLoginViaPointer(
+        IntPtr singletonPtrAddress,
+        int loginOffset,
+        string sourceName
+    )
     {
         if (!_memory.TryReadInt32(singletonPtrAddress, out var singletonValue))
             return false;
@@ -148,8 +178,11 @@ public sealed class SingletonResolver(ProcessHandle process, MemoryAccessor memo
         var addr = newLoginBase.ToInt32();
         if (addr < 0x10000 || addr > 0x7FFFFFFF)
         {
-            _logger?.LogDebug("[Rue-CMemory] Rejected CLogin candidate from {Source}: 0x{Addr:X8} (out of range)",
-                sourceName, addr);
+            _logger?.LogDebug(
+                "[Rue-CMemory] Rejected CLogin candidate from {Source}: 0x{Addr:X8} (out of range)",
+                sourceName,
+                addr
+            );
             return false;
         }
 
@@ -159,8 +192,11 @@ public sealed class SingletonResolver(ProcessHandle process, MemoryAccessor memo
         if (_cloginBase != newLoginBase)
         {
             _cloginBase = newLoginBase;
-            _logger?.LogDebug("[Rue-CMemory] Found CLogin via {Source}->m_pLogin at 0x{Address:X8}",
-                sourceName, _cloginBase.ToInt32());
+            _logger?.LogDebug(
+                "[Rue-CMemory] Found CLogin via {Source}->m_pLogin at 0x{Address:X8}",
+                sourceName,
+                _cloginBase.ToInt32()
+            );
         }
 
         return true;
@@ -174,7 +210,10 @@ public sealed class SingletonResolver(ProcessHandle process, MemoryAccessor memo
         {
             _logger?.LogDebug(
                 "[Rue-CMemory] Rejected CLogin candidate from {Source}: 0x{Addr:X8} - LoginStep={Step} (garbage)",
-                sourceName, candidateBase.ToInt32(), stepVal.Value);
+                sourceName,
+                candidateBase.ToInt32(),
+                stepVal.Value
+            );
             return false;
         }
 
@@ -184,7 +223,10 @@ public sealed class SingletonResolver(ProcessHandle process, MemoryAccessor memo
         {
             _logger?.LogDebug(
                 "[Rue-CMemory] Rejected CLogin candidate from {Source}: 0x{Addr:X8} - CharSelected={Val} (garbage)",
-                sourceName, candidateBase.ToInt32(), charSelVal.Value);
+                sourceName,
+                candidateBase.ToInt32(),
+                charSelVal.Value
+            );
             return false;
         }
 

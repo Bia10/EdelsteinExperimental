@@ -8,8 +8,8 @@ public class FieldOnPacketSummonedSkillPlug : IPipelinePlug<FieldOnPacketSummone
 {
     private readonly ISkillManager _skillManager;
 
-    public FieldOnPacketSummonedSkillPlug(ISkillManager skillManager) 
-        => _skillManager = skillManager;
+    public FieldOnPacketSummonedSkillPlug(ISkillManager skillManager) =>
+        _skillManager = skillManager;
 
     public async Task Handle(IPipelineContext ctx, FieldOnPacketSummonedSkill message)
     {

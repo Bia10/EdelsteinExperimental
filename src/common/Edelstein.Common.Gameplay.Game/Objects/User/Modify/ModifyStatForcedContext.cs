@@ -6,7 +6,7 @@ namespace Edelstein.Common.Gameplay.Game.Objects.User.Modify;
 public class ModifyStatForcedContext : IModifyStatForcedContext
 {
     public ModifyStatForcedType Flag { get; private set; }
-    
+
     public bool IsReset { get; private set; }
 
     public short STR
@@ -133,30 +133,30 @@ public class ModifyStatForcedContext : IModifyStatForcedContext
     }
 
     private readonly IFieldUserStatsForced _stats;
-    
+
     public ModifyStatForcedContext(IFieldUserStatsForced stats) => _stats = stats;
 
     public void Reset()
     {
         Flag = 0;
-        
+
         IsReset = true;
-        
+
         _stats.STR = null;
         _stats.DEX = null;
         _stats.INT = null;
         _stats.LUK = null;
-        
+
         _stats.PAD = null;
         _stats.PDD = null;
         _stats.MAD = null;
         _stats.MDD = null;
         _stats.EVA = null;
         _stats.ACC = null;
-        
+
         _stats.Speed = null;
         _stats.Jump = null;
-        
+
         _stats.SpeedMax = null;
     }
 }

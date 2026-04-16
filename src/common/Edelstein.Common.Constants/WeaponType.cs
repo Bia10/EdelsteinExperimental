@@ -27,5 +27,5 @@ public enum WeaponType
     ThrowingGlove = 0x2F,
 
     Knuckle = 0x30,
-    Gun = 0x31
+    Gun = 0x31,
 }

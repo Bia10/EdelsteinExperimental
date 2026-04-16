@@ -9,7 +9,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Cygnus;
 public class Flamewizard2SkillHandler : Flamewizard1SkillHandler
 {
     public override int ID => Job.Flamewizard2;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

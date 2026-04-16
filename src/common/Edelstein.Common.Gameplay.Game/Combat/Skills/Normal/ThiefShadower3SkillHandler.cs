@@ -10,7 +10,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class ThiefShadower3SkillHandler : ThiefShadower2SkillHandler
 {
     public override int ID => Job.Thiefmaster;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

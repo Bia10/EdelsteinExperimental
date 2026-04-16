@@ -14,7 +14,7 @@ public class FieldGeneratorNPC : IFieldGenerator
         _field = field;
         _units = units;
     }
-    
+
     public string ID { get; }
 
     public async Task Generate()
@@ -22,7 +22,8 @@ public class FieldGeneratorNPC : IFieldGenerator
         foreach (var unit in _units)
         {
             var obj = unit.Generate();
-            if (obj == null) continue;
+            if (obj == null)
+                continue;
             await _field.Enter(obj);
         }
     }

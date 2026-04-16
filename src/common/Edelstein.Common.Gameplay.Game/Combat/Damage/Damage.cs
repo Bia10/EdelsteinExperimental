@@ -2,7 +2,4 @@
 
 namespace Edelstein.Common.Gameplay.Game.Combat.Damage;
 
-public record struct Damage(
-    int Value, 
-    bool IsCritical = false
-) : IDamage;
+public record struct Damage(int Value, bool IsCritical = false) : IDamage;

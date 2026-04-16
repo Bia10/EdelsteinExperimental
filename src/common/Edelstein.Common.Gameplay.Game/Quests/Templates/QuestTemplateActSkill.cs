@@ -12,13 +12,13 @@ public record QuestTemplateActSkill : IQuestTemplateActSkill
         SkillLevel = node.ResolveInt("skillLevel") ?? 0;
         MasterLevel = node.ResolveInt("masterLevel") ?? 0;
         IsOnlyMasterLevel = node.ResolveInt("onlyMasterLevel") > 0;
-        Jobs = node.ResolvePath("job")?.Children
-            .Select(p => p.ResolveInt())
+        Jobs = node.ResolvePath("job")
+            ?.Children.Select(p => p.ResolveInt())
             .Where(i => i.HasValue)
             .Select(i => i.Value)
             .ToFrozenSet();
     }
-    
+
     public int SkillID { get; }
     public int SkillLevel { get; }
     public int MasterLevel { get; }

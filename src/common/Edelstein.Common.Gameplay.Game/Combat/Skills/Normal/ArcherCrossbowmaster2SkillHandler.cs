@@ -8,7 +8,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class ArcherCrossbowmaster2SkillHandler : Archer1SkillHandler
 {
     public override int ID => Job.Crossbowman;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -20,7 +20,7 @@ public class ArcherCrossbowmaster2SkillHandler : Archer1SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.SoulArrow, context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

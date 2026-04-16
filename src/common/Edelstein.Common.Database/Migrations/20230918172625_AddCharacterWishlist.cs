@@ -15,15 +15,14 @@ namespace Edelstein.Common.Database.Migrations
                 table: "characters",
                 type: "json",
                 nullable: false,
-                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterWishlist, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Int32[], System.Private.CoreLib\",\"$values\":[0,0,0,0,0,0,0,0,0,0]}}");
+                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterWishlist, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Int32[], System.Private.CoreLib\",\"$values\":[0,0,0,0,0,0,0,0,0,0]}}"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Wishlist",
-                table: "characters");
+            migrationBuilder.DropColumn(name: "Wishlist", table: "characters");
         }
     }
 }

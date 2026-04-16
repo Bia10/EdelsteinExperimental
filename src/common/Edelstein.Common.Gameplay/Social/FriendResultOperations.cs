@@ -21,5 +21,5 @@ public enum FriendResultOperations
     DeleteFriendDone = 0x12,
     Notify = 0x14,
     IncMaxCountDone = 0x15,
-    PleaseWait = 0x17
+    PleaseWait = 0x17,
 }

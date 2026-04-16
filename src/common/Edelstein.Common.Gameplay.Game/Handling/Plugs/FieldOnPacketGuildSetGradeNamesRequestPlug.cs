@@ -1,4 +1,4 @@
-using Edelstein.Protocol.Gameplay.Game.Contracts;
+﻿using Edelstein.Protocol.Gameplay.Game.Contracts;
 using Edelstein.Protocol.Services.Social.Contracts;
 using Edelstein.Protocol.Utilities.Pipelines;
 
@@ -9,7 +9,8 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 /// On success <c>NotifyGuildGradeNamesChanged</c> broadcasts
 /// <c>SetGradeName_Done (0x40)</c> to all online guild members.
 /// </summary>
-public class FieldOnPacketGuildSetGradeNamesRequestPlug : IPipelinePlug<FieldOnPacketGuildSetGradeNamesRequest>
+public class FieldOnPacketGuildSetGradeNamesRequestPlug
+    : IPipelinePlug<FieldOnPacketGuildSetGradeNamesRequest>
 {
     public async Task Handle(IPipelineContext ctx, FieldOnPacketGuildSetGradeNamesRequest message)
     {
@@ -25,6 +26,7 @@ public class FieldOnPacketGuildSetGradeNamesRequestPlug : IPipelinePlug<FieldOnP
                 message.GradeNames[2],
                 message.GradeNames[3],
                 message.GradeNames[4]
-            ));
+            )
+        );
     }
 }

@@ -32,72 +32,122 @@ using Serilog;
 
 await Host.CreateDefaultBuilder(args)
     .UseServiceProviderFactory(new AutofacServiceProviderFactory())
-    .ConfigureAppConfiguration((context, builder) =>
-    {
-        builder.AddJsonFile("appsettings.json", true);
-        builder.AddJsonFile($"appsettings.{context.HostingEnvironment.EnvironmentName}.json", true);
-        builder.AddJsonFile("appsettings.local.json", optional: true);
-        builder.AddEnvironmentVariables();
-        builder.AddCommandLine(args);
-    })
-    .UseSerilog((ctx, logger) => logger.ReadFrom.Configuration(ctx.Configuration))
-    .ConfigureServices((ctx, services) =>
-    {
-        services.AddSingleton(ctx.Configuration.GetSection("Host").Get<ProgramConfig>()!);
-
-        services.AddAutoMapper(typeof(AuthDbContext), typeof(ServerDbContext), typeof(GameplayDbContext));
-        services.AddDbContextFactory<AuthDbContext>(o =>
-            o.UseNpgsql(ctx.Configuration.GetConnectionString(AuthDbContext.ConnectionStringKey)));
-        services.AddDbContextFactory<ServerDbContext>(o =>
-            o.UseNpgsql(ctx.Configuration.GetConnectionString(ServerDbContext.ConnectionStringKey)));
-        services.AddDbContextFactory<GameplayDbContext>(o =>
-            o.UseNpgsql(ctx.Configuration.GetConnectionString(GameplayDbContext.ConnectionStringKey)));
-        services.AddDbContextFactory<SocialDbContext>(o =>
-            o.UseNpgsql(ctx.Configuration.GetConnectionString(SocialDbContext.ConnectionStringKey)));
-
-        services.AddSingleton<IMessageBus>(new InMemoryMessageBus(
-            new InMemoryMessageBusOptions
-            {
-                Serializer = new JsonNetSerializer(new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.All})
-            }));
-
-        services.AddSingleton<IAccountRepository, AccountRepository>();
-        services.AddSingleton<IAccountWorldRepository, AccountWorldRepository>();
-        services.AddSingleton<ICharacterRepository, CharacterRepository>();
-
-        services.AddSingleton<IAuthService, AuthService>();
-        services.AddSingleton<IServerService, ServerService>();
-        services.AddSingleton<ISessionService, SessionService>();
-        services.AddSingleton<IMigrationService, MigrationService>();
-        
-        services.AddSingleton<IFriendService, FriendService>();
-        services.AddSingleton<IPartyService, PartyService>();
-        services.AddSingleton(ctx.Configuration.GetSection("Guild").Get<GuildOptions>() ?? new GuildOptions());
-        services.AddSingleton<IGuildService, GuildService>();
-    })
-    .ConfigureServices((ctx, services) =>
-    {
-        services.AddSingleton<ITickerManager, TickerManager>(p => new TickerManager(
-            p.GetRequiredService<ILogger<TickerManager>>(),
-            p.GetRequiredService<ProgramConfig>().TicksPerSecond
-        ));
-
-        switch (ctx.Configuration.GetSection("Data")["Type"])
+    .ConfigureAppConfiguration(
+        (context, builder) =>
         {
-            case "NX":
-                services.AddSingleton<IDataNamespace>(
-                    new NXNamespace(ctx.Configuration.GetSection("Data")["Directory"] ?? throw new InvalidOperationException())
-                );
-                break;
-            case "WZ":
-                services.AddSingleton<IDataNamespace>(new WZNamespace(
-                    ctx.Configuration.GetSection("Data")["Directory"] ?? throw new InvalidOperationException(),
-                    ctx.Configuration.GetSection("Data")["Key"] ?? throw new InvalidOperationException()));
-                break;
+            builder.AddJsonFile("appsettings.json", true);
+            builder.AddJsonFile(
+                $"appsettings.{context.HostingEnvironment.EnvironmentName}.json",
+                true
+            );
+            builder.AddJsonFile("appsettings.local.json", optional: true);
+            builder.AddEnvironmentVariables();
+            builder.AddCommandLine(args);
         }
+    )
+    .UseSerilog((ctx, logger) => logger.ReadFrom.Configuration(ctx.Configuration))
+    .ConfigureServices(
+        (ctx, services) =>
+        {
+            services.AddSingleton(ctx.Configuration.GetSection("Host").Get<ProgramConfig>()!);
 
-        services.AddSingleton<IScriptEngine>(new LuaScriptEngine(ctx.Configuration.GetSection("Scripts")["Directory"] ?? throw new InvalidOperationException()));
-        services.AddSingleton(typeof(ITemplateManager<>), typeof(TemplateManager<>));
-    })
-    .ConfigureServices((ctx, services) => { services.AddHostedService<ProgramHost>(); })
+            services.AddAutoMapper(
+                typeof(AuthDbContext),
+                typeof(ServerDbContext),
+                typeof(GameplayDbContext)
+            );
+            services.AddDbContextFactory<AuthDbContext>(o =>
+                o.UseNpgsql(
+                    ctx.Configuration.GetConnectionString(AuthDbContext.ConnectionStringKey)
+                )
+            );
+            services.AddDbContextFactory<ServerDbContext>(o =>
+                o.UseNpgsql(
+                    ctx.Configuration.GetConnectionString(ServerDbContext.ConnectionStringKey)
+                )
+            );
+            services.AddDbContextFactory<GameplayDbContext>(o =>
+                o.UseNpgsql(
+                    ctx.Configuration.GetConnectionString(GameplayDbContext.ConnectionStringKey)
+                )
+            );
+            services.AddDbContextFactory<SocialDbContext>(o =>
+                o.UseNpgsql(
+                    ctx.Configuration.GetConnectionString(SocialDbContext.ConnectionStringKey)
+                )
+            );
+
+            services.AddSingleton<IMessageBus>(
+                new InMemoryMessageBus(
+                    new InMemoryMessageBusOptions
+                    {
+                        Serializer = new JsonNetSerializer(
+                            new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.All }
+                        ),
+                    }
+                )
+            );
+
+            services.AddSingleton<IAccountRepository, AccountRepository>();
+            services.AddSingleton<IAccountWorldRepository, AccountWorldRepository>();
+            services.AddSingleton<ICharacterRepository, CharacterRepository>();
+
+            services.AddSingleton<IAuthService, AuthService>();
+            services.AddSingleton<IServerService, ServerService>();
+            services.AddSingleton<ISessionService, SessionService>();
+            services.AddSingleton<IMigrationService, MigrationService>();
+
+            services.AddSingleton<IFriendService, FriendService>();
+            services.AddSingleton<IPartyService, PartyService>();
+            services.AddSingleton(
+                ctx.Configuration.GetSection("Guild").Get<GuildOptions>() ?? new GuildOptions()
+            );
+            services.AddSingleton<IGuildService, GuildService>();
+        }
+    )
+    .ConfigureServices(
+        (ctx, services) =>
+        {
+            services.AddSingleton<ITickerManager, TickerManager>(p => new TickerManager(
+                p.GetRequiredService<ILogger<TickerManager>>(),
+                p.GetRequiredService<ProgramConfig>().TicksPerSecond
+            ));
+
+            switch (ctx.Configuration.GetSection("Data")["Type"])
+            {
+                case "NX":
+                    services.AddSingleton<IDataNamespace>(
+                        new NXNamespace(
+                            ctx.Configuration.GetSection("Data")["Directory"]
+                                ?? throw new InvalidOperationException()
+                        )
+                    );
+                    break;
+                case "WZ":
+                    services.AddSingleton<IDataNamespace>(
+                        new WZNamespace(
+                            ctx.Configuration.GetSection("Data")["Directory"]
+                                ?? throw new InvalidOperationException(),
+                            ctx.Configuration.GetSection("Data")["Key"]
+                                ?? throw new InvalidOperationException()
+                        )
+                    );
+                    break;
+            }
+
+            services.AddSingleton<IScriptEngine>(
+                new LuaScriptEngine(
+                    ctx.Configuration.GetSection("Scripts")["Directory"]
+                        ?? throw new InvalidOperationException()
+                )
+            );
+            services.AddSingleton(typeof(ITemplateManager<>), typeof(TemplateManager<>));
+        }
+    )
+    .ConfigureServices(
+        (ctx, services) =>
+        {
+            services.AddHostedService<ProgramHost>();
+        }
+    )
     .RunConsoleAsync();

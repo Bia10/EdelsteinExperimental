@@ -33,22 +33,29 @@ public class StatCommand : AbstractCommand<StatCommandArgs>
             case ModifyStatType.Skin:
             case ModifyStatType.Face:
             case ModifyStatType.Hair:
-                var result = await user.Prompt(target =>
-                    target.AskAvatar("Is this style okay?", new[] { args.Value }),
+                var result = await user.Prompt(
+                    target => target.AskAvatar("Is this style okay?", new[] { args.Value }),
                     -1
                 );
 
-                if (result == -1) return;
+                if (result == -1)
+                    return;
                 break;
             case ModifyStatType.SP:
                 if (JobConstants.IsExtendSPJob(user.Character.Job))
                 {
-                    var jobLevel = await user.Prompt(s => s.AskNumber("Which job level would you like to set?", min: 0, max: 10), -1);
+                    var jobLevel = await user.Prompt(
+                        s => s.AskNumber("Which job level would you like to set?", min: 0, max: 10),
+                        -1
+                    );
 
-                    if (jobLevel == -1) return;
+                    if (jobLevel == -1)
+                        return;
 
                     await user.ModifyStats(s => s.SetExtendSP((byte)jobLevel, (byte)args.Value));
-                    await user.Message($"Successfully set extend SP (job level: {jobLevel}) to {args.Value}");
+                    await user.Message(
+                        $"Successfully set extend SP (job level: {jobLevel}) to {args.Value}"
+                    );
                     return;
                 }
                 break;
@@ -119,7 +126,8 @@ public class StatCommand : AbstractCommand<StatCommandArgs>
                 case ModifyStatType.TempEXP:
                     s.TempEXP = args.Value;
                     break;
-                default: return;
+                default:
+                    return;
             }
         });
         await user.Message($"Successfully set {args.Type} to {args.Value}");

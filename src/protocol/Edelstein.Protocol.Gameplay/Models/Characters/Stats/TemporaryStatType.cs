@@ -131,5 +131,5 @@ public enum TemporaryStatType
     PartyBooster = 0x7E,
     GuidedBullet = 0x7F,
     Undead = 0x80,
-    SummonBomb = 0x81
+    SummonBomb = 0x81,
 }

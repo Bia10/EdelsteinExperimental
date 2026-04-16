@@ -22,7 +22,8 @@ public class UserOnPacketSelectWorldAutoSelectCharacterPlug(
     LoginContext context,
     ICharacterRepository characterRepository,
     MemoryContext? memoryContext = null,
-    LoginMilestonesTracker? tracker = null) : IPipelinePlug<UserOnPacketSelectWorld>
+    LoginMilestonesTracker? tracker = null
+) : IPipelinePlug<UserOnPacketSelectWorld>
 {
     private readonly ILogger? _logger = logger;
     private readonly RueConfigLogin _config = options.Value;
@@ -43,9 +44,16 @@ public class UserOnPacketSelectWorldAutoSelectCharacterPlug(
 
         // In passive mode, skip auto-character selection
         var watchMode = _config.ClientMemory?.WatchMode ?? RueConfigClientMemory.WatchModeActive;
-        if (watchMode.Equals(RueConfigClientMemory.WatchModePassive, StringComparison.OrdinalIgnoreCase))
+        if (
+            watchMode.Equals(
+                RueConfigClientMemory.WatchModePassive,
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
         {
-            _logger?.LogInformation("[Rue-AutoLogin] Passive mode - skipping auto-character selection");
+            _logger?.LogInformation(
+                "[Rue-AutoLogin] Passive mode - skipping auto-character selection"
+            );
             return;
         }
 
@@ -61,8 +69,9 @@ public class UserOnPacketSelectWorldAutoSelectCharacterPlug(
         var t0 = Environment.TickCount64;
 
         // Get the character list
-        var characters = (await _characterRepository.RetrieveAllByAccountWorld(message.User.AccountWorld.ID))
-            .ToImmutableArray();
+        var characters = (
+            await _characterRepository.RetrieveAllByAccountWorld(message.User.AccountWorld.ID)
+        ).ToImmutableArray();
 
         ICharacter? selectedCharacter = null;
 
@@ -76,8 +85,10 @@ public class UserOnPacketSelectWorldAutoSelectCharacterPlug(
 
             if (selectedCharacter == null)
             {
-                _logger?.LogWarning("[Rue-AutoLogin] No characters and auto-create disabled for {Username}",
-                    message.User.Account?.Username);
+                _logger?.LogWarning(
+                    "[Rue-AutoLogin] No characters and auto-create disabled for {Username}",
+                    message.User.Account?.Username
+                );
                 return;
             }
         }
@@ -89,8 +100,10 @@ public class UserOnPacketSelectWorldAutoSelectCharacterPlug(
 
         if (selectedCharacter == null)
         {
-            _logger?.LogWarning("[Rue-AutoLogin] No matching character for {Username}",
-                message.User.Account?.Username);
+            _logger?.LogWarning(
+                "[Rue-AutoLogin] No matching character for {Username}",
+                message.User.Account?.Username
+            );
             return;
         }
 
@@ -99,10 +112,13 @@ public class UserOnPacketSelectWorldAutoSelectCharacterPlug(
         {
             var stableOk = await Monitor.WaitWithTimeout(
                 ct => Monitor.WaitForStepTransitionComplete(ct),
-                "StepTransitionComplete before character select");
+                "StepTransitionComplete before character select"
+            );
 
             if (!stableOk)
-                _logger?.LogWarning("[Rue-AutoLogin] Step transition timeout before character select - proceeding");
+                _logger?.LogWarning(
+                    "[Rue-AutoLogin] Step transition timeout before character select - proceeding"
+                );
         }
         else
         {
@@ -112,8 +128,12 @@ public class UserOnPacketSelectWorldAutoSelectCharacterPlug(
         }
 
         var transitionElapsed = Environment.TickCount64 - t0;
-        _logger?.LogInformation("[Rue-AutoLogin] Step transition complete (+{Elapsed}), selecting character {Name} (ID:{ID})",
-            LoginMilestonesTracker.FormatElapsed(transitionElapsed), selectedCharacter.Name, selectedCharacter.ID);
+        _logger?.LogInformation(
+            "[Rue-AutoLogin] Step transition complete (+{Elapsed}), selecting character {Name} (ID:{ID})",
+            LoginMilestonesTracker.FormatElapsed(transitionElapsed),
+            selectedCharacter.Name,
+            selectedCharacter.ID
+        );
 
         // Determine if we need to enable SPW or check existing SPW
         var hasSPW = !string.IsNullOrEmpty(message.User.Account?.SPW);
@@ -122,30 +142,36 @@ public class UserOnPacketSelectWorldAutoSelectCharacterPlug(
         if (hasSPW)
         {
             // Account has SPW, use CheckSPWRequest
-            await _context.Pipelines.UserOnPacketCheckSPWRequest.Process(new UserOnPacketCheckSPWRequest(
-                message.User,
-                autoSPW,
-                selectedCharacter.ID,
-                "00-00-00-00-00-00",
-                "00-00-00-00-00-00_00000000"
-            ));
+            await _context.Pipelines.UserOnPacketCheckSPWRequest.Process(
+                new UserOnPacketCheckSPWRequest(
+                    message.User,
+                    autoSPW,
+                    selectedCharacter.ID,
+                    "00-00-00-00-00-00",
+                    "00-00-00-00-00-00_00000000"
+                )
+            );
         }
         else
         {
             // Account doesn't have SPW, use EnableSPWRequest to set it and enter game
-            await _context.Pipelines.UserOnPacketEnableSPWRequest.Process(new UserOnPacketEnableSPWRequest(
-                message.User,
-                selectedCharacter.ID,
-                "00-00-00-00-00-00",
-                "00-00-00-00-00-00_00000000",
-                autoSPW
-            ));
+            await _context.Pipelines.UserOnPacketEnableSPWRequest.Process(
+                new UserOnPacketEnableSPWRequest(
+                    message.User,
+                    selectedCharacter.ID,
+                    "00-00-00-00-00-00",
+                    "00-00-00-00-00-00_00000000",
+                    autoSPW
+                )
+            );
         }
 
-        _logger?.LogInformation("[Rue-AutoLogin] Character selected (+{Elapsed})", LoginMilestonesTracker.FormatElapsed(Environment.TickCount64 - t0));
+        _logger?.LogInformation(
+            "[Rue-AutoLogin] Character selected (+{Elapsed})",
+            LoginMilestonesTracker.FormatElapsed(Environment.TickCount64 - t0)
+        );
         _tracker?.RecordCompletion();
     }
-
 
     private ICharacter? FindCharacter(ImmutableArray<ICharacter> characters)
     {
@@ -153,7 +179,8 @@ public class UserOnPacketSelectWorldAutoSelectCharacterPlug(
         if (!string.IsNullOrEmpty(_config.AutoSelectCharacterName))
         {
             var byName = characters.FirstOrDefault(c =>
-                c.Name.Equals(_config.AutoSelectCharacterName, StringComparison.OrdinalIgnoreCase));
+                c.Name.Equals(_config.AutoSelectCharacterName, StringComparison.OrdinalIgnoreCase)
+            );
             if (byName != null)
                 return byName;
         }
@@ -185,7 +212,10 @@ public class UserOnPacketSelectWorldAutoSelectCharacterPlug(
 
             if (suffix > 9999) // Safety limit
             {
-                _logger?.LogError("[Rue-AutoLogin] No unique name available with prefix {Prefix}", baseName);
+                _logger?.LogError(
+                    "[Rue-AutoLogin] No unique name available with prefix {Prefix}",
+                    baseName
+                );
                 return null;
             }
         }
@@ -208,7 +238,8 @@ public class UserOnPacketSelectWorldAutoSelectCharacterPlug(
                 config.Shoes,
                 config.Weapon,
                 config.Gender
-            ));
+            )
+        );
 
         if (createResult.IsRequestedCancellation)
         {

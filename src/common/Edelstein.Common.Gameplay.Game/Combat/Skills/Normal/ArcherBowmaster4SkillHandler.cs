@@ -10,7 +10,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class ArcherBowmaster4SkillHandler : ArcherBowmaster3SkillHandler
 {
     public override int ID => Job.Bowmaster;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -18,7 +18,7 @@ public class ArcherBowmaster4SkillHandler : ArcherBowmaster3SkillHandler
             case Skill.BowmasterSharpEyes:
                 var cr = context.SkillLevel!.X;
                 var cd = context.SkillLevel!.CDMax;
-                
+
                 context.AddTemporaryStat(TemporaryStatType.SharpEyes, (cr << 8) + cd);
                 break;
             case Skill.BowmasterHamstring:
@@ -32,7 +32,7 @@ public class ArcherBowmaster4SkillHandler : ArcherBowmaster3SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.Concentration, context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

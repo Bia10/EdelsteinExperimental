@@ -1,8 +1,3 @@
-namespace Edelstein.Protocol.Services.Social.Contracts;
+﻿namespace Edelstein.Protocol.Services.Social.Contracts;
 
-public record GuildUpdateLevelOrJobRequest(
-    int GuildID,
-    int CharacterID,
-    int Level,
-    int Job
-);
+public record GuildUpdateLevelOrJobRequest(int GuildID, int CharacterID, int Level, int Job);

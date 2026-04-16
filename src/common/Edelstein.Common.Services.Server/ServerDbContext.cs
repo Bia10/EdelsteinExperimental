@@ -7,9 +7,8 @@ public class ServerDbContext : DbContext
 {
     public const string ConnectionStringKey = "Server";
 
-    public ServerDbContext(DbContextOptions<ServerDbContext> options) : base(options)
-    {
-    }
+    public ServerDbContext(DbContextOptions<ServerDbContext> options)
+        : base(options) { }
 
     public DbSet<ServerEntity> Servers { get; set; }
     public DbSet<ServerLoginEntity> LoginServers { get; set; }
@@ -20,6 +19,6 @@ public class ServerDbContext : DbContext
     public DbSet<SessionEntity> Sessions { get; set; }
     public DbSet<MigrationEntity> Migrations { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder builder)
-        => builder.ApplyConfigurationsFromAssembly(typeof(ServerDbContext).Assembly);
+    protected override void OnModelCreating(ModelBuilder builder) =>
+        builder.ApplyConfigurationsFromAssembly(typeof(ServerDbContext).Assembly);
 }

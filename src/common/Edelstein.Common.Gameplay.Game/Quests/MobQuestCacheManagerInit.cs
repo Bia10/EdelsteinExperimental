@@ -10,8 +10,11 @@ public class MobQuestCacheManagerInit : IPipelinePlug<StageStart>
 {
     private readonly IMobQuestCacheManager _manager;
     private readonly ITemplateManager<IQuestTemplate> _templates;
-    
-    public MobQuestCacheManagerInit(IMobQuestCacheManager manager, ITemplateManager<IQuestTemplate> templates)
+
+    public MobQuestCacheManagerInit(
+        IMobQuestCacheManager manager,
+        ITemplateManager<IQuestTemplate> templates
+    )
     {
         _manager = manager;
         _templates = templates;
@@ -22,7 +25,8 @@ public class MobQuestCacheManagerInit : IPipelinePlug<StageStart>
         var quests = await _templates.RetrieveAll();
         foreach (var quest in quests)
         {
-            if (quest.CheckEnd.CheckMob == null) continue;
+            if (quest.CheckEnd.CheckMob == null)
+                continue;
             foreach (var mob in quest.CheckEnd.CheckMob)
                 (await _manager.Retrieve(mob.MobID))?.Quests.Add(quest.ID);
         }

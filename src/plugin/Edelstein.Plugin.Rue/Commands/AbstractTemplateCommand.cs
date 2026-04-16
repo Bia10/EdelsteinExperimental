@@ -11,26 +11,34 @@ namespace Edelstein.Plugin.Rue.Commands;
 public enum TemplateCommandIndexKind : byte
 {
     Default = 0,
-    Description = 1
+    Description = 1,
 }
 
 /// <summary>
 /// Index entry for template command search.
 /// SearchString is stored as-is; normalization is applied at query/build time.
 /// </summary>
-public readonly record struct TemplateCommandIndex(int ID, string SearchString, string DisplayString, TemplateCommandIndexKind Kind)
+public readonly record struct TemplateCommandIndex(
+    int ID,
+    string SearchString,
+    string DisplayString,
+    TemplateCommandIndexKind Kind
+)
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TemplateCommandIndex Create(int id, string? searchString, string displayString)
-        => new(id, searchString ?? string.Empty, displayString, TemplateCommandIndexKind.Default);
+    public static TemplateCommandIndex Create(int id, string? searchString, string displayString) =>
+        new(id, searchString ?? string.Empty, displayString, TemplateCommandIndexKind.Default);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TemplateCommandIndex CreateDescription(int id, string? searchString, string displayString)
-        => new(id, searchString ?? string.Empty, displayString, TemplateCommandIndexKind.Description);
+    public static TemplateCommandIndex CreateDescription(
+        int id,
+        string? searchString,
+        string displayString
+    ) => new(id, searchString ?? string.Empty, displayString, TemplateCommandIndexKind.Description);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static TemplateCommandIndex CreateFromId(int id, string displayString)
-        => new(id, id.ToString(), displayString, TemplateCommandIndexKind.Default);
+    public static TemplateCommandIndex CreateFromId(int id, string displayString) =>
+        new(id, id.ToString(), displayString, TemplateCommandIndexKind.Default);
 }
 
 public class TemplateCommandArgs : CommandArgs
@@ -43,17 +51,21 @@ public class TemplateCommandArgs : CommandArgs
 /// <summary>
 /// Base class for template search commands with default argument handling.
 /// </summary>
-public abstract class AbstractTemplateCommand<TTemplate> : AbstractTemplateCommand<TTemplate, TemplateCommandArgs>
+public abstract class AbstractTemplateCommand<TTemplate>
+    : AbstractTemplateCommand<TTemplate, TemplateCommandArgs>
     where TTemplate : class, ITemplate
 {
-    protected AbstractTemplateCommand(ITemplateManager<TTemplate> templates) : base(templates) { }
+    protected AbstractTemplateCommand(ITemplateManager<TTemplate> templates)
+        : base(templates) { }
 }
 
 /// <summary>
 /// Base class for searchable template commands with trie-based indexing and pagination.
 /// Supports both numeric ID lookup and text search with lazy trie construction.
 /// </summary>
-public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractCommand<TArgs>, IIndexedCommand
+public abstract class AbstractTemplateCommand<TTemplate, TArgs>
+    : AbstractCommand<TArgs>,
+        IIndexedCommand
     where TTemplate : class, ITemplate
     where TArgs : TemplateCommandArgs
 {
@@ -73,10 +85,21 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
     private UkkonenTrie<int>? _trie;
     private readonly SemaphoreSlim _indexLock = new(1, 1);
     private readonly object _trieBuildSync = new();
-    private static readonly int TrieBuildConcurrency = Math.Min(MaxConcurrentTrieBuilds, Environment.ProcessorCount);
-    private static readonly SemaphoreSlim TrieBuildThrottle = new(TrieBuildConcurrency, TrieBuildConcurrency);
+    private static readonly int TrieBuildConcurrency = Math.Min(
+        MaxConcurrentTrieBuilds,
+        Environment.ProcessorCount
+    );
+    private static readonly SemaphoreSlim TrieBuildThrottle = new(
+        TrieBuildConcurrency,
+        TrieBuildConcurrency
+    );
 
-    private readonly record struct IndexEntry(int ID, string SearchString, TemplateCommandIndexKind Kind);
+    private readonly record struct IndexEntry(
+        int ID,
+        string SearchString,
+        TemplateCommandIndexKind Kind
+    );
+
     private readonly record struct MatchResult(int ID, string? DisplayOverride);
 
     /// <summary>
@@ -131,20 +154,22 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
     private int _isTrieBuilt; // 0 = not built, 1 = built (using int for Interlocked)
     private Task? _trieBuildTask;
 
-    protected AbstractTemplateCommand(ITemplateManager<TTemplate> templates)
-        => _templates = templates;
+    protected AbstractTemplateCommand(ITemplateManager<TTemplate> templates) =>
+        _templates = templates;
 
     protected abstract Task<IReadOnlyList<TemplateCommandIndex>> Indices();
     protected abstract Task Execute(IFieldUser user, TTemplate template, TArgs args);
 
     public async Task Index(IndexingStatus status)
     {
-        if (Volatile.Read(ref _isIndexed) == 1) return;
+        if (Volatile.Read(ref _isIndexed) == 1)
+            return;
 
         await _indexLock.WaitAsync().ConfigureAwait(false);
         try
         {
-            if (Volatile.Read(ref _isIndexed) == 1) return;
+            if (Volatile.Read(ref _isIndexed) == 1)
+                return;
 
             _indexingStatus = status;
             status.SetLoading(Name);
@@ -165,9 +190,10 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
             }
 
             _linearEntries = linear;
-            _displayById = displayBuilder.Count == 0
-                ? FrozenDictionary<int, string>.Empty
-                : displayBuilder.ToFrozenDictionary();
+            _displayById =
+                displayBuilder.Count == 0
+                    ? FrozenDictionary<int, string>.Empty
+                    : displayBuilder.ToFrozenDictionary();
 
             Volatile.Write(ref _isIndexed, 1);
             status.SetCompleted(Name, count);
@@ -181,11 +207,22 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
 
     private void StartTrieBuild()
     {
-        if (Volatile.Read(ref _isIndexed) != 1 || Volatile.Read(ref _isTrieBuilt) == 1 || _trieDisabled) return;
+        if (
+            Volatile.Read(ref _isIndexed) != 1
+            || Volatile.Read(ref _isTrieBuilt) == 1
+            || _trieDisabled
+        )
+            return;
 
         lock (_trieBuildSync)
         {
-            if (Volatile.Read(ref _isIndexed) != 1 || Volatile.Read(ref _isTrieBuilt) == 1 || _trieDisabled || _trieBuildTask != null) return;
+            if (
+                Volatile.Read(ref _isIndexed) != 1
+                || Volatile.Read(ref _isTrieBuilt) == 1
+                || _trieDisabled
+                || _trieBuildTask != null
+            )
+                return;
 
             _trieBuildTask = Task.Run(BuildTrieAsync);
         }
@@ -197,7 +234,12 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
         await TrieBuildThrottle.WaitAsync().ConfigureAwait(false);
         try
         {
-            if (Volatile.Read(ref _isIndexed) != 1 || Volatile.Read(ref _isTrieBuilt) == 1 || _trieDisabled) return;
+            if (
+                Volatile.Read(ref _isIndexed) != 1
+                || Volatile.Read(ref _isTrieBuilt) == 1
+                || _trieDisabled
+            )
+                return;
 
             _indexingStatus?.SetBuilding(Name, _linearEntries.Length);
 
@@ -277,21 +319,24 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
             else if (trieBuildFailed)
                 _trieDisabled = true;
 
-            _indexingStatus?.SetTrieTelemetry(new TrieIndexTelemetry(
-                CommandName: Name,
-                TotalIndices: count,
-                DescriptionIndices: descriptionIndices,
-                NormalizedNull: normalizedNull,
-                NormalizedTooShort: normalizedTooShort,
-                NormalizedTooLong: 0,
-                DuplicateKeys: duplicateKeys,
-                AddedKeys: addedKeys,
-                AddArgumentExceptions: addArgumentExceptions,
-                AddOutOfRangeExceptions: addOutOfRangeExceptions,
-                AddNullReferenceExceptions: addNullReferenceExceptions,
-                RetrieveExceptions: 0,
-                BuildElapsedMs: buildElapsedMs,
-                TrieEnabled: _trieEnabled));
+            _indexingStatus?.SetTrieTelemetry(
+                new TrieIndexTelemetry(
+                    CommandName: Name,
+                    TotalIndices: count,
+                    DescriptionIndices: descriptionIndices,
+                    NormalizedNull: normalizedNull,
+                    NormalizedTooShort: normalizedTooShort,
+                    NormalizedTooLong: 0,
+                    DuplicateKeys: duplicateKeys,
+                    AddedKeys: addedKeys,
+                    AddArgumentExceptions: addArgumentExceptions,
+                    AddOutOfRangeExceptions: addOutOfRangeExceptions,
+                    AddNullReferenceExceptions: addNullReferenceExceptions,
+                    RetrieveExceptions: 0,
+                    BuildElapsedMs: buildElapsedMs,
+                    TrieEnabled: _trieEnabled
+                )
+            );
 
             Volatile.Write(ref _isTrieBuilt, 1);
         }
@@ -312,7 +357,8 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
     {
         if (Volatile.Read(ref _isIndexed) != 1)
         {
-            var message = _indexingStatus?.GetProgressMessage()
+            var message =
+                _indexingStatus?.GetProgressMessage()
                 ?? "Templates have not finished indexing yet, please try again later..";
             await user.Message(message);
             return;
@@ -340,16 +386,22 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
             var exactMatch = await _templates.Retrieve(exactId);
             if (exactMatch != null)
             {
-                var displayName = _displayById.TryGetValue(exactId, out var knownDisplay) && !string.IsNullOrWhiteSpace(knownDisplay)
-                    ? knownDisplay
-                    : "EXACT-ID-MATCH";
+                var displayName =
+                    _displayById.TryGetValue(exactId, out var knownDisplay)
+                    && !string.IsNullOrWhiteSpace(knownDisplay)
+                        ? knownDisplay
+                        : "EXACT-ID-MATCH";
 
-                var displayString = string.Create(displayName.Length + 4, displayName, static (span, name) =>
-                {
-                    "#e".AsSpan().CopyTo(span);
-                    name.AsSpan().CopyTo(span[2..]);
-                    "#n".AsSpan().CopyTo(span[(2 + name.Length)..]);
-                });
+                var displayString = string.Create(
+                    displayName.Length + 4,
+                    displayName,
+                    static (span, name) =>
+                    {
+                        "#e".AsSpan().CopyTo(span);
+                        name.AsSpan().CopyTo(span[2..]);
+                        "#n".AsSpan().CopyTo(span[(2 + name.Length)..]);
+                    }
+                );
 
                 results.Add(new MatchResult(exactId, displayString));
                 seenIds.Add(exactId);
@@ -391,7 +443,9 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
             }
 
             // Trie success: only search Description entries; Default entries already in trie
-            var kindFilter = trieSearchSucceeded ? TemplateCommandIndexKind.Description : (TemplateCommandIndexKind?)null;
+            var kindFilter = trieSearchSucceeded
+                ? TemplateCommandIndexKind.Description
+                : (TemplateCommandIndexKind?)null;
             AddLinearMatches(results, seenIds, normalizedSearch, kindFilter);
         }
         else
@@ -405,46 +459,64 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
         {
             var resultsCopy = results.ToArray();
 
-            var templateID = await user.Prompt(target =>
-            {
-                var maxPage = (resultsCopy.Length + MaxResultsPerPage - 1) / MaxResultsPerPage;
-                var currentPage = 1;
-                var menu = new Dictionary<int, string>(MaxResultsPerPage + 2);
-
-                while (true)
+            var templateID = await user.Prompt(
+                target =>
                 {
-                    menu.Clear();
-                    var skipCount = MaxResultsPerPage * (currentPage - 1);
+                    var maxPage = (resultsCopy.Length + MaxResultsPerPage - 1) / MaxResultsPerPage;
+                    var currentPage = 1;
+                    var menu = new Dictionary<int, string>(MaxResultsPerPage + 2);
 
-                    for (var i = skipCount; i < resultsCopy.Length && i < skipCount + MaxResultsPerPage; i++)
+                    while (true)
                     {
-                        var r = resultsCopy[i];
-                        var display = r.DisplayOverride;
-                        if (string.IsNullOrWhiteSpace(display))
-                            display = _displayById.TryGetValue(r.ID, out var d) && !string.IsNullOrWhiteSpace(d)
-                                ? d
-                                : r.ID.ToString();
+                        menu.Clear();
+                        var skipCount = MaxResultsPerPage * (currentPage - 1);
 
-                        menu[r.ID] = $"{display} ({r.ID})";
+                        for (
+                            var i = skipCount;
+                            i < resultsCopy.Length && i < skipCount + MaxResultsPerPage;
+                            i++
+                        )
+                        {
+                            var r = resultsCopy[i];
+                            var display = r.DisplayOverride;
+                            if (string.IsNullOrWhiteSpace(display))
+                                display =
+                                    _displayById.TryGetValue(r.ID, out var d)
+                                    && !string.IsNullOrWhiteSpace(d)
+                                        ? d
+                                        : r.ID.ToString();
+
+                            menu[r.ID] = $"{display} ({r.ID})";
+                        }
+
+                        if (currentPage < maxPage)
+                            menu[MenuNextPage] = "#rNext page#k";
+                        if (currentPage > 1)
+                            menu[MenuPrevPage] = "#rPrevious page#k";
+
+                        var selection = target.AskMenu(
+                            $"Found {resultsCopy.Length} results for '{args.Search}' in {elapsedMs}ms (page {currentPage} of {maxPage})",
+                            menu
+                        );
+
+                        switch (selection)
+                        {
+                            case MenuNextPage:
+                                currentPage++;
+                                continue;
+                            case MenuPrevPage:
+                                currentPage--;
+                                continue;
+                            default:
+                                return selection;
+                        }
                     }
+                },
+                MenuCancelled
+            );
 
-                    if (currentPage < maxPage) menu[MenuNextPage] = "#rNext page#k";
-                    if (currentPage > 1) menu[MenuPrevPage] = "#rPrevious page#k";
-
-                    var selection = target.AskMenu(
-                        $"Found {resultsCopy.Length} results for '{args.Search}' in {elapsedMs}ms (page {currentPage} of {maxPage})",
-                        menu);
-
-                    switch (selection)
-                    {
-                        case MenuNextPage: currentPage++; continue;
-                        case MenuPrevPage: currentPage--; continue;
-                        default: return selection;
-                    }
-                }
-            }, MenuCancelled);
-
-            if (templateID == MenuCancelled) return;
+            if (templateID == MenuCancelled)
+                return;
 
             var template = await _templates.Retrieve(templateID);
             if (template == null)
@@ -463,9 +535,8 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
     private static string ToLowerStackAlloc(string input)
     {
         var length = input.Length;
-        Span<char> buffer = length <= MaxStackAllocLength
-            ? stackalloc char[length]
-            : new char[length];
+        Span<char> buffer =
+            length <= MaxStackAllocLength ? stackalloc char[length] : new char[length];
 
         for (var i = 0; i < length; i++)
             buffer[i] = char.ToLowerInvariant(input[i]);
@@ -477,7 +548,8 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
         PooledResultList results,
         HashSet<int> seenIds,
         ReadOnlySpan<char> query,
-        TemplateCommandIndexKind? kindFilter)
+        TemplateCommandIndexKind? kindFilter
+    )
     {
         for (var i = 0; i < _linearEntries.Length; i++)
         {
@@ -497,7 +569,8 @@ public abstract class AbstractTemplateCommand<TTemplate, TArgs> : AbstractComman
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool IsAllDigits(ReadOnlySpan<char> span)
     {
-        if (span.IsEmpty) return false;
+        if (span.IsEmpty)
+            return false;
 
         foreach (var c in span)
             if (!char.IsAsciiDigit(c))

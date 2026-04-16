@@ -4,9 +4,9 @@ using Edelstein.Protocol.Scripting;
 
 namespace Edelstein.Common.Gameplay.Game.Conversations;
 
-public class ScriptedConversationManager : 
-    Repository<string, INamedConversation>, 
-    INamedConversationManager
+public class ScriptedConversationManager
+    : Repository<string, INamedConversation>,
+        INamedConversationManager
 {
     private readonly IScriptEngine _engine;
 
@@ -15,8 +15,9 @@ public class ScriptedConversationManager :
     public override async Task<INamedConversation?> Retrieve(string key)
     {
         var conversation = await base.Retrieve(key);
-        if (conversation != null) return conversation;
-        
+        if (conversation != null)
+            return conversation;
+
         var script = await _engine.CreateByName(key);
         return script == null ? null : new ScriptedConversation(key, script);
     }

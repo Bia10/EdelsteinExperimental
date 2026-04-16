@@ -9,7 +9,7 @@ public static class PartyExtensions
     public static void WritePartyInfo(this IPacketWriter writer, IPartyMembership party)
     {
         var members = party.Members.Values.ToImmutableList();
-        
+
         for (var i = 0; i < 6; i++)
             writer.WriteInt(members.ElementAtOrDefault(i)?.CharacterID ?? 0);
         for (var i = 0; i < 6; i++)
@@ -22,7 +22,7 @@ public static class PartyExtensions
             writer.WriteInt(members.ElementAtOrDefault(i)?.ChannelID ?? -2);
 
         writer.WriteInt(party.BossCharacterID);
-            
+
         for (var i = 0; i < 6; i++)
             writer.WriteInt(members.ElementAtOrDefault(i)?.FieldID ?? 999999999);
 
@@ -34,7 +34,7 @@ public static class PartyExtensions
             writer.WriteInt(0);
             writer.WriteInt(0);
         }
-            
+
         for (var i = 0; i < 6; i++)
             writer.WriteInt(0);
         for (var i = 0; i < 6; i++)

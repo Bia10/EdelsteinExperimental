@@ -7,8 +7,10 @@ namespace Edelstein.Common.Gameplay.Models.Characters;
 
 public class CharacterTemporaryStats : ICharacterTemporaryStats
 {
-    public ITemporaryStatRecord? this[TemporaryStatType type] => Records.TryGetValue(type, out var record) ? record : null;
-    public IDictionary<TemporaryStatType, ITemporaryStatRecord> Records { get; } = new Dictionary<TemporaryStatType, ITemporaryStatRecord>();
+    public ITemporaryStatRecord? this[TemporaryStatType type] =>
+        Records.TryGetValue(type, out var record) ? record : null;
+    public IDictionary<TemporaryStatType, ITemporaryStatRecord> Records { get; } =
+        new Dictionary<TemporaryStatType, ITemporaryStatRecord>();
 
     public ITemporaryStatDiceInfo DiceInfo { get; } = new TemporaryStatDiceInfo();
 

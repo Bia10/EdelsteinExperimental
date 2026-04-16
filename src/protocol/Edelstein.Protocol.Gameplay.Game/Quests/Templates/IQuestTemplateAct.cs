@@ -8,13 +8,13 @@ public interface IQuestTemplateAct
     int? IncPetTameness { get; }
     int? PetSpeed { get; }
     int? BuffItemID { get; }
-    
+
     string? Info { get; }
-    
+
     string? NPCAction { get; }
-    
+
     int? NextQuest { get; }
-    
+
     ICollection<IQuestTemplateActItem>? Items { get; }
     ICollection<IQuestTemplateActSkill>? Skills { get; }
     ICollection<IQuestTemplateActSP>? SP { get; }

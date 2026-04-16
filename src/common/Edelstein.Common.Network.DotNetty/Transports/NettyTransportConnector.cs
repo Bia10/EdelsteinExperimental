@@ -34,14 +34,16 @@ public class NettyTransportConnector : ITransportConnector
             .Group(group0)
             .Channel<TcpSocketChannel>()
             .Option(ChannelOption.TcpNodelay, true)
-            .Handler(new ActionChannelInitializer<IChannel>(ch =>
-            {
-                ch.Pipeline.AddLast(
-                    new NettyPacketDecoder(_version, aesCipher, igCipher),
-                    new NettyTransportConnectorHandler(_version, _initializer, _sockets),
-                    new NettyPacketEncoder(_version, aesCipher, igCipher)
-                );
-            }))
+            .Handler(
+                new ActionChannelInitializer<IChannel>(ch =>
+                {
+                    ch.Pipeline.AddLast(
+                        new NettyPacketDecoder(_version, aesCipher, igCipher),
+                        new NettyTransportConnectorHandler(_version, _initializer, _sockets),
+                        new NettyPacketEncoder(_version, aesCipher, igCipher)
+                    );
+                })
+            )
             .BindAsync(port);
 
         return new NettyTransportConnectorState(channel, group0, _version, _sockets);

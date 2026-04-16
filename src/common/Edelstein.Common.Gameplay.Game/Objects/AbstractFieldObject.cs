@@ -23,11 +23,10 @@ public abstract class AbstractFieldObject : IFieldObject
     public IField? Field { get; set; }
     public IFieldSplit? FieldSplit { get; set; }
     public IPoint2D Position { get; protected set; }
-    
+
     public ICollection<IFieldAffectedArea> Affected { get; }
 
     public bool IsVisibleTo(IFieldObject obj) => !IsHidden;
-    
 
     private async Task UpdateFieldSplit()
     {
@@ -35,23 +34,30 @@ public abstract class AbstractFieldObject : IFieldObject
 
         if (split == null)
         {
-            if (Field != null) await Field.Enter(this);
+            if (Field != null)
+                await Field.Enter(this);
             return;
         }
 
-        if (FieldSplit != split) await split.Enter(this);
+        if (FieldSplit != split)
+            await split.Enter(this);
     }
-    
+
     public async Task Hide(bool hidden = true)
     {
-        if (IsHidden == hidden) return;
-        if (FieldSplit == null) return;
+        if (IsHidden == hidden)
+            return;
+        if (FieldSplit == null)
+            return;
 
-        if (hidden) await FieldSplit.Dispatch(GetLeaveFieldPacket(), this);
+        if (hidden)
+            await FieldSplit.Dispatch(GetLeaveFieldPacket(), this);
         IsHidden = hidden;
-        if (!hidden) await FieldSplit.Dispatch(GetEnterFieldPacket(), this);
+        if (!hidden)
+            await FieldSplit.Dispatch(GetEnterFieldPacket(), this);
 
-        if (this is not IFieldObjectController controller) return;
+        if (this is not IFieldObjectController controller)
+            return;
 
         foreach (var controlled in controller.Controlled.ToImmutableArray())
             await controlled.Control();

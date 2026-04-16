@@ -18,5 +18,6 @@ public readonly record struct Point2D : IPoint2D
         Y = y;
     }
 
-    public float Distance(IPoint2D point) => MathF.Sqrt(MathF.Pow(X - point.X, 2) + MathF.Pow(Y - point.Y, 2));
+    public float Distance(IPoint2D point) =>
+        MathF.Sqrt(MathF.Pow(X - point.X, 2) + MathF.Pow(Y - point.Y, 2));
 }

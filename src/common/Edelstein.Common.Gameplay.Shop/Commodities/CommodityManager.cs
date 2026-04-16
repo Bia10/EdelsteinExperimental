@@ -9,10 +9,10 @@ public class CommodityManager : ICommodityManager
     private readonly ITemplateManager<ICommodityTemplate> _templates;
     private readonly INotSaleManager _notSaleManager;
     private readonly IModifiedCommodityManager _modifiedManager;
-    
+
     public CommodityManager(
-        ITemplateManager<ICommodityTemplate> templates, 
-        INotSaleManager notSaleManager, 
+        ITemplateManager<ICommodityTemplate> templates,
+        INotSaleManager notSaleManager,
         IModifiedCommodityManager modifiedManager
     )
     {
@@ -20,15 +20,16 @@ public class CommodityManager : ICommodityManager
         _notSaleManager = notSaleManager;
         _modifiedManager = modifiedManager;
     }
-    
+
     public async Task<ICommodity?> Retrieve(int key)
     {
         var template = await _templates.Retrieve(key);
         var modified = await _modifiedManager.Retrieve(key);
-        
-        if (template == null && modified == null) return null;
+
+        if (template == null && modified == null)
+            return null;
         var notSale = await _notSaleManager.Retrieve(key);
-        
+
         return new Commodity
         {
             ID = key,
@@ -49,7 +50,7 @@ public class CommodityManager : ICommodityManager
             Limit = modified?.Limit ?? template?.Limit ?? 0,
             PbCash = modified?.PbCash ?? template?.PbCash ?? 0,
             PbPoint = modified?.PbPoint ?? template?.PbPoint ?? 0,
-            PbGift = modified?.PbGift ?? template?.PbGift ?? 0
+            PbGift = modified?.PbGift ?? template?.PbGift ?? 0,
         };
     }
 }

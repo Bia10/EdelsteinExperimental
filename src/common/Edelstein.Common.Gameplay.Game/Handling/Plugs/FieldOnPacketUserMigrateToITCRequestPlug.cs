@@ -8,30 +8,33 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class FieldOnPacketUserMigrateToITCRequestPlug : IPipelinePlug<FieldOnPacketUserMigrateToITCRequest>
+public class FieldOnPacketUserMigrateToITCRequestPlug
+    : IPipelinePlug<FieldOnPacketUserMigrateToITCRequest>
 {
     private readonly IServerService _serverService;
 
-    public FieldOnPacketUserMigrateToITCRequestPlug(IServerService serverService) => _serverService = serverService;
-    
+    public FieldOnPacketUserMigrateToITCRequestPlug(IServerService serverService) =>
+        _serverService = serverService;
+
     public async Task Handle(IPipelineContext ctx, FieldOnPacketUserMigrateToITCRequest message)
     {
-        var response = await _serverService.GetTradeByWorld(new ServerGetTradeByWorldRequest(
-            message.User.StageUser.Context.Options.WorldID
-        ));
+        var response = await _serverService.GetTradeByWorld(
+            new ServerGetTradeByWorldRequest(message.User.StageUser.Context.Options.WorldID)
+        );
         var server = response.Server;
-        if (server == null) return;
-        
+        if (server == null)
+            return;
+
         using var packet = new PacketWriter(PacketSendOperations.MigrateCommand);
         var endpoint = new IPEndPoint(IPAddress.Parse(server.Host), server.Port);
         var address = endpoint.Address.MapToIPv4().GetAddressBytes();
         var port = (short)endpoint.Port;
-        
+
         packet.WriteBool(true);
-        foreach (var b in address) 
+        foreach (var b in address)
             packet.WriteByte(b);
         packet.WriteShort(port);
-        
+
         await message.User.StageUser.Migrate(server.ID, packet.Build());
     }
 }

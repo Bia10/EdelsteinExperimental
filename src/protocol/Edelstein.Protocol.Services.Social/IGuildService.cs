@@ -9,7 +9,6 @@ namespace Edelstein.Protocol.Services.Social;
 /// </summary>
 public interface IGuildService
 {
-
     /// <summary>
     /// Loads the full guild membership snapshot for the given character.
     /// Returns <c>null</c> when the character does not belong to any guild.

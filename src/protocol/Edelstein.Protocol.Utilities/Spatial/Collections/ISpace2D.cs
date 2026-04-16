@@ -1,6 +1,7 @@
 ﻿namespace Edelstein.Protocol.Utilities.Spatial.Collections;
 
-public interface ISpace2D<TObject> where TObject : IObject2D
+public interface ISpace2D<TObject>
+    where TObject : IObject2D
 {
     void Insert(IEnumerable<TObject> obj);
 

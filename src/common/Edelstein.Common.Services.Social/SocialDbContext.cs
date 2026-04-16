@@ -7,9 +7,8 @@ public class SocialDbContext : DbContext
 {
     public const string ConnectionStringKey = "Social";
 
-    public SocialDbContext(DbContextOptions<SocialDbContext> options) : base(options)
-    {
-    }
+    public SocialDbContext(DbContextOptions<SocialDbContext> options)
+        : base(options) { }
 
     public DbSet<FriendEntity> Friends { get; set; }
     public DbSet<FriendProfileEntity> FriendProfiles { get; set; }
@@ -23,6 +22,6 @@ public class SocialDbContext : DbContext
     public DbSet<GuildBBSPostEntity> GuildBBSPosts { get; set; }
     public DbSet<GuildBBSCommentEntity> GuildBBSComments { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder builder)
-        => builder.ApplyConfigurationsFromAssembly(typeof(SocialDbContext).Assembly);
+    protected override void OnModelCreating(ModelBuilder builder) =>
+        builder.ApplyConfigurationsFromAssembly(typeof(SocialDbContext).Assembly);
 }

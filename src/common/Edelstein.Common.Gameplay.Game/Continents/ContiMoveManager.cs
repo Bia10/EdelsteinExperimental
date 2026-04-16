@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Immutable;
 using Edelstein.Protocol.Gameplay.Game;
 using Edelstein.Protocol.Gameplay.Game.Continents;
@@ -18,20 +18,20 @@ public class ContiMoveManager : IContiMoveManager, ITickable
     }
 
     public Task<IContiMove?> Retrieve(int key) =>
-        Task.FromResult(_conti.TryGetValue(key, out var conti)
-            ? conti
-            : null);
+        Task.FromResult(_conti.TryGetValue(key, out var conti) ? conti : null);
 
     public Task<IContiMove?> RetrieveByName(string name) =>
         Task.FromResult(_conti.Values.FirstOrDefault(c => c.Template.Name == name));
 
     public Task<IContiMove?> RetrieveByField(IField field) =>
-        Task.FromResult(_conti.Values.FirstOrDefault(c =>
-            c.StartShipMoveField == field ||
-            c.WaitField == field ||
-            c.MoveField == field ||
-            c.CabinField == field
-        ));
+        Task.FromResult(
+            _conti.Values.FirstOrDefault(c =>
+                c.StartShipMoveField == field
+                || c.WaitField == field
+                || c.MoveField == field
+                || c.CabinField == field
+            )
+        );
 
     public Task<ICollection<IContiMove>> RetrieveAll() =>
         Task.FromResult<ICollection<IContiMove>>(_conti.Values.ToImmutableArray());
@@ -42,6 +42,6 @@ public class ContiMoveManager : IContiMoveManager, ITickable
         return Task.FromResult(entry);
     }
 
-    public async Task OnTick(DateTime now)
-        => await Task.WhenAll(_conti.Values.OfType<ITickable>().Select(c => c.OnTick(now)));
+    public async Task OnTick(DateTime now) =>
+        await Task.WhenAll(_conti.Values.OfType<ITickable>().Select(c => c.OnTick(now)));
 }

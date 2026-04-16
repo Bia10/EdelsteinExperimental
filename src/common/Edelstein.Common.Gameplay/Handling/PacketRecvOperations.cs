@@ -316,5 +316,5 @@ public enum PacketRecvOperations : short
     CheckDuplicatedIDInCS = 0x137,
     END_CHARACTERSALE = 0x138,
     LogoutGiftSelect = 0x139,
-    NO = 0x13A
+    NO = 0x13A,
 }

@@ -17,28 +17,28 @@ public record FieldUserStats : IFieldUserStats
         SkillLevels = new FieldUserStatsSkillLevels();
         Reset();
     }
-    
+
     public int Level { get; private set; }
-    
+
     public int STR { get; private set; }
     public int DEX { get; private set; }
     public int INT { get; private set; }
     public int LUK { get; private set; }
-    
+
     public int MaxHP { get; private set; }
     public int MaxMP { get; private set; }
-    
+
     public int PAD { get; private set; }
     public int PDD { get; private set; }
     public int MAD { get; private set; }
     public int MDD { get; private set; }
     public int ACC { get; private set; }
     public int EVA { get; private set; }
-    
+
     public int Craft { get; private set; }
     public int Speed { get; private set; }
     public int Jump { get; private set; }
-    
+
     public int STRr { get; private set; }
     public int DEXr { get; private set; }
     public int INTr { get; private set; }
@@ -51,76 +51,76 @@ public record FieldUserStats : IFieldUserStats
     public int MDDr { get; private set; }
     public int ACCr { get; private set; }
     public int EVAr { get; private set; }
-    
+
     public int PACC { get; private set; }
     public int MACC { get; private set; }
     public int PEVA { get; private set; }
     public int MEVA { get; private set; }
-    
+
     public int Ar { get; private set; }
     public int Er { get; private set; }
-    
+
     public int Cr { get; private set; }
     public int CDMin { get; private set; }
     public int CDMax { get; private set; }
-    
+
     public int IMDr { get; private set; }
-    
+
     public int PDamR { get; private set; }
     public int MDamR { get; private set; }
     public int BossDamR { get; private set; }
-    
+
     public int Mastery { get; private set; }
-    
+
     public int AttackSpeedBase { get; private set; }
     public int AttackSpeed { get; private set; }
 
     public int DamageMin { get; private set; }
     public int DamageMax { get; private set; }
-    
+
     public int CompletedSetItemID { get; private set; }
 
     public IFieldUserStatsSkillLevels SkillLevels { get; }
-    
+
     public async Task Apply(IFieldUser user)
     {
         Reset();
         var character = user.Character;
 
         Level = character.Level;
-        
+
         STR = character.STR;
         DEX = character.DEX;
         INT = character.INT;
         LUK = character.LUK;
         MaxHP = character.MaxHP;
         MaxMP = character.MaxMP;
-        
+
         Craft = INT + DEX + LUK;
         Speed = 100;
         Jump = 100;
-        
+
         Cr = 5;
         CDMin = 20;
         CDMax = 50;
-        
+
         Mastery = 0;
-        
+
         AttackSpeedBase = 6;
         AttackSpeed = 6;
-        
+
         DamageMin = 1;
         DamageMax = 1;
 
         CompletedSetItemID = 0;
 
         SkillLevels.Records.Clear();
-        
+
         await ApplyItems(user);
         await ApplySkills(user);
         await ApplyTemporaryStats(user);
         await ApplyMastery(user);
-        
+
         STR += (int)(STR * (STRr / 100d));
         DEX += (int)(DEX * (DEXr / 100d));
         INT += (int)(INT * (INTr / 100d));
@@ -132,24 +132,24 @@ public record FieldUserStats : IFieldUserStats
         DEX = user.StatsForced.DEX ?? DEX;
         INT = user.StatsForced.INT ?? INT;
         LUK = user.StatsForced.LUK ?? LUK;
-        
+
         PAD += (int)(PAD * (PADr / 100d));
         PAD = user.StatsForced.PAD ?? PAD;
-        
+
         PDD += (int)(PDD * (PDDr / 100d));
         PDD = user.StatsForced.PDD ?? PDD;
         PDD += (int)(STR * 1.2 + LUK * 0.5 + DEX * 0.5 + INT * 0.4);
-        
+
         MAD += (int)(MAD * (MADr / 100d));
         MAD = user.StatsForced.MAD ?? MAD;
-        
+
         MDD += (int)(MDD * (MDDr / 100d));
         MDD = user.StatsForced.MDD ?? MDD;
         MDD += (int)(INT * 1.2 + DEX * 0.5 + LUK * 0.5 + STR * 0.4);
-        
+
         ACC = user.StatsForced.ACC ?? ACC;
         EVA = user.StatsForced.EVA ?? EVA;
-        
+
         PACC = (int)(DEX * 1.2 + LUK) + ACC;
         PACC += (int)(PACC * (ACCr / 100d));
         MACC = (int)(LUK * 1.2 + INT) + ACC;
@@ -161,7 +161,7 @@ public record FieldUserStats : IFieldUserStats
 
         Speed = user.StatsForced.Speed ?? Speed;
         Jump = user.StatsForced.Jump ?? Jump;
-        
+
         MaxHP = Math.Min(MaxHP, 99999);
         MaxMP = Math.Min(MaxMP, 99999);
 
@@ -173,44 +173,44 @@ public record FieldUserStats : IFieldUserStats
         MACC = Math.Min(MACC, 9999);
         PEVA = Math.Min(PEVA, 9999);
         MEVA = Math.Min(MEVA, 9999);
-        
+
         Speed = Math.Min(Math.Max(Speed, 100), user.StatsForced.SpeedMax ?? 140);
         Jump = Math.Min(Math.Max(Jump, 100), 123);
-        
+
         CDMin = Math.Min(CDMin, CDMax);
-        
+
         AttackSpeedBase = Math.Min(Math.Max(AttackSpeedBase, 2), 10);
         AttackSpeed = Math.Min(Math.Max(AttackSpeed, 2), 10);
-        
+
         await ApplyDamage(user);
-        
+
         DamageMin = Math.Min(Math.Max(DamageMin, 1), 999999);
         DamageMax = Math.Min(Math.Max(DamageMax, 1), 999999);
     }
-    
+
     public void Reset()
-    {    
+    {
         Level = 0;
-        
+
         STR = 0;
         DEX = 0;
         INT = 0;
         LUK = 0;
-        
+
         MaxHP = 0;
         MaxMP = 0;
-        
+
         PAD = 0;
         PDD = 0;
         MAD = 0;
         MDD = 0;
         ACC = 0;
         EVA = 0;
-        
+
         Craft = 0;
         Speed = 0;
         Jump = 0;
-        
+
         STRr = 0;
         DEXr = 0;
         INTr = 0;
@@ -223,25 +223,25 @@ public record FieldUserStats : IFieldUserStats
         MDDr = 0;
         ACCr = 0;
         EVAr = 0;
-        
+
         PACC = 0;
         MACC = 0;
         PEVA = 0;
         MEVA = 0;
-        
+
         Ar = 0;
         Er = 0;
-        
+
         Cr = 0;
         CDMin = 0;
         CDMax = 0;
-        
+
         IMDr = 0;
-        
+
         PDamR = 0;
         MDamR = 0;
         BossDamR = 0;
-        
+
         Mastery = 0;
 
         DamageMin = 0;
@@ -250,19 +250,22 @@ public record FieldUserStats : IFieldUserStats
 
     private async Task ApplyItems(IFieldUser user)
     {
-        var equipped = user.Character.Inventories[ItemInventoryType.Equip]?.Items
-            .Where(kv => kv.Key < 0)
-            .Where(kv => kv.Value is ItemSlotEquip)
-            .Select(kv => (kv.Key, (ItemSlotEquip)kv.Value))
-            .ToImmutableArray() ?? ImmutableArray<(short Key, ItemSlotEquip)>.Empty;
+        var equipped =
+            user.Character.Inventories[ItemInventoryType.Equip]
+                ?.Items.Where(kv => kv.Key < 0)
+                .Where(kv => kv.Value is ItemSlotEquip)
+                .Select(kv => (kv.Key, (ItemSlotEquip)kv.Value))
+                .ToImmutableArray()
+            ?? ImmutableArray<(short Key, ItemSlotEquip)>.Empty;
         var setCompletion = new Dictionary<int, int>();
 
         foreach (var (slot, item) in equipped)
         {
             var template = await user.StageUser.Context.Templates.Item.Retrieve(item.ID);
 
-            if (template is not IItemEquipTemplate equip) continue;
-            
+            if (template is not IItemEquipTemplate equip)
+                continue;
+
             STR += item.STR;
             DEX += item.DEX;
             INT += item.INT;
@@ -270,17 +273,18 @@ public record FieldUserStats : IFieldUserStats
             MaxHP += item.MaxHP;
             MaxMP += item.MaxMP;
 
-            if (slot != -(int)BodyPart.PetWear2 &&
-                slot != -(int)BodyPart.PetWear3 &&
-                slot != -(int)BodyPart.PetRingLabel2 &&
-                slot != -(int)BodyPart.PetRingLabel3 &&
-                slot != -(int)BodyPart.PetRingQuote2 &&
-                slot != -(int)BodyPart.PetRingQuote3 &&
-                (
-                    item.ID / 10000 == 190 || 
-                    slot != -(int)BodyPart.TamingMob && 
-                    slot != -(int)BodyPart.Saddle && 
-                    slot != -(int)BodyPart.MobEquip
+            if (
+                slot != -(int)BodyPart.PetWear2
+                && slot != -(int)BodyPart.PetWear3
+                && slot != -(int)BodyPart.PetRingLabel2
+                && slot != -(int)BodyPart.PetRingLabel3
+                && slot != -(int)BodyPart.PetRingQuote2
+                && slot != -(int)BodyPart.PetRingQuote3
+                && (
+                    item.ID / 10000 == 190
+                    || slot != -(int)BodyPart.TamingMob
+                        && slot != -(int)BodyPart.Saddle
+                        && slot != -(int)BodyPart.MobEquip
                 )
             )
             {
@@ -297,16 +301,13 @@ public record FieldUserStats : IFieldUserStats
                 MaxHPr += equip.IncMaxHPr;
                 MaxMPr += equip.IncMaxMPr;
 
-                if (item.Grade is
-                    ItemGrade.Rare or
-                    ItemGrade.Epic or
-                    ItemGrade.Unique)
+                if (item.Grade is ItemGrade.Rare or ItemGrade.Epic or ItemGrade.Unique)
                 {
                     var level = (equip.ReqLevel - 1) / 10;
 
                     level = Math.Max(1, level);
                     level = Math.Min(20, level);
-                
+
                     await ApplyItemOption(user, item.Option1, level);
                     await ApplyItemOption(user, item.Option2, level);
                     await ApplyItemOption(user, item.Option3, level);
@@ -314,7 +315,8 @@ public record FieldUserStats : IFieldUserStats
             }
 
             if (equip.SetItemID > 0)
-                setCompletion[equip.SetItemID] = (setCompletion.TryGetValue(equip.SetItemID, out var count) ? count : 0) + 1;
+                setCompletion[equip.SetItemID] =
+                    (setCompletion.TryGetValue(equip.SetItemID, out var count) ? count : 0) + 1;
 
             if (slot == -(short)BodyPart.Weapon)
             {
@@ -322,32 +324,38 @@ public record FieldUserStats : IFieldUserStats
                 AttackSpeed = equip.AttackSpeed ?? AttackSpeed;
             }
         }
-        
+
         foreach (var (setItemID, count) in setCompletion)
         {
-            var setItemTemplate = await user.StageUser.Context.Templates.ItemSet.Retrieve(setItemID);
-            if (setItemTemplate == null) continue;
+            var setItemTemplate = await user.StageUser.Context.Templates.ItemSet.Retrieve(
+                setItemID
+            );
+            if (setItemTemplate == null)
+                continue;
 
             for (var i = 1; i <= count; i++)
             {
-                var setItemEffect = setItemTemplate.Effects.TryGetValue(i, out var effect) ? effect : null;
-                if (setItemEffect == null) continue;
+                var setItemEffect = setItemTemplate.Effects.TryGetValue(i, out var effect)
+                    ? effect
+                    : null;
+                if (setItemEffect == null)
+                    continue;
                 STR += setItemEffect.IncSTR;
                 DEX += setItemEffect.IncDEX;
                 INT += setItemEffect.IncINT;
                 LUK += setItemEffect.IncLUK;
-                
+
                 MaxHP += setItemEffect.IncMaxHP;
                 MaxMP += setItemEffect.IncMaxMP;
-                
+
                 PAD += setItemEffect.IncPAD;
                 MAD += setItemEffect.IncMAD;
                 PDD += setItemEffect.IncPDD;
                 MDD += setItemEffect.IncMDD;
-                
+
                 ACC += setItemEffect.IncACC;
                 EVA += setItemEffect.IncEVA;
-                
+
                 Craft += setItemEffect.IncCraft;
                 Speed += setItemEffect.IncSpeed;
                 Jump += setItemEffect.IncJump;
@@ -358,16 +366,21 @@ public record FieldUserStats : IFieldUserStats
         }
 
         var weaponType = ItemConstants.GetWeaponType(
-            user.Character.Inventories[ItemInventoryType.Equip]?.Items.TryGetValue(-(short)BodyPart.Weapon, out var result1) ?? false
-                ? result1.ID 
-                : 0);
-        var rechargeable = user.Character.Inventories[ItemInventoryType.Consume]?.Items.Values
-                .OfType<IItemSlotBundle>()
-                .FirstOrDefault(
-                    i => 
-                        (weaponType == WeaponType.ThrowingGlove && i.ID / 10000 == 207 || 
-                         weaponType == WeaponType.Gun && i.ID / 10000 == 233) &&
-                        i.Number > 0);
+            user.Character.Inventories[ItemInventoryType.Equip]
+                ?.Items.TryGetValue(-(short)BodyPart.Weapon, out var result1) ?? false
+                ? result1.ID
+                : 0
+        );
+        var rechargeable = user
+            .Character.Inventories[ItemInventoryType.Consume]
+            ?.Items.Values.OfType<IItemSlotBundle>()
+            .FirstOrDefault(i =>
+                (
+                    weaponType == WeaponType.ThrowingGlove && i.ID / 10000 == 207
+                    || weaponType == WeaponType.Gun && i.ID / 10000 == 233
+                )
+                && i.Number > 0
+            );
 
         if (rechargeable != null)
         {
@@ -380,9 +393,11 @@ public record FieldUserStats : IFieldUserStats
     private async Task ApplyItemOption(IFieldUser user, int option, int level)
     {
         var template = await user.StageUser.Context.Templates.ItemOption.Retrieve(option);
-        if (template == null) return;
-        if (!template.Levels.TryGetValue(level, out var levelTemplate)) return;
-        
+        if (template == null)
+            return;
+        if (!template.Levels.TryGetValue(level, out var levelTemplate))
+            return;
+
         STR += levelTemplate.IncSTR;
         DEX += levelTemplate.IncDEX;
         LUK += levelTemplate.IncLUK;
@@ -400,15 +415,15 @@ public record FieldUserStats : IFieldUserStats
 
         Speed += levelTemplate.IncSpeed;
         Jump += levelTemplate.IncJump;
-    
+
         STRr += levelTemplate.IncSTRr;
         DEXr += levelTemplate.IncDEXr;
         LUKr += levelTemplate.IncLUKr;
         INTr += levelTemplate.IncINTr;
-    
+
         MaxHPr += levelTemplate.IncMaxHPr;
         MaxMPr += levelTemplate.IncMaxMPr;
-    
+
         PADr += levelTemplate.IncPADr;
         PDDr += levelTemplate.IncPDDr;
         MADr += levelTemplate.IncMADr;
@@ -416,35 +431,45 @@ public record FieldUserStats : IFieldUserStats
         ACCr += levelTemplate.IncACCr;
         EVAr += levelTemplate.IncEVAr;
     }
-    
+
     private async Task ApplySkills(IFieldUser user)
     {
-        var subWeapon = 
-            user.Character.Inventories[ItemInventoryType.Equip]?.Items.TryGetValue(-(short)BodyPart.Shield, out var result2) ?? false
+        var subWeapon =
+            user.Character.Inventories[ItemInventoryType.Equip]
+                ?.Items.TryGetValue(-(short)BodyPart.Shield, out var result2) ?? false
                 ? result2.ID
                 : 0;
         foreach (var (skillID, record) in user.Character.Skills.Records)
         {
             var skillLevel = record.Level;
             var template = await user.StageUser.Context.Templates.Skill.Retrieve(skillID);
-            if (template == null) continue;
-            
-            if (JobConstants.GetJobLevel(skillID / 10000) > 0 && skillID != Skill.KnightCombatOrders && skillLevel > 0)
+            if (template == null)
+                continue;
+
+            if (
+                JobConstants.GetJobLevel(skillID / 10000) > 0
+                && skillID != Skill.KnightCombatOrders
+                && skillLevel > 0
+            )
             {
                 var maxLevel = template.MaxLevel;
-                
-                if (template.IsCombatOrders) maxLevel += 2;
 
-                skillLevel += user.Character.TemporaryStats[TemporaryStatType.CombatOrders]?.Value ?? 0;
+                if (template.IsCombatOrders)
+                    maxLevel += 2;
+
+                skillLevel +=
+                    user.Character.TemporaryStats[TemporaryStatType.CombatOrders]?.Value ?? 0;
                 skillLevel = Math.Min(maxLevel, skillLevel);
             }
-            
+
             SkillLevels.Records[skillID] = skillLevel;
 
             var levelTemplate = template[skillLevel];
-            if (levelTemplate == null) continue;
-            if (template is not { IsPSD: true }) continue;
-            
+            if (levelTemplate == null)
+                continue;
+            if (template is not { IsPSD: true })
+                continue;
+
             MaxHPr += levelTemplate.MHPr;
             MaxMPr += levelTemplate.MMPr;
 
@@ -464,70 +489,93 @@ public record FieldUserStats : IFieldUserStats
 
             Jump += levelTemplate.PsdJump;
             Speed += levelTemplate.PsdSpeed;
-            
-            if (template.PsdSkill.Count > 0) continue;
-            
+
+            if (template.PsdSkill.Count > 0)
+                continue;
+
             Cr += levelTemplate.Cr;
             CDMin += levelTemplate.CDMin;
             CDMax += levelTemplate.CDMax;
         }
-        
-        if (JobConstants.GetJobRace(user.Character.Job) == 0 &&
-            JobConstants.GetJobType(user.Character.Job) == 1 && 
-            JobConstants.GetJobBranch(user.Character.Job) == 2 &&
-            subWeapon > 0)
+
+        if (
+            JobConstants.GetJobRace(user.Character.Job) == 0
+            && JobConstants.GetJobType(user.Character.Job) == 1
+            && JobConstants.GetJobBranch(user.Character.Job) == 2
+            && subWeapon > 0
+        )
         {
-            var shieldMasterySkill = await user.StageUser.Context.Templates.Skill.Retrieve(Skill.KnightShieldMastery);
+            var shieldMasterySkill = await user.StageUser.Context.Templates.Skill.Retrieve(
+                Skill.KnightShieldMastery
+            );
             var shieldMasteryLevel = shieldMasterySkill?[SkillLevels[Skill.KnightShieldMastery]];
 
             PDDr += shieldMasteryLevel?.X ?? 0;
             MDDr += shieldMasteryLevel?.X ?? 0;
         }
-        
-        if (JobConstants.GetJobRace(user.Character.Job) == 0 &&
-            JobConstants.GetJobType(user.Character.Job) == 3)
+
+        if (
+            JobConstants.GetJobRace(user.Character.Job) == 0
+            && JobConstants.GetJobType(user.Character.Job) == 3
+        )
         {
-            var criticalShotSkill = await user.StageUser.Context.Templates.Skill.Retrieve(Skill.ArcherCriticalShot);
+            var criticalShotSkill = await user.StageUser.Context.Templates.Skill.Retrieve(
+                Skill.ArcherCriticalShot
+            );
             var criticalShotLevel = criticalShotSkill?[SkillLevels[Skill.ArcherCriticalShot]];
 
             Cr += criticalShotLevel?.Prop ?? 0;
         }
-        
-        if (JobConstants.GetJobRace(user.Character.Job) == 0 &&
-            JobConstants.GetJobType(user.Character.Job) == 4)
+
+        if (
+            JobConstants.GetJobRace(user.Character.Job) == 0
+            && JobConstants.GetJobType(user.Character.Job) == 4
+        )
         {
-            var nimbleBodySkill = await user.StageUser.Context.Templates.Skill.Retrieve(Skill.RogueNimbleBody);
+            var nimbleBodySkill = await user.StageUser.Context.Templates.Skill.Retrieve(
+                Skill.RogueNimbleBody
+            );
             var nimbleBodyLevel = nimbleBodySkill?[SkillLevels[Skill.RogueNimbleBody]];
 
             ACC += nimbleBodyLevel?.X ?? 0;
             EVA += nimbleBodyLevel?.Y ?? 0;
         }
-        
-        if (JobConstants.GetJobRace(user.Character.Job) == 0 &&
-            JobConstants.GetJobType(user.Character.Job) == 5)
+
+        if (
+            JobConstants.GetJobRace(user.Character.Job) == 0
+            && JobConstants.GetJobType(user.Character.Job) == 5
+        )
         {
-            var quickMotionSkill = await user.StageUser.Context.Templates.Skill.Retrieve(Skill.PirateQuickmotion);
+            var quickMotionSkill = await user.StageUser.Context.Templates.Skill.Retrieve(
+                Skill.PirateQuickmotion
+            );
             var quickMotionLevel = quickMotionSkill?[SkillLevels[Skill.PirateQuickmotion]];
 
             ACC += quickMotionLevel?.X ?? 0;
             EVA += quickMotionLevel?.Y ?? 0;
         }
-        
-        if (JobConstants.GetJobRace(user.Character.Job) == 2 &&
-            JobConstants.GetJobType(user.Character.Job) == 2)
+
+        if (
+            JobConstants.GetJobRace(user.Character.Job) == 2
+            && JobConstants.GetJobType(user.Character.Job) == 2
+        )
         {
-            var dragonSoulSkill = await user.StageUser.Context.Templates.Skill.Retrieve(Skill.EvanDragonSoul);
+            var dragonSoulSkill = await user.StageUser.Context.Templates.Skill.Retrieve(
+                Skill.EvanDragonSoul
+            );
             var dragonSoulLevel = dragonSoulSkill?[SkillLevels[Skill.EvanDragonSoul]];
 
             MAD += dragonSoulLevel?.MAD ?? 0;
-            
-            var criticalMagicSkill = await user.StageUser.Context.Templates.Skill.Retrieve(Skill.EvanMagicCritical);
+
+            var criticalMagicSkill = await user.StageUser.Context.Templates.Skill.Retrieve(
+                Skill.EvanMagicCritical
+            );
             var criticalMagicLevel = criticalMagicSkill?[SkillLevels[Skill.EvanMagicCritical]];
 
             Cr += criticalMagicLevel?.Prop ?? 0;
         }
     }
-    
+
     private async Task ApplyTemporaryStats(IFieldUser user)
     {
         STRr += user.Character.TemporaryStats[TemporaryStatType.BasicStatUp]?.Value ?? 0;
@@ -539,11 +587,11 @@ public record FieldUserStats : IFieldUserStats
         PDD += user.Character.TemporaryStats[TemporaryStatType.PDD]?.Value ?? 0;
         MAD += user.Character.TemporaryStats[TemporaryStatType.MAD]?.Value ?? 0;
         MDD += user.Character.TemporaryStats[TemporaryStatType.MDD]?.Value ?? 0;
-        
+
         PAD += user.Character.TemporaryStats[TemporaryStatType.EPAD]?.Value ?? 0;
         PDD += user.Character.TemporaryStats[TemporaryStatType.EPDD]?.Value ?? 0;
         MDD += user.Character.TemporaryStats[TemporaryStatType.EMDD]?.Value ?? 0;
-        
+
         ACC += user.Character.TemporaryStats[TemporaryStatType.ACC]?.Value ?? 0;
         EVA += user.Character.TemporaryStats[TemporaryStatType.EVA]?.Value ?? 0;
         Craft += user.Character.TemporaryStats[TemporaryStatType.Craft]?.Value ?? 0;
@@ -561,38 +609,47 @@ public record FieldUserStats : IFieldUserStats
             Cr += sharpEyesStat.Value >> 8;
             CDMax += sharpEyesStat.Value & 0xFF;
         }
-        
+
         var thornsEffectStat = user.Character.TemporaryStats[TemporaryStatType.ThornsEffect];
         if (thornsEffectStat != null)
         {
             Cr += thornsEffectStat.Value >> 8;
             CDMax += thornsEffectStat.Value & 0xFF;
         }
-            
+
         var superBodyStat = user.Character.TemporaryStats[TemporaryStatType.SuperBody];
-        
+
         var darkAuraStat = user.Character.TemporaryStats[TemporaryStatType.DarkAura];
         if (darkAuraStat != null)
         {
             PADr += darkAuraStat.Value;
             MADr += darkAuraStat.Value;
         }
-        
+
         var yellowAuraStat = user.Character.TemporaryStats[TemporaryStatType.YellowAura];
         if (yellowAuraStat != null)
         {
-            var yellowAuraSkill = await user.StageUser.Context.Templates.Skill.Retrieve(superBodyStat?.Reason ?? yellowAuraStat.Reason);
-            var yellowAuraLevel = yellowAuraSkill?[SkillLevels[superBodyStat != null ? Skill.BmageAuraYellow : yellowAuraStat.Reason]];
-            
+            var yellowAuraSkill = await user.StageUser.Context.Templates.Skill.Retrieve(
+                superBodyStat?.Reason ?? yellowAuraStat.Reason
+            );
+            var yellowAuraLevel = yellowAuraSkill?[
+                SkillLevels[superBodyStat != null ? Skill.BmageAuraYellow : yellowAuraStat.Reason]
+            ];
+
             Speed += yellowAuraLevel?.X ?? 0;
             AttackSpeed += yellowAuraLevel?.Y ?? 0;
         }
 
-        if (JobConstants.GetJobRace(user.Character.Job) == 3 &&
-            JobConstants.GetJobType(user.Character.Job) == 3 &&
-            user.Character.TemporaryStats.RideVehicleRecord?.Reason == Skill.WildhunterJaguarRiding)
+        if (
+            JobConstants.GetJobRace(user.Character.Job) == 3
+            && JobConstants.GetJobType(user.Character.Job) == 3
+            && user.Character.TemporaryStats.RideVehicleRecord?.Reason
+                == Skill.WildhunterJaguarRiding
+        )
         {
-            var jaguarRidingSkill = await user.StageUser.Context.Templates.Skill.Retrieve(Skill.WildhunterJaguarRiding);
+            var jaguarRidingSkill = await user.StageUser.Context.Templates.Skill.Retrieve(
+                Skill.WildhunterJaguarRiding
+            );
             var jaguarRidingLevel = jaguarRidingSkill?[SkillLevels[Skill.WildhunterJaguarRiding]];
 
             MaxHPr += jaguarRidingLevel?.W ?? 0;
@@ -606,10 +663,20 @@ public record FieldUserStats : IFieldUserStats
 
         if (user.Character.TemporaryStats[TemporaryStatType.Frozen] != null)
         {
-            if (AttackSpeedBase < 10) 
-                AttackSpeedBase += (int)((user.Character.TemporaryStats[TemporaryStatType.Frozen]?.Value ?? 0) * (10 - AttackSpeedBase) / 100d);;
+            if (AttackSpeedBase < 10)
+                AttackSpeedBase += (int)(
+                    (user.Character.TemporaryStats[TemporaryStatType.Frozen]?.Value ?? 0)
+                    * (10 - AttackSpeedBase)
+                    / 100d
+                );
+            ;
             if (AttackSpeed < 10)
-                AttackSpeed += (int)((user.Character.TemporaryStats[TemporaryStatType.Frozen]?.Value ?? 0) * (10 - AttackSpeed) / 100d);;
+                AttackSpeed += (int)(
+                    (user.Character.TemporaryStats[TemporaryStatType.Frozen]?.Value ?? 0)
+                    * (10 - AttackSpeed)
+                    / 100d
+                );
+            ;
         }
 
         if (user.Character.TemporaryStats[TemporaryStatType.Dice] != null)
@@ -642,26 +709,30 @@ public record FieldUserStats : IFieldUserStats
     {
         var skillTemplate = await user.StageUser.Context.Templates.Skill.Retrieve(skillID);
         var skillLevelTemplate = skillTemplate?[SkillLevels[skillID]];
-        return skillLevelTemplate == null 
-            ? new Tuple<int, int>(0, 0) 
+        return skillLevelTemplate == null
+            ? new Tuple<int, int>(0, 0)
             : new Tuple<int, int>(skillLevelTemplate.Mastery, skillLevelTemplate.X);
     }
-    
+
     private async Task ApplyMastery(IFieldUser user)
     {
         var weaponType = ItemConstants.GetWeaponType(
-            user.Character.Inventories[ItemInventoryType.Equip]?.Items.TryGetValue(-(short)BodyPart.Weapon, out var result1) ?? false
-                ? result1.ID 
-                : 0);
+            user.Character.Inventories[ItemInventoryType.Equip]
+                ?.Items.TryGetValue(-(short)BodyPart.Weapon, out var result1) ?? false
+                ? result1.ID
+                : 0
+        );
         var subWeaponType = ItemConstants.GetWeaponType(
-            user.Character.Inventories[ItemInventoryType.Equip]?.Items.TryGetValue(-(short)BodyPart.Shield, out var result2) ?? false
-                ? result2.ID 
-                : 0);
+            user.Character.Inventories[ItemInventoryType.Equip]
+                ?.Items.TryGetValue(-(short)BodyPart.Shield, out var result2) ?? false
+                ? result2.ID
+                : 0
+        );
         var incMastery = 0;
         var incPAD = 0;
         var incMAD = 0;
         var incACC = 0;
-        
+
         if (JobConstants.GetJobType(user.Character.Job) == 2)
         {
             var skills = new List<int>();
@@ -669,13 +740,15 @@ public record FieldUserStats : IFieldUserStats
             switch (JobConstants.GetJobRace(user.Character.Job))
             {
                 case 0:
-                    skills.Add(JobConstants.GetJobBranch(user.Character.Job) switch
-                    {
-                        1 => Skill.Wizard1SpellMastery,
-                        2 => Skill.Wizard2SpellMastery,
-                        3 => Skill.ClericSpellMastery,
-                        _ => 0
-                    });
+                    skills.Add(
+                        JobConstants.GetJobBranch(user.Character.Job) switch
+                        {
+                            1 => Skill.Wizard1SpellMastery,
+                            2 => Skill.Wizard2SpellMastery,
+                            3 => Skill.ClericSpellMastery,
+                            _ => 0,
+                        }
+                    );
                     break;
                 case 1:
                     skills.Add(Skill.FlamewizardSpellMastery);
@@ -692,30 +765,36 @@ public record FieldUserStats : IFieldUserStats
             foreach (var skill in skills.TakeWhile(_ => incMastery == 0))
                 (incMastery, incMAD) = await GetMastery(user, skill);
         }
-        
+
         switch (weaponType)
         {
             case WeaponType.OneHandedSword:
             case WeaponType.TwoHandedSword:
-                {
-                    foreach (var skill in new List<int>
-                             {
-                                 Skill.FighterWeaponMastery,
-                                 Skill.PageWeaponMastery,
-                                 Skill.SoulmasterSwordMastery
-                             }.TakeWhile(_ => incMastery == 0))
+            {
+                foreach (
+                    var skill in new List<int>
                     {
-                        (incMastery, incACC) = await GetMastery(user, skill);
+                        Skill.FighterWeaponMastery,
+                        Skill.PageWeaponMastery,
+                        Skill.SoulmasterSwordMastery,
+                    }.TakeWhile(_ => incMastery == 0)
+                )
+                {
+                    (incMastery, incACC) = await GetMastery(user, skill);
 
-                        if (skill != Skill.PageWeaponMastery || incMastery <= 0 ||
-                            user.Character.TemporaryStats[TemporaryStatType.WeaponCharge] == null) continue;
+                    if (
+                        skill != Skill.PageWeaponMastery
+                        || incMastery <= 0
+                        || user.Character.TemporaryStats[TemporaryStatType.WeaponCharge] == null
+                    )
+                        continue;
 
-                        var (incMastery2, _) = await GetMastery(user, Skill.PaladinAdvancedCharge);
-                        if (incMastery2 > 0)
-                            incMastery = incMastery2;
-                    }
-                    break;
+                    var (incMastery2, _) = await GetMastery(user, Skill.PaladinAdvancedCharge);
+                    if (incMastery2 > 0)
+                        incMastery = incMastery2;
                 }
+                break;
+            }
             case WeaponType.OneHandedAxe:
             case WeaponType.TwoHandedAxe:
                 (incMastery, incACC) = await GetMastery(user, Skill.FighterWeaponMastery);
@@ -724,8 +803,11 @@ public record FieldUserStats : IFieldUserStats
             case WeaponType.TwoHandedMace:
             {
                 (incMastery, incACC) = await GetMastery(user, Skill.PageWeaponMastery);
-                
-                if (incMastery > 0 && user.Character.TemporaryStats[TemporaryStatType.WeaponCharge] != null)
+
+                if (
+                    incMastery > 0
+                    && user.Character.TemporaryStats[TemporaryStatType.WeaponCharge] != null
+                )
                 {
                     var (incMastery2, _) = await GetMastery(user, Skill.PaladinAdvancedCharge);
                     if (incMastery2 > 0)
@@ -736,18 +818,20 @@ public record FieldUserStats : IFieldUserStats
             case WeaponType.Spear:
             case WeaponType.Polearm:
             {
-                if (weaponType == WeaponType.Polearm && 
-                    JobConstants.GetJobRace(user.Character.Job) == 2 && 
-                    JobConstants.GetJobType(user.Character.Job) == 1)
+                if (
+                    weaponType == WeaponType.Polearm
+                    && JobConstants.GetJobRace(user.Character.Job) == 2
+                    && JobConstants.GetJobType(user.Character.Job) == 1
+                )
                 {
                     (incMastery, incACC) = await GetMastery(user, Skill.AranPolearmMastery);
                     if (user.Stats.SkillLevels[Skill.AranHighMastery] > 0)
                         (incMastery, incPAD) = await GetMastery(user, Skill.AranHighMastery);
                     break;
                 }
-                
+
                 (incMastery, incACC) = await GetMastery(user, Skill.SpearmanWeaponMastery);
-                
+
                 if (user.Character.TemporaryStats[TemporaryStatType.Beholder] != null)
                     (incMastery, _) = await GetMastery(user, Skill.DarkknightBeholder);
                 break;
@@ -760,7 +844,7 @@ public record FieldUserStats : IFieldUserStats
                         (incMastery, incPAD) = await GetMastery(user, Skill.WindbreakerBowExpert);
                     break;
                 }
-                
+
                 (incMastery, incACC) = await GetMastery(user, Skill.HunterBowMastery);
                 if (user.Stats.SkillLevels[Skill.BowmasterBowExpert] > 0)
                     (incMastery, incPAD) = await GetMastery(user, Skill.BowmasterBowExpert);
@@ -770,28 +854,37 @@ public record FieldUserStats : IFieldUserStats
                 {
                     (incMastery, incACC) = await GetMastery(user, Skill.WildhunterCrossbowMastery);
                     if (user.Stats.SkillLevels[Skill.WildhunterCrossbowExpert] > 0)
-                        (incMastery, incPAD) = await GetMastery(user, Skill.WildhunterCrossbowExpert);
+                        (incMastery, incPAD) = await GetMastery(
+                            user,
+                            Skill.WildhunterCrossbowExpert
+                        );
                     break;
                 }
-                
+
                 (incMastery, incACC) = await GetMastery(user, Skill.CrossbowmanCrossbowMastery);
                 if (user.Stats.SkillLevels[Skill.CrossbowmasterCrossbowExpert] > 0)
-                    (incMastery, incPAD) = await GetMastery(user, Skill.CrossbowmasterCrossbowExpert);
+                    (incMastery, incPAD) = await GetMastery(
+                        user,
+                        Skill.CrossbowmasterCrossbowExpert
+                    );
                 break;
             case WeaponType.ThrowingGlove:
-                (incMastery, incACC) = JobConstants.GetJobRace(user.Character.Job) == 1
-                    ? await GetMastery(user, Skill.NightwalkerJavelinMastery)
-                    : await GetMastery(user, Skill.AssassinJavelinMastery);
+                (incMastery, incACC) =
+                    JobConstants.GetJobRace(user.Character.Job) == 1
+                        ? await GetMastery(user, Skill.NightwalkerJavelinMastery)
+                        : await GetMastery(user, Skill.AssassinJavelinMastery);
                 break;
             case WeaponType.Dagger:
-                (incMastery, incACC) = subWeaponType == WeaponType.SubDagger
-                    ? await GetMastery(user, Skill.Dual1DualMastery)
-                    : await GetMastery(user, Skill.ThiefDaggerMastery);
+                (incMastery, incACC) =
+                    subWeaponType == WeaponType.SubDagger
+                        ? await GetMastery(user, Skill.Dual1DualMastery)
+                        : await GetMastery(user, Skill.ThiefDaggerMastery);
                 break;
             case WeaponType.Knuckle:
-                (incMastery, incACC) = JobConstants.GetJobRace(user.Character.Job) == 1
-                    ? await GetMastery(user, Skill.StrikerKnuckleMastery)
-                    : await GetMastery(user, Skill.InfighterKnuckleMastery);
+                (incMastery, incACC) =
+                    JobConstants.GetJobRace(user.Character.Job) == 1
+                        ? await GetMastery(user, Skill.StrikerKnuckleMastery)
+                        : await GetMastery(user, Skill.InfighterKnuckleMastery);
                 break;
             case WeaponType.Gun:
                 if (JobConstants.GetJobRace(user.Character.Job) == 3)
@@ -801,30 +894,32 @@ public record FieldUserStats : IFieldUserStats
                         (incMastery, _) = await GetMastery(user, Skill.MechanicHn07Upgrade);
                     break;
                 }
-                
+
                 (incMastery, incACC) = await GetMastery(user, Skill.GunslingerGunMastery);
                 break;
         }
-        
+
         Mastery += incMastery;
         PAD += incPAD;
         MAD += incMAD;
         ACC += incACC;
     }
-    
+
     private Task ApplyDamage(IFieldUser user)
     {
         var weaponType = ItemConstants.GetWeaponType(
-            user.Character.Inventories[ItemInventoryType.Equip]?.Items.TryGetValue(-(short)BodyPart.Weapon, out var result1) ?? false
-                ? result1.ID 
-                : 0);
-        
+            user.Character.Inventories[ItemInventoryType.Equip]
+                ?.Items.TryGetValue(-(short)BodyPart.Weapon, out var result1) ?? false
+                ? result1.ID
+                : 0
+        );
+
         var stat1 = 0;
         var stat2 = 0;
         var stat3 = 0;
         var attack = PAD;
         var multiplier = 1.0;
-        
+
         if (JobConstants.GetJobLevel(user.Character.Job) == 0)
         {
             stat1 = STR;
@@ -901,7 +996,7 @@ public record FieldUserStats : IFieldUserStats
                     break;
             }
         }
-        
+
         var masteryMultiplier = Mastery / 100d;
 
         masteryMultiplier += ItemConstants.GetMasteryConstByWeaponType(weaponType);

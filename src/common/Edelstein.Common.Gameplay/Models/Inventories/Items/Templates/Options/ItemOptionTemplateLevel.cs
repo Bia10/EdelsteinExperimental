@@ -43,9 +43,9 @@ public record ItemOptionTemplateLevel : IItemOptionTemplateLevel
         IncMDDr = node.ResolveShort("incMDDr") ?? 0;
 
         IncCr = node.ResolveShort("incCr") ?? 0;
-        
+
         IncAllSkill = node.ResolveShort("incAllskill") ?? 0;
-        
+
         RecoveryHP = node.ResolveShort("RecoveryHP") ?? 0;
         RecoveryMP = node.ResolveShort("RecoveryMP") ?? 0;
         RecoveryUP = node.ResolveShort("RecoveryUP") ?? 0;
@@ -59,16 +59,16 @@ public record ItemOptionTemplateLevel : IItemOptionTemplateLevel
         AttackType = node.ResolveShort("attackType") ?? 0;
         IncMesoProb = node.ResolveInt("incMesoProp") ?? 0;
         IncRewardProb = node.ResolveInt("incRewardProp") ?? 0;
-        
+
         Level = node.ResolveShort("level") ?? 0;
         Boss = node.ResolveShort("boss") ?? 0;
     }
-    
+
     public int ID { get; }
-    
+
     public int Prob { get; }
     public int Time { get; }
-    
+
     public short IncSTR { get; }
     public short IncDEX { get; }
     public short IncINT { get; }
@@ -85,7 +85,7 @@ public record ItemOptionTemplateLevel : IItemOptionTemplateLevel
     public short IncMAD { get; }
     public short IncPDD { get; }
     public short IncMDD { get; }
-    
+
     public short IncSTRr { get; }
     public short IncDEXr { get; }
     public short IncINTr { get; }
@@ -99,9 +99,9 @@ public record ItemOptionTemplateLevel : IItemOptionTemplateLevel
     public short IncPDDr { get; }
     public short IncMDDr { get; }
     public short IncCr { get; }
-    
+
     public short IncAllSkill { get; }
-    
+
     public short RecoveryHP { get; }
     public short RecoveryMP { get; }
     public short RecoveryUP { get; }
@@ -115,7 +115,7 @@ public record ItemOptionTemplateLevel : IItemOptionTemplateLevel
     public short AttackType { get; }
     public int IncMesoProb { get; }
     public int IncRewardProb { get; }
-    
+
     public short Level { get; }
     public short Boss { get; }
 }

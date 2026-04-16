@@ -10,7 +10,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Cygnus;
 public class Flamewizard1SkillHandler : NoblesseSkillHandler
 {
     public override int ID => Job.Flamewizard;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -22,7 +22,7 @@ public class Flamewizard1SkillHandler : NoblesseSkillHandler
                 context.AddSummoned(MoveAbilityType.Walk, SummonedAssistType.Attack);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

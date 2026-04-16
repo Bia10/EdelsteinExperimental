@@ -10,13 +10,16 @@ public class ModifiedQuestTimeManagerInit : IPipelinePlug<StageStart>
 {
     private readonly IModifiedQuestTimeManager _manager;
     private readonly ITemplateManager<ModifiedQuestTimeTemplate> _templates;
-    
-    public ModifiedQuestTimeManagerInit(IModifiedQuestTimeManager manager, ITemplateManager<ModifiedQuestTimeTemplate> templates)
+
+    public ModifiedQuestTimeManagerInit(
+        IModifiedQuestTimeManager manager,
+        ITemplateManager<ModifiedQuestTimeTemplate> templates
+    )
     {
         _manager = manager;
         _templates = templates;
     }
 
-    public async Task Handle(IPipelineContext ctx, StageStart message) 
-        => await Task.WhenAll((await _templates.RetrieveAll()).Select(_manager.Insert));
+    public async Task Handle(IPipelineContext ctx, StageStart message) =>
+        await Task.WhenAll((await _templates.RetrieveAll()).Select(_manager.Insert));
 }

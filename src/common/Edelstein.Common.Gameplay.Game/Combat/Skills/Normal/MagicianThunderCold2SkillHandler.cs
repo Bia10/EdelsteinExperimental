@@ -9,7 +9,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class MagicianThunderCold2SkillHandler : Magician1SkillHandler
 {
     public override int ID => Job.WizardThunderCold;
-    
+
     public override Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
     {
         switch (context.Skill?.ID)
@@ -18,10 +18,10 @@ public class MagicianThunderCold2SkillHandler : Magician1SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Freeze, 1);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

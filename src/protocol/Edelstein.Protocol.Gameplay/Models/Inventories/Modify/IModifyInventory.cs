@@ -4,7 +4,8 @@ using Edelstein.Protocol.Utilities.Packets;
 
 namespace Edelstein.Protocol.Gameplay.Models.Inventories.Modify;
 
-public interface IModifyInventory<in TSlot> : IPacketWritable where TSlot : IItemSlot
+public interface IModifyInventory<in TSlot> : IPacketWritable
+    where TSlot : IItemSlot
 {
     bool IsUpdated { get; }
     bool IsUpdatedAvatar { get; }

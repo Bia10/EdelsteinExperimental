@@ -2,10 +2,7 @@
 
 namespace Edelstein.Common.Gameplay.Game.Objects.User.Effects.Field;
 
-public record TrembleFieldEffect(
-    bool IsHeavyAndShort,
-    int Delay
-) : IPacketWritable
+public record TrembleFieldEffect(bool IsHeavyAndShort, int Delay) : IPacketWritable
 {
     public void WriteTo(IPacketWriter writer)
     {

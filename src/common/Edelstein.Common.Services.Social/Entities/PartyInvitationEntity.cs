@@ -6,9 +6,9 @@ public record PartyInvitationEntity : IIdentifiable<int>
 {
     public int ID { get; set; }
     public int PartyID { get; set; }
-        
+
     public PartyEntity Party { get; set; }
-    
+
     public int CharacterID { get; set; }
     public DateTime DateExpire { get; set; }
 }

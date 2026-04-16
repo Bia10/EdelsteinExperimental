@@ -20,7 +20,7 @@ public class WarriorPaladin4SkillHandler : WarriorPaladin3SkillHandler
 
         return base.HandleAttack(context, user);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

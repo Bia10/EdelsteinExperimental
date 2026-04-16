@@ -46,17 +46,22 @@ public record Character : ICharacter
     public byte FriendMax { get; set; } = 20;
 
     public ICharacterFuncKeys FuncKeys { get; private set; } = new CharacterFuncKeys();
-    public ICharacterQuickslotKeys QuickslotKeys { get; private set; } = new CharacterQuickslotKeys();
-    
+    public ICharacterQuickslotKeys QuickslotKeys { get; private set; } =
+        new CharacterQuickslotKeys();
+
     public ICharacterWishlist Wishlist { get; private set; } = new CharacterWishlist();
 
     public ICharacterInventories Inventories { get; private set; } = new CharacterInventories();
     public ICharacterSkills Skills { get; private set; } = new CharacterSkills();
-    public ICharacterQuestCompletes QuestCompletes { get; private set; } = new CharacterQuestCompletes();
+    public ICharacterQuestCompletes QuestCompletes { get; private set; } =
+        new CharacterQuestCompletes();
     public ICharacterQuestRecords QuestRecords { get; private set; } = new CharacterQuestRecords();
-    public ICharacterQuestRecordsEx QuestRecordsEx { get; private set; } = new CharacterQuestRecordsEx();
-    
-    public ICharacterWildHunterInfo WildHunterInfo { get; private set; } = new CharacterWildHunterInfo();
+    public ICharacterQuestRecordsEx QuestRecordsEx { get; private set; } =
+        new CharacterQuestRecordsEx();
 
-    public ICharacterTemporaryStats TemporaryStats { get; private set; } = new CharacterTemporaryStats();
+    public ICharacterWildHunterInfo WildHunterInfo { get; private set; } =
+        new CharacterWildHunterInfo();
+
+    public ICharacterTemporaryStats TemporaryStats { get; private set; } =
+        new CharacterTemporaryStats();
 }

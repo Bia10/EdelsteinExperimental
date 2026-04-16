@@ -11,30 +11,36 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class ArcherBowmaster3SkillHandler : ArcherBowmaster2SkillHandler
 {
     public override int ID => Job.Ranger;
-    
-    public override async Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
+
+    public override async Task HandleAttackMob(
+        ISkillContext context,
+        IFieldUser user,
+        IFieldMob mob
+    )
     {
         switch (context.Skill?.ID)
         {
             case Skill.RangerFireShot:
-                context.AddMobBurnedInfo(await user.Damage.CalculateBurnedDamage(
-                    user.Character,
-                    user.Stats,
-                    mob,
-                    mob.Stats,
-                    context.Skill!.ID,
-                    context.SkillLevel!.Level
-                ));
+                context.AddMobBurnedInfo(
+                    await user.Damage.CalculateBurnedDamage(
+                        user.Character,
+                        user.Stats,
+                        mob,
+                        mob.Stats,
+                        context.Skill!.ID,
+                        context.SkillLevel!.Level
+                    )
+                );
                 break;
             case Skill.RangerSilverHawk:
                 context.SetProc();
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         await base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -47,7 +53,7 @@ public class ArcherBowmaster3SkillHandler : ArcherBowmaster2SkillHandler
                 context.AddSummoned(MoveAbilityType.Fly, SummonedAssistType.Attack);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

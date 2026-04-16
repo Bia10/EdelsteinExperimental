@@ -11,13 +11,10 @@ public record GameContextPipelines(
     IPipeline<UserOnPacket<IGameStageUser>> UserOnPacket,
     IPipeline<UserOnException<IGameStageUser>> UserOnException,
     IPipeline<UserOnDisconnect<IGameStageUser>> UserOnDisconnect,
-    
     IPipeline<UserOnPacketAliveAck<IGameStageUser>> UserOnPacketAliveAck,
     IPipeline<UserOnPacketMigrateIn<IGameStageUser>> UserOnPacketMigrateIn,
-    
     IPipeline<NotifyPartyMemberUpdateChannelOrField> NotifyPartyMemberUpdateChannelOrField,
     IPipeline<NotifyPartyMemberUpdateLevelOrJob> NotifyPartyMemberUpdateLevelOrJob,
-
     IPipeline<FieldOnPacketUserTransferFieldRequest> FieldOnPacketUserTransferFieldRequest,
     IPipeline<FieldOnPacketUserTransferChannelRequest> FieldOnPacketUserTransferChannelRequest,
     IPipeline<FieldOnPacketUserMigrateToCashShopRequest> FieldOnPacketUserMigrateToCashShopRequest,
@@ -48,16 +45,13 @@ public record GameContextPipelines(
     IPipeline<FieldOnPacketUserQuestScriptEndRequest> FieldOnPacketUserQuestScriptEndRequest,
     IPipeline<FieldOnPacketUserThrowGrenade> FieldOnPacketUserThrowGrenade,
     IPipeline<FieldOnPacketUserClientTimerEndRequest> FieldOnPacketUserClientTimerEndRequest,
-
     IPipeline<FieldOnPacketPartyCreateRequest> FieldOnPacketPartyCreateRequest,
     IPipeline<FieldOnPacketPartyLeaveRequest> FieldOnPacketPartyLeaveRequest,
     IPipeline<FieldOnPacketPartyInviteRequest> FieldOnPacketPartyInviteRequest,
     IPipeline<FieldOnPacketPartyKickRequest> FieldOnPacketPartyKickRequest,
     IPipeline<FieldOnPacketPartyChangeLeaderRequest> FieldOnPacketPartyChangeLeaderRequest,
-    
     IPipeline<FieldOnPacketPartyInviteAcceptResult> FieldOnPacketPartyInviteAcceptResult,
     IPipeline<FieldOnPacketPartyInviteRejectResult> FieldOnPacketPartyInviteRejectResult,
-
     IPipeline<NotifyGuildCreated> NotifyGuildCreated,
     IPipeline<NotifyGuildDisbanded> NotifyGuildDisbanded,
     IPipeline<NotifyGuildMemberInvited> NotifyGuildMemberInvited,
@@ -73,7 +67,6 @@ public record GameContextPipelines(
     IPipeline<NotifyGuildMarkChanged> NotifyGuildMarkChanged,
     IPipeline<NotifyGuildMaxMemberChanged> NotifyGuildMaxMemberChanged,
     IPipeline<NotifyGuildSkillUpdated> NotifyGuildSkillUpdated,
-
     IPipeline<FieldOnPacketGuildNameCheckRequest> FieldOnPacketGuildNameCheckRequest,
     IPipeline<FieldOnPacketGuildCreateRequest> FieldOnPacketGuildCreateRequest,
     IPipeline<FieldOnPacketGuildDisbandRequest> FieldOnPacketGuildDisbandRequest,
@@ -86,28 +79,18 @@ public record GameContextPipelines(
     IPipeline<FieldOnPacketGuildSetMemberGradeRequest> FieldOnPacketGuildSetMemberGradeRequest,
     IPipeline<FieldOnPacketGuildSetMarkRequest> FieldOnPacketGuildSetMarkRequest,
     IPipeline<FieldOnPacketGuildRejectResult> FieldOnPacketGuildRejectResult,
-
     IPipeline<FieldOnPacketFriendSetRequest> FieldOnPacketFriendSetRequest,
     IPipeline<FieldOnPacketFriendAcceptRequest> FieldOnPacketFriendAcceptRequest,
     IPipeline<FieldOnPacketFriendDeleteRequest> FieldOnPacketFriendDeleteRequest,
-    
     IPipeline<FieldOnPacketUserFuncKeyMappedModified> FieldOnPacketUserFuncKeyMappedModified,
-    
     IPipeline<FieldOnPacketUserMigrateToITCRequest> FieldOnPacketUserMigrateToITCRequest,
-    
     IPipeline<FieldOnPacketSummonedMove> FieldOnPacketSummonedMove,
     IPipeline<FieldOnPacketSummonedAttack> FieldOnPacketSummonedAttack,
     IPipeline<FieldOnPacketSummonedSkill> FieldOnPacketSummonedSkill,
-    
     IPipeline<FieldOnPacketDragonMove> FieldOnPacketDragonMove,
-    
     IPipeline<FieldOnPacketUserQuickslotKeyMappedModified> FieldOnPacketUserQuickslotKeyMappedModified,
-    
     IPipeline<FieldOnPacketMobMove> FieldOnPacketMobMove,
-    
     IPipeline<FieldOnPacketNPCMove> FieldOnPacketNPCMove,
-    
     IPipeline<FieldOnPacketDropPickupRequest> FieldOnPacketDropPickupRequest,
-    
     IPipeline<FieldOnPacketUserContiState> FieldOnPacketUserContiState
 );

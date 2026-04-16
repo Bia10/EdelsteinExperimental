@@ -3,5 +3,5 @@
 public enum FieldLifeType
 {
     NPC,
-    Monster
+    Monster,
 }

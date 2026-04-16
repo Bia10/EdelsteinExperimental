@@ -12,10 +12,14 @@ public class MobTemplate : IMobTemplate
     {
         ID = id;
 
-        if (node.ResolvePath("fly") != null) MoveAbility = MoveAbilityType.Fly;
-        else if (node.ResolvePath("jump") != null) MoveAbility = MoveAbilityType.Jump;
-        else if (node.ResolvePath("move") != null) MoveAbility = MoveAbilityType.Walk;
-        else MoveAbility = MoveAbilityType.Stop;
+        if (node.ResolvePath("fly") != null)
+            MoveAbility = MoveAbilityType.Fly;
+        else if (node.ResolvePath("jump") != null)
+            MoveAbility = MoveAbilityType.Jump;
+        else if (node.ResolvePath("move") != null)
+            MoveAbility = MoveAbilityType.Walk;
+        else
+            MoveAbility = MoveAbilityType.Stop;
 
         Level = info.ResolveShort("level") ?? 0;
 
@@ -44,12 +48,12 @@ public class MobTemplate : IMobTemplate
             { Element.Poison, ElementAttribute.None },
             { Element.Holy, ElementAttribute.None },
             { Element.Dark, ElementAttribute.None },
-            { Element.Undead, ElementAttribute.None }
+            { Element.Undead, ElementAttribute.None },
         };
 
         var elemCount = 0;
         var elemAttrs = info.ResolveString("elemAttr") ?? string.Empty;
-        
+
         foreach (var group in elemAttrs.GroupBy(_ => elemCount++ / 2).ToImmutableArray())
         {
             var groupList = group.ToImmutableArray();
@@ -63,20 +67,20 @@ public class MobTemplate : IMobTemplate
                 'H' => Element.Holy,
                 'D' => Element.Dark,
                 'U' => Element.Undead,
-                _ => Element.Physical
+                _ => Element.Physical,
             };
             var elemAttr = (ElementAttribute)Convert.ToInt32(groupList[1].ToString());
 
             ElementAttributes[elem] = elemAttr;
         }
     }
-    
+
     public int ID { get; }
 
     public MoveAbilityType MoveAbility { get; }
 
     public short Level { get; }
-    
+
     public bool IsBoss { get; }
 
     public int MaxHP { get; }
@@ -92,6 +96,6 @@ public class MobTemplate : IMobTemplate
     public int EVA { get; }
 
     public int EXP { get; }
-    
+
     public IDictionary<Element, ElementAttribute> ElementAttributes { get; }
 }

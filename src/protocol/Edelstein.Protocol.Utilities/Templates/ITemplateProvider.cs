@@ -2,8 +2,7 @@
 
 namespace Edelstein.Protocol.Utilities.Templates;
 
-public interface ITemplateProvider<TTemplate> : 
-    IIdentifiable<int> 
+public interface ITemplateProvider<TTemplate> : IIdentifiable<int>
     where TTemplate : ITemplate
 {
     Task<TTemplate> Provide();

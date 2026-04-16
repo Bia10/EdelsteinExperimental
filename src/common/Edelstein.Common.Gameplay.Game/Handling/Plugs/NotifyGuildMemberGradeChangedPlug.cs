@@ -18,21 +18,20 @@ public class NotifyGuildMemberGradeChangedPlug : IPipelinePlug<NotifyGuildMember
 {
     private readonly IGameStage _stage;
 
-    public NotifyGuildMemberGradeChangedPlug(IGameStage stage) =>
-        _stage = stage;
+    public NotifyGuildMemberGradeChangedPlug(IGameStage stage) => _stage = stage;
 
     public async Task Handle(IPipelineContext ctx, NotifyGuildMemberGradeChanged message)
     {
         var users = await _stage.Users.RetrieveAll();
-        var affected = users
-            .Where(u => u.Guild?.ID == message.GuildID)
-            .ToImmutableArray();
+        var affected = users.Where(u => u.Guild?.ID == message.GuildID).ToImmutableArray();
 
         foreach (var user in affected)
         {
             // Update the affected member's grade in the local snapshot.
-            if (user.Guild?.Members.TryGetValue(message.CharacterID, out var member) == true
-                && member is GuildMembershipMember m)
+            if (
+                user.Guild?.Members.TryGetValue(message.CharacterID, out var member) == true
+                && member is GuildMembershipMember m
+            )
             {
                 m.Grade = message.Grade;
             }

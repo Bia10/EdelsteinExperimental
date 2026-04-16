@@ -12,11 +12,12 @@ public class NotifyFriendUpdateListPlug : IPipelinePlug<NotifyFriendUpdateList>
     private readonly IGameStage _stage;
 
     public NotifyFriendUpdateListPlug(IGameStage stage) => _stage = stage;
-    
+
     public async Task Handle(IPipelineContext ctx, NotifyFriendUpdateList message)
     {
         var user = await _stage.Users.Retrieve(message.CharacterID);
-        if (user == null) return;
+        if (user == null)
+            return;
         user.Friends = message.FriendList;
 
         using var packet = new PacketWriter(PacketSendOperations.FriendResult);

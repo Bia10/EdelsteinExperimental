@@ -5,7 +5,4 @@
 /// Wire: LP_GuildResult GuildRes_IncMaxMemberNum_Done (0x3C).
 /// Payload: guildID(4) + maxMemberNum(4).
 /// </summary>
-public record NotifyGuildMaxMemberChanged(
-    int GuildID,
-    int MaxMemberNum
-);
+public record NotifyGuildMaxMemberChanged(int GuildID, int MaxMemberNum);

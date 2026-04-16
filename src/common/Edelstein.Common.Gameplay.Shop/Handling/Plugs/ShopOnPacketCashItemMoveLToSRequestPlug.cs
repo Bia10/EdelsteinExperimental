@@ -10,23 +10,33 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Shop.Handling.Plugs;
 
-public class ShopOnPacketCashItemMoveLToSRequestPlug : IPipelinePlug<ShopOnPacketCashItemMoveLToSRequest>
+public class ShopOnPacketCashItemMoveLToSRequestPlug
+    : IPipelinePlug<ShopOnPacketCashItemMoveLToSRequest>
 {
     private readonly IInventoryManager _inventoryManager;
-    
-    public ShopOnPacketCashItemMoveLToSRequestPlug(IInventoryManager inventoryManager) => _inventoryManager = inventoryManager;
-    
+
+    public ShopOnPacketCashItemMoveLToSRequestPlug(IInventoryManager inventoryManager) =>
+        _inventoryManager = inventoryManager;
+
     public async Task Handle(IPipelineContext ctx, ShopOnPacketCashItemMoveLToSRequest message)
     {
-        if (message.User.Character == null) return;
-        if (message.User.AccountWorld == null) return;
-        
-        var slot = message.User.AccountWorld.Locker.Items
-            .FirstOrDefault(i => (i.Item as IItemSlotBase)?.CashItemSN == message.CashItemSN);
-        var context = new ModifyInventoryGroupContext(message.User.Character.Inventories, message.User.Context.Templates.Item);
+        if (message.User.Character == null)
+            return;
+        if (message.User.AccountWorld == null)
+            return;
 
-        if (slot == null) return;
-        if (!_inventoryManager.HasSlotFor(message.User.Character.Inventories, slot.Item)) return;
+        var slot = message.User.AccountWorld.Locker.Items.FirstOrDefault(i =>
+            (i.Item as IItemSlotBase)?.CashItemSN == message.CashItemSN
+        );
+        var context = new ModifyInventoryGroupContext(
+            message.User.Character.Inventories,
+            message.User.Context.Templates.Item
+        );
+
+        if (slot == null)
+            return;
+        if (!_inventoryManager.HasSlotFor(message.User.Character.Inventories, slot.Item))
+            return;
 
         message.User.AccountWorld.Locker.Items.Remove(slot);
         var target = context.Add(slot.Item);

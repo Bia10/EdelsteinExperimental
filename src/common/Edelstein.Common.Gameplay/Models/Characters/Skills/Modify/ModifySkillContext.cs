@@ -20,47 +20,54 @@ public class ModifySkillContext : IModifySkillContext
         _records = new Dictionary<int, ISkillRecord>();
     }
 
-    public void Add(int templateID, int increment = 1)
-        => Set(templateID, (_character.Skills[templateID]?.Level ?? 0) + increment);
+    public void Add(int templateID, int increment = 1) =>
+        Set(templateID, (_character.Skills[templateID]?.Level ?? 0) + increment);
 
-    public void Add(ISkillTemplate template, int increment = 1)
-        => Add(template.ID, increment);
+    public void Add(ISkillTemplate template, int increment = 1) => Add(template.ID, increment);
 
     public void Set(int templateID, int level, int? masterLevel = null, DateTime? dateExpire = null)
     {
         var record = _character.Skills[templateID];
-        
+
         if (record == null)
         {
             var newRecord = new SkillRecord
             {
                 Level = level,
                 MasterLevel = masterLevel,
-                DateExpire = dateExpire
+                DateExpire = dateExpire,
             };
 
             _character.Skills.Records.Add(templateID, newRecord);
             _records.Add(templateID, newRecord);
             return;
         }
-        
+
         record.Level = level;
         record.MasterLevel = masterLevel;
         record.DateExpire = dateExpire;
 
         _records.Add(templateID, record);
     }
-    
-    public void Set(ISkillTemplate template, int level, int? masterLevel = null, DateTime? dateExpire = null) 
-        => Set(template.ID, level, masterLevel, dateExpire);
+
+    public void Set(
+        ISkillTemplate template,
+        int level,
+        int? masterLevel = null,
+        DateTime? dateExpire = null
+    ) => Set(template.ID, level, masterLevel, dateExpire);
 
     public void ResetByTemplate(int templateID) => Set(templateID, 0);
+
     public void ResetByTemplate(ISkillTemplate template) => ResetByTemplate(template.ID);
+
     public void ResetByJobLevel(int jobLevel)
     {
-        foreach (var kv in _character.Skills.Records
-                     .Where(kv => JobConstants.GetJobLevel(jobLevel) == jobLevel)
-                     .ToImmutableArray())
+        foreach (
+            var kv in _character
+                .Skills.Records.Where(kv => JobConstants.GetJobLevel(jobLevel) == jobLevel)
+                .ToImmutableArray()
+        )
             Set(kv.Key, 0);
     }
 
@@ -78,7 +85,9 @@ public class ModifySkillContext : IModifySkillContext
             writer.WriteInt(kv.Key);
             writer.WriteInt(kv.Value.Level);
             writer.WriteInt(kv.Value.MasterLevel ?? 0);
-            writer.WriteDateTime(kv.Value.DateExpire ?? DateTime.FromFileTimeUtc(150842304000000000));
+            writer.WriteDateTime(
+                kv.Value.DateExpire ?? DateTime.FromFileTimeUtc(150842304000000000)
+            );
         }
     }
 }

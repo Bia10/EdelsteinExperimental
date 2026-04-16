@@ -2,6 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketUserContiState(
-    IFieldUser User
-);
+public record FieldOnPacketUserContiState(IFieldUser User);

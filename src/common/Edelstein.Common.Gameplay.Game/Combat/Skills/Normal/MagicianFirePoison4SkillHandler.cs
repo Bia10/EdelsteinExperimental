@@ -12,21 +12,27 @@ public class MagicianFirePoison4SkillHandler : MagicianFirePoison3SkillHandler
 {
     public override int ID => Job.ArchmageFirePoison;
 
-    public override async Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
+    public override async Task HandleAttackMob(
+        ISkillContext context,
+        IFieldUser user,
+        IFieldMob mob
+    )
     {
         switch (context.Skill?.ID)
         {
             case Skill.Archmage1FireDemon:
             case Skill.Archmage1Paralyze:
             case Skill.Archmage1Meteor:
-                context.AddMobBurnedInfo(await user.Damage.CalculateBurnedDamage(
-                    user.Character,
-                    user.Stats,
-                    mob,
-                    mob.Stats,
-                    context.Skill!.ID,
-                    context.SkillLevel!.Level
-                ));
+                context.AddMobBurnedInfo(
+                    await user.Damage.CalculateBurnedDamage(
+                        user.Character,
+                        user.Stats,
+                        mob,
+                        mob.Stats,
+                        context.Skill!.ID,
+                        context.SkillLevel!.Level
+                    )
+                );
                 break;
         }
 

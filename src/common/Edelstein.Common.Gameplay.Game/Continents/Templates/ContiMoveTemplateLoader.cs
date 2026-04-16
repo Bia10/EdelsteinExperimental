@@ -1,4 +1,4 @@
-using Duey.Abstractions;
+﻿using Duey.Abstractions;
 using Edelstein.Common.Utilities.Templates;
 using Edelstein.Protocol.Gameplay.Game.Continents.Templates;
 using Edelstein.Protocol.Utilities.Templates;
@@ -10,7 +10,10 @@ public class ContiMoveTemplateLoader : ITemplateLoader
     private readonly IDataNamespace _data;
     private readonly ITemplateManager<IContiMoveTemplate> _manager;
 
-    public ContiMoveTemplateLoader(IDataNamespace data, ITemplateManager<IContiMoveTemplate> manager)
+    public ContiMoveTemplateLoader(
+        IDataNamespace data,
+        ITemplateManager<IContiMoveTemplate> manager
+    )
     {
         _data = data;
         _manager = manager;
@@ -20,24 +23,29 @@ public class ContiMoveTemplateLoader : ITemplateLoader
     {
         var directory = _data.ResolvePath("Server/Continent.img");
 
-        if (directory == null) return 0;
+        if (directory == null)
+            return 0;
 
-        await Task.WhenAll(directory.Children
-            .Select(async n =>
+        await Task.WhenAll(
+            directory.Children.Select(async n =>
             {
                 var id = Convert.ToInt32(n.Name);
-                await _manager.Insert(new TemplateProviderLazy<IContiMoveTemplate>(
-                    id,
-                    () => new ContiMoveTemplate(
+                await _manager.Insert(
+                    new TemplateProviderLazy<IContiMoveTemplate>(
                         id,
-                        n.Cache(),
-                        n.ResolvePath("field")!.Cache(),
-                        n.ResolvePath("scheduler")!.Cache(),
-                        n.ResolvePath("genMob")?.Cache(),
-                        n.ResolvePath("time")!.Cache()
+                        () =>
+                            new ContiMoveTemplate(
+                                id,
+                                n.Cache(),
+                                n.ResolvePath("field")!.Cache(),
+                                n.ResolvePath("scheduler")!.Cache(),
+                                n.ResolvePath("genMob")?.Cache(),
+                                n.ResolvePath("time")!.Cache()
+                            )
                     )
-                ));
-            }));
+                );
+            })
+        );
 
         _manager.Freeze();
         return _manager.Count;

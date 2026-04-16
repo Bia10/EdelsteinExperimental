@@ -48,4 +48,3 @@ public enum GuildBBSRequestOperations : byte
     /// </summary>
     DeleteComment = 0x05,
 }
-

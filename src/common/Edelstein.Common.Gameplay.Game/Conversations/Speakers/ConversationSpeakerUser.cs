@@ -1,4 +1,4 @@
-using Edelstein.Common.Constants;
+﻿using Edelstein.Common.Constants;
 using Edelstein.Common.Gameplay.Game.Conversations.Speakers.Facades;
 using Edelstein.Common.Gameplay.Game.Objects.User.Effects;
 using Edelstein.Common.Gameplay.Game.Objects.User.Effects.Field;
@@ -23,11 +23,11 @@ public class ConversationSpeakerUser : ConversationSpeaker, IConversationSpeaker
 
     public ConversationSpeakerUser(
         IFieldUser user,
-        IConversationContext context, 
-        int id = 9010000, 
+        IConversationContext context,
+        int id = 9010000,
         ConversationSpeakerFlags flags = 0
-    ) : base(context, id, flags) 
-        => _user = user;
+    )
+        : base(context, id, flags) => _user = user;
 
     public byte Skin
     {
@@ -40,19 +40,19 @@ public class ConversationSpeakerUser : ConversationSpeaker, IConversationSpeaker
         get => _user.Character.Face;
         set => _user.ModifyStats(s => s.Face = value).Wait();
     }
-    
+
     public int Hair
     {
         get => _user.Character.Hair;
         set => _user.ModifyStats(s => s.Hair = value).Wait();
     }
-    
+
     public byte Level
     {
         get => _user.Character.Level;
         set => _user.ModifyStats(s => s.Level = value).Wait();
     }
-    
+
     public short Job
     {
         get => _user.Character.Job;
@@ -69,7 +69,7 @@ public class ConversationSpeakerUser : ConversationSpeaker, IConversationSpeaker
         get => _user.Character.STR;
         set => _user.ModifyStats(s => s.STR = value).Wait();
     }
-    
+
     public short DEX
     {
         get => _user.Character.DEX;
@@ -87,7 +87,7 @@ public class ConversationSpeakerUser : ConversationSpeaker, IConversationSpeaker
         get => _user.Character.LUK;
         set => _user.ModifyStats(s => s.LUK = value).Wait();
     }
-    
+
     public int HP
     {
         get => _user.Character.HP;
@@ -111,7 +111,7 @@ public class ConversationSpeakerUser : ConversationSpeaker, IConversationSpeaker
         get => _user.Character.MaxMP;
         set => _user.ModifyStats(s => s.MaxMP = value).Wait();
     }
-    
+
     public short AP
     {
         get => _user.Character.AP;
@@ -123,7 +123,7 @@ public class ConversationSpeakerUser : ConversationSpeaker, IConversationSpeaker
         get => _user.Character.SP;
         set => _user.ModifyStats(s => s.SP = value).Wait();
     }
-    
+
     public int EXP
     {
         get => _user.Character.EXP;
@@ -135,7 +135,7 @@ public class ConversationSpeakerUser : ConversationSpeaker, IConversationSpeaker
         get => _user.Character.POP;
         set => _user.ModifyStats(s => s.POP = value).Wait();
     }
-    
+
     public int Money
     {
         get => _user.Character.Money;
@@ -168,47 +168,48 @@ public class ConversationSpeakerUser : ConversationSpeaker, IConversationSpeaker
     {
         var rates = _user.StageUser.Context.Managers.Rates;
         var rateContext = new RateContext(_user, _user.StageUser.Context.Options);
-        var finalAmount = RateModifier.Apply(amount, rates.GetFinalRate(RateType.Meso, rateContext));
+        var finalAmount = RateModifier.Apply(
+            amount,
+            rates.GetFinalRate(RateType.Meso, rateContext)
+        );
 
         Money += finalAmount;
         _user.Message(new IncMoneyMessage(finalAmount));
     }
-    
-    public void TransferField(int fieldID, string portal = "")
-        => _user.StageUser.Context.Managers.Field.Retrieve(fieldID).Result?.Enter(_user, portal);
 
-    public void SetDirectionMode(bool enable, int delay = 0)
-        => _user.SetDirectionMode(enable, delay).Wait();
-    
-    public void SetStandAloneMode(bool enable)
-        => _user.SetStandAloneMode(enable).Wait();
+    public void TransferField(int fieldID, string portal = "") =>
+        _user.StageUser.Context.Managers.Field.Retrieve(fieldID).Result?.Enter(_user, portal);
 
-    public void Message(string message)
-        => _user.Message(message);
-    
-    public void MessageScriptProgress(string message)
-        => _user.MessageScriptProgress(message);
+    public void SetDirectionMode(bool enable, int delay = 0) =>
+        _user.SetDirectionMode(enable, delay).Wait();
 
-    public void MessageBalloon(string message, short? width = null, short? duration = null, IPoint2D? position = null)
-        => _user.MessageBalloon(message, width, duration, position);
+    public void SetStandAloneMode(bool enable) => _user.SetStandAloneMode(enable).Wait();
 
-    public void EffectPlayPortalSE()
-        => _user.Effect(new PlayPortalSEEffect(), isRemote: false);
-    
-    public void EffectSquib(string path)
-        => _user.Effect(new SquibEffect(path), isRemote: false);
+    public void Message(string message) => _user.Message(message);
 
-    public void EffectReserved(string path)
-        => _user.Effect(new ReservedEffect(path), isRemote: false);
-    
-    public void EffectAvatarOriented(string path)
-        => _user.Effect(new AvatarOrientedEffect(path), isRemote: false);
+    public void MessageScriptProgress(string message) => _user.MessageScriptProgress(message);
 
-    public void EffectFieldScreen(string path)
-        => _user.EffectField(new ScreenFieldEffect(path));
+    public void MessageBalloon(
+        string message,
+        short? width = null,
+        short? duration = null,
+        IPoint2D? position = null
+    ) => _user.MessageBalloon(message, width, duration, position);
 
-    public void EffectFieldTremble(bool isHeavyAndShort, int delay)
-        => _user.EffectField(new TrembleFieldEffect(isHeavyAndShort, delay));
+    public void EffectPlayPortalSE() => _user.Effect(new PlayPortalSEEffect(), isRemote: false);
+
+    public void EffectSquib(string path) => _user.Effect(new SquibEffect(path), isRemote: false);
+
+    public void EffectReserved(string path) =>
+        _user.Effect(new ReservedEffect(path), isRemote: false);
+
+    public void EffectAvatarOriented(string path) =>
+        _user.Effect(new AvatarOrientedEffect(path), isRemote: false);
+
+    public void EffectFieldScreen(string path) => _user.EffectField(new ScreenFieldEffect(path));
+
+    public void EffectFieldTremble(bool isHeavyAndShort, int delay) =>
+        _user.EffectField(new TrembleFieldEffect(isHeavyAndShort, delay));
 
     // --- Guild ---
 
@@ -229,7 +230,8 @@ public class ConversationSpeakerUser : ConversationSpeaker, IConversationSpeaker
 
     public void ShowGuildMarkInput()
     {
-        if (_user.StageUser.Guild == null) return;
+        if (_user.StageUser.Guild == null)
+            return;
         using var packet = new PacketWriter(PacketSendOperations.GuildResult);
         packet.WriteByte((byte)GuildResultOperations.SetGuildMark);
         _ = _user.Dispatch(packet.Build());
@@ -238,27 +240,39 @@ public class ConversationSpeakerUser : ConversationSpeaker, IConversationSpeaker
     public bool DisbandGuild()
     {
         var guild = _user.StageUser.Guild;
-        if (guild == null || guild.Grade != 1) return false;
-        var response = _user.StageUser.Context.Services.Guild.Disband(
-            new GuildDisbandRequest(guild.ID, _user.Character.ID)).Result;
+        if (guild == null || guild.Grade != 1)
+            return false;
+        var response = _user
+            .StageUser.Context.Services.Guild.Disband(
+                new GuildDisbandRequest(guild.ID, _user.Character.ID)
+            )
+            .Result;
         return response.Result == GuildResult.Success;
     }
 
     public bool ExpandGuild()
     {
         var guild = _user.StageUser.Guild;
-        if (guild == null || guild.Grade != 1) return false;
-        var response = _user.StageUser.Context.Services.Guild.IncMaxMemberNum(
-            new GuildIncMaxMemberRequest(guild.ID, _user.Character.ID)).Result;
+        if (guild == null || guild.Grade != 1)
+            return false;
+        var response = _user
+            .StageUser.Context.Services.Guild.IncMaxMemberNum(
+                new GuildIncMaxMemberRequest(guild.ID, _user.Character.ID)
+            )
+            .Result;
         return response.Result == GuildResult.Success;
     }
 
     public bool DeleteGuildMark()
     {
         var guild = _user.StageUser.Guild;
-        if (guild == null || guild.Grade != 1) return false;
-        var response = _user.StageUser.Context.Services.Guild.SetMark(
-            new GuildSetMarkRequest(guild.ID, _user.Character.ID, 0, 0, 0, 0)).Result;
+        if (guild == null || guild.Grade != 1)
+            return false;
+        var response = _user
+            .StageUser.Context.Services.Guild.SetMark(
+                new GuildSetMarkRequest(guild.ID, _user.Character.ID, 0, 0, 0, 0)
+            )
+            .Result;
         return response.Result == GuildResult.Success;
     }
 }

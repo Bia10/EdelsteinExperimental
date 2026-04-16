@@ -11,12 +11,14 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
 public class DragonMoveHandler : AbstractPipedFieldDragonHandler<FieldOnPacketDragonMove>
 {
-    public DragonMoveHandler(IPipeline<FieldOnPacketDragonMove> pipeline) : base(pipeline)
-    {
-    }
+    public DragonMoveHandler(IPipeline<FieldOnPacketDragonMove> pipeline)
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.DragonMove;
 
-    protected override FieldOnPacketDragonMove? Serialize(IFieldUser user, IFieldDragon dragon, IPacketReader reader)
-        => new(user, dragon, reader.Read(new FieldDragonMovePath()));
+    protected override FieldOnPacketDragonMove? Serialize(
+        IFieldUser user,
+        IFieldDragon dragon,
+        IPacketReader reader
+    ) => new(user, dragon, reader.Read(new FieldDragonMovePath()));
 }

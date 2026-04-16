@@ -11,12 +11,14 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
 public class SummonedMoveHandler : AbstractPipedFieldSummonedHandler<FieldOnPacketSummonedMove>
 {
-    public SummonedMoveHandler(IPipeline<FieldOnPacketSummonedMove> pipeline) : base(pipeline)
-    {
-    }
+    public SummonedMoveHandler(IPipeline<FieldOnPacketSummonedMove> pipeline)
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.SummonedMove;
 
-    protected override FieldOnPacketSummonedMove? Serialize(IFieldUser user, IFieldSummoned summoned, IPacketReader reader)
-        => new(user, summoned, reader.Read(new FieldSummonedMovePath()));
+    protected override FieldOnPacketSummonedMove? Serialize(
+        IFieldUser user,
+        IFieldSummoned summoned,
+        IPacketReader reader
+    ) => new(user, summoned, reader.Read(new FieldSummonedMovePath()));
 }

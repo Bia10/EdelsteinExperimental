@@ -3,7 +3,7 @@
 public interface IQuestTemplateCheckMob
 {
     int Order { get; }
-    
+
     int MobID { get; }
     int Count { get; }
 }

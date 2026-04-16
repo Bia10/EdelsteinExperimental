@@ -16,7 +16,8 @@ namespace Edelstein.Common.Services.Social.Migrations
                 column: "CharacterID",
                 principalTable: "friend_profiles",
                 principalColumn: "CharacterID",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Cascade
+            );
         }
 
         /// <inheritdoc />
@@ -24,7 +25,8 @@ namespace Edelstein.Common.Services.Social.Migrations
         {
             migrationBuilder.DropForeignKey(
                 name: "FK_friends_friend_profiles_CharacterID",
-                table: "friends");
+                table: "friends"
+            );
         }
     }
 }

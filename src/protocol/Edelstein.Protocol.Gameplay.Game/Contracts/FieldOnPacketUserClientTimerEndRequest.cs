@@ -2,6 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketUserClientTimerEndRequest(
-    IFieldUser User
-);
+public record FieldOnPacketUserClientTimerEndRequest(IFieldUser User);

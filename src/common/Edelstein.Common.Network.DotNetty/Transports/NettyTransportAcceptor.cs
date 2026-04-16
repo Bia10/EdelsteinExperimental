@@ -36,15 +36,17 @@ public class NettyTransportAcceptor : ITransportAcceptor
             .Group(group0, group1)
             .Channel<TcpServerSocketChannel>()
             .Option(ChannelOption.SoBacklog, 1024)
-            .ChildHandler(new ActionChannelInitializer<IChannel>(ch =>
-            {
-                ch.Pipeline.AddLast(
-                    new ReadTimeoutHandler(TimeSpan.FromMinutes(5)),
-                    new NettyPacketDecoder(_version, aesCipher, igCipher),
-                    new NettyTransportAcceptorHandler(_version, _initializer, _sockets),
-                    new NettyPacketEncoder(_version, aesCipher, igCipher)
-                );
-            }))
+            .ChildHandler(
+                new ActionChannelInitializer<IChannel>(ch =>
+                {
+                    ch.Pipeline.AddLast(
+                        new ReadTimeoutHandler(TimeSpan.FromMinutes(5)),
+                        new NettyPacketDecoder(_version, aesCipher, igCipher),
+                        new NettyTransportAcceptorHandler(_version, _initializer, _sockets),
+                        new NettyPacketEncoder(_version, aesCipher, igCipher)
+                    );
+                })
+            )
             .BindAsync(port);
 
         return new NettyTransportAcceptorState(channel, group0, group1, _version, _sockets);

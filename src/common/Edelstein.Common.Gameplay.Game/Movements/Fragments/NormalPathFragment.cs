@@ -14,9 +14,8 @@ public class NormalPathFragment<TMoveAction> : ActionPathFragment<TMoveAction>
     private IPoint2D _position;
     private IPoint2D _vPosition;
 
-    public NormalPathFragment(MovePathFragmentType type) : base(type)
-    {
-    }
+    public NormalPathFragment(MovePathFragmentType type)
+        : base(type) { }
 
     protected override void ReadBody(IPacketReader reader)
     {

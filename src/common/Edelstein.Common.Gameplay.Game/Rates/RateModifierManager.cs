@@ -6,8 +6,7 @@ public sealed class RateModifierManager : IRateModifierManager
 {
     private readonly IRateModifierSource[] _sources;
 
-    public RateModifierManager(IEnumerable<IRateModifierSource> sources) =>
-        _sources = [.. sources];
+    public RateModifierManager(IEnumerable<IRateModifierSource> sources) => _sources = [.. sources];
 
     // Sync versions - for use in synchronous contexts (e.g., scripting)
     public IReadOnlyList<IRateModifier> GetModifiers(RateType type, IRateContext context) =>
@@ -16,7 +15,10 @@ public sealed class RateModifierManager : IRateModifierManager
     public double GetFinalRate(RateType type, IRateContext context) =>
         GetFinalRateAsync(type, context).AsTask().GetAwaiter().GetResult();
 
-    public async ValueTask<IReadOnlyList<IRateModifier>> GetModifiersAsync(RateType type, IRateContext context)
+    public async ValueTask<IReadOnlyList<IRateModifier>> GetModifiersAsync(
+        RateType type,
+        IRateContext context
+    )
     {
         List<IRateModifier>? modifiers = null;
 
@@ -24,13 +26,15 @@ public sealed class RateModifierManager : IRateModifierManager
         {
             foreach (var modifier in await source.GetModifiersAsync(type, context))
             {
-                if (modifier.Multiplier <= 0d) continue;
+                if (modifier.Multiplier <= 0d)
+                    continue;
                 modifiers ??= [];
                 modifiers.Add(modifier);
             }
         }
 
-        if (modifiers is not { Count: > 0 }) return [];
+        if (modifiers is not { Count: > 0 })
+            return [];
         if (modifiers.Count > 1)
             modifiers.Sort((x, y) => (x.Priority ?? 0).CompareTo(y.Priority ?? 0));
         return modifiers;

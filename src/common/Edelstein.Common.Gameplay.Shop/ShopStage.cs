@@ -19,24 +19,24 @@ public class ShopStage : AbstractStage<IShopStageUser>, IShopStage
             await user.Disconnect();
             return;
         }
-        
+
         using var packet = new PacketWriter(PacketSendOperations.SetCashShop);
-        
+
         packet.WriteCharacterData(
-            user.Character, 
-            DbFlags.Character | 
-            DbFlags.Money | 
-            DbFlags.ItemSlotEquip | 
-            DbFlags.ItemSlotConsume | 
-            DbFlags.ItemSlotInstall |
-            DbFlags.ItemSlotEtc | 
-            DbFlags.ItemSlotCash | 
-            DbFlags.InventorySize
+            user.Character,
+            DbFlags.Character
+                | DbFlags.Money
+                | DbFlags.ItemSlotEquip
+                | DbFlags.ItemSlotConsume
+                | DbFlags.ItemSlotInstall
+                | DbFlags.ItemSlotEtc
+                | DbFlags.ItemSlotCash
+                | DbFlags.InventorySize
         );
 
         packet.WriteBool(true); // CashShopAuthorized
         packet.WriteString(user.Account.Username);
-        
+
         var notSale = await user.Context.Managers.NotSale.RetrieveAll();
         packet.WriteInt(notSale.Count);
         foreach (var commodity in notSale)
@@ -92,7 +92,7 @@ public class ShopStage : AbstractStage<IShopStageUser>, IShopStage
                     packet.WriteInt(sn);
             }
         }
-        
+
         packet.WriteBool(false); // v49
 
         packet.WriteBytes(new byte[1080]);

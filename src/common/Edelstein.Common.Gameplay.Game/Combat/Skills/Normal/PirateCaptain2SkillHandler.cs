@@ -11,26 +11,32 @@ public class PirateCaptain2SkillHandler : Pirate1SkillHandler
 {
     public override int ID => Job.Gunslinger;
 
-    public override async Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
+    public override async Task HandleAttackMob(
+        ISkillContext context,
+        IFieldUser user,
+        IFieldMob mob
+    )
     {
         switch (context.Skill?.ID)
         {
             case Skill.GunslingerThrowingBomb:
-                context.AddMobBurnedInfo(await user.Damage.CalculateBurnedDamage(
-                    user.Character,
-                    user.Stats,
-                    mob,
-                    mob.Stats,
-                    context.Skill!.ID,
-                    context.SkillLevel!.Level
-                ));
+                context.AddMobBurnedInfo(
+                    await user.Damage.CalculateBurnedDamage(
+                        user.Character,
+                        user.Stats,
+                        mob,
+                        mob.Stats,
+                        context.Skill!.ID,
+                        context.SkillLevel!.Level
+                    )
+                );
                 break;
             case Skill.GunslingerFakeShot:
                 context.SetProc();
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         await base.HandleAttackMob(context, user, mob);
     }
 
@@ -42,7 +48,7 @@ public class PirateCaptain2SkillHandler : Pirate1SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.Booster, context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

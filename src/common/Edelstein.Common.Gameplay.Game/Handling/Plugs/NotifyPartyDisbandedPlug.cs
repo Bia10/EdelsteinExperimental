@@ -13,20 +13,19 @@ public class NotifyPartyDisbandedPlug : IPipelinePlug<NotifyPartyDisbanded>
     private readonly IGameStage _stage;
 
     public NotifyPartyDisbandedPlug(IGameStage stage) => _stage = stage;
-    
+
     public async Task Handle(IPipelineContext ctx, NotifyPartyDisbanded message)
     {
         var users = await _stage.Users.RetrieveAll();
-        var partied = users
-            .Where(u => u.Party?.PartyID == message.PartyID)
-            .ToImmutableArray();
+        var partied = users.Where(u => u.Party?.PartyID == message.PartyID).ToImmutableArray();
 
         foreach (var user in partied)
         {
-            if (user.Party == null) continue;
+            if (user.Party == null)
+                continue;
 
             user.Party = null;
-            
+
             using var packet = new PacketWriter(PacketSendOperations.PartyResult);
             packet.WriteByte((byte)PartyResultOperations.WithdrawPartyDone);
             packet.WriteInt(message.PartyID);

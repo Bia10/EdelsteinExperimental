@@ -8,21 +8,25 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class FieldOnPacketUserTransferChannelRequestPlug : IPipelinePlug<FieldOnPacketUserTransferChannelRequest>
+public class FieldOnPacketUserTransferChannelRequestPlug
+    : IPipelinePlug<FieldOnPacketUserTransferChannelRequest>
 {
     private readonly IServerService _serverService;
-    
-    public FieldOnPacketUserTransferChannelRequestPlug(IServerService serverService) 
-        => _serverService = serverService;
-    
+
+    public FieldOnPacketUserTransferChannelRequestPlug(IServerService serverService) =>
+        _serverService = serverService;
+
     public async Task Handle(IPipelineContext ctx, FieldOnPacketUserTransferChannelRequest message)
     {
-        var response = await _serverService.GetGameByWorldAndChannel(new ServerGetGameByWorldAndChannelRequest(
-            message.User.StageUser.Context.Options.WorldID,
-            message.ChannelID
-        ));
+        var response = await _serverService.GetGameByWorldAndChannel(
+            new ServerGetGameByWorldAndChannelRequest(
+                message.User.StageUser.Context.Options.WorldID,
+                message.ChannelID
+            )
+        );
         var server = response.Server;
-        if (server == null) return;
+        if (server == null)
+            return;
 
         using var packet = new PacketWriter(PacketSendOperations.MigrateCommand);
         var endpoint = new IPEndPoint(IPAddress.Parse(server.Host), server.Port);
@@ -35,6 +39,5 @@ public class FieldOnPacketUserTransferChannelRequestPlug : IPipelinePlug<FieldOn
         packet.WriteShort(port);
 
         await message.User.StageUser.Migrate(server.ID, packet.Build());
-
     }
 }

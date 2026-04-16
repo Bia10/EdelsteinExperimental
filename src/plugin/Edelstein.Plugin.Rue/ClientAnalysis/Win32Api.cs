@@ -10,7 +10,7 @@ internal static class Win32Api
         VmOperation = 0x0008,
         VmRead = 0x0010,
         VmWrite = 0x0020,
-        QueryInformation = 0x0400
+        QueryInformation = 0x0400,
     }
 
     [Flags]
@@ -18,7 +18,7 @@ internal static class Win32Api
     {
         Commit = 0x1000,
         Reserve = 0x2000,
-        Release = 0x8000
+        Release = 0x8000,
     }
 
     [Flags]
@@ -27,25 +27,25 @@ internal static class Win32Api
         NoAccess = 0x01,
         ReadWrite = 0x04,
         ExecuteReadWrite = 0x40,
-        Guard = 0x100
+        Guard = 0x100,
     }
 
     internal enum MemoryState : uint
     {
-        Commit = 0x1000
+        Commit = 0x1000,
     }
 
     [Flags]
     internal enum FreeType : uint
     {
-        Release = 0x8000
+        Release = 0x8000,
     }
 
     internal enum WaitResult : uint
     {
         Object0 = 0x00000000,
         Timeout = 0x00000102,
-        Failed = 0xFFFFFFFF
+        Failed = 0xFFFFFFFF,
     }
 
     internal enum NtStatus : uint
@@ -74,7 +74,11 @@ internal static class Win32Api
     }
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    internal static extern IntPtr OpenProcess(ProcessAccess dwDesiredAccess, bool bInheritHandle, int dwProcessId);
+    internal static extern IntPtr OpenProcess(
+        ProcessAccess dwDesiredAccess,
+        bool bInheritHandle,
+        int dwProcessId
+    );
 
     [DllImport("kernel32.dll", SetLastError = true)]
     internal static extern bool CloseHandle(IntPtr hObject);
@@ -85,7 +89,8 @@ internal static class Win32Api
         IntPtr lpBaseAddress,
         byte[] lpBuffer,
         int dwSize,
-        out int lpNumberOfBytesRead);
+        out int lpNumberOfBytesRead
+    );
 
     [DllImport("kernel32.dll", SetLastError = true)]
     internal static extern bool WriteProcessMemory(
@@ -93,7 +98,8 @@ internal static class Win32Api
         IntPtr lpBaseAddress,
         byte[] lpBuffer,
         int nSize,
-        out int lpNumberOfBytesWritten);
+        out int lpNumberOfBytesWritten
+    );
 
     [DllImport("kernel32.dll", SetLastError = true)]
     internal static extern bool VirtualProtectEx(
@@ -101,7 +107,8 @@ internal static class Win32Api
         IntPtr lpAddress,
         int dwSize,
         MemoryProtection flNewProtect,
-        out MemoryProtection lpflOldProtect);
+        out MemoryProtection lpflOldProtect
+    );
 
     [DllImport("kernel32.dll", SetLastError = true)]
     internal static extern IntPtr VirtualAllocEx(
@@ -109,14 +116,16 @@ internal static class Win32Api
         IntPtr lpAddress,
         uint dwSize,
         AllocationType flAllocationType,
-        MemoryProtection flProtect);
+        MemoryProtection flProtect
+    );
 
     [DllImport("kernel32.dll", SetLastError = true)]
     internal static extern bool VirtualFreeEx(
         IntPtr hProcess,
         IntPtr lpAddress,
         uint dwSize,
-        FreeType dwFreeType);
+        FreeType dwFreeType
+    );
 
     [DllImport("kernel32.dll", SetLastError = true)]
     internal static extern IntPtr CreateRemoteThread(
@@ -126,7 +135,8 @@ internal static class Win32Api
         IntPtr lpStartAddress,
         IntPtr lpParameter,
         uint dwCreationFlags,
-        out uint lpThreadId);
+        out uint lpThreadId
+    );
 
     [DllImport("kernel32.dll", SetLastError = true)]
     internal static extern WaitResult WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
@@ -139,7 +149,8 @@ internal static class Win32Api
         IntPtr hProcess,
         IntPtr lpAddress,
         out MEMORY_BASIC_INFORMATION lpBuffer,
-        uint dwLength);
+        uint dwLength
+    );
 
     [StructLayout(LayoutKind.Sequential)]
     internal struct MEMORY_BASIC_INFORMATION

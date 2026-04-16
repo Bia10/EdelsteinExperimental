@@ -12,13 +12,12 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 public class AdminHandler : AbstractFieldHandler
 {
     private ILogger _logger;
-    
+
     public AdminHandler(ILogger<AdminHandler> logger) => _logger = logger;
-    
+
     public override short Operation => (short)PacketRecvOperations.Admin;
 
-    public override bool Check(IGameStageUser user)
-        => user.Account?.GradeCode > 0;
+    public override bool Check(IGameStageUser user) => user.Account?.GradeCode > 0;
 
     protected override async Task Handle(IFieldUser user, IPacketReader reader)
     {
@@ -26,10 +25,10 @@ public class AdminHandler : AbstractFieldHandler
         var gradeCode = user.Account?.GradeCode ?? 0;
         var subGradeCode = user.Account?.SubGradeCode ?? 0;
         var canUseCommonCommand =
-            subGradeCode.HasFlag(AccountSubGradeCode.TesterAccount) ||
-            subGradeCode.HasFlag(AccountSubGradeCode.ManagerAccount) ||
-            gradeCode.HasFlag(AccountGradeCode.AdminLevel1);
-        
+            subGradeCode.HasFlag(AccountSubGradeCode.TesterAccount)
+            || subGradeCode.HasFlag(AccountSubGradeCode.ManagerAccount)
+            || gradeCode.HasFlag(AccountGradeCode.AdminLevel1);
+
         switch (type)
         {
             case 0x0: // /create <arg1>
@@ -38,7 +37,9 @@ public class AdminHandler : AbstractFieldHandler
                 break;
             case 0x1: // /d <arg1>
                 if (canUseCommonCommand)
-                    await user.ModifyInventory(i => i[(ItemInventoryType)reader.ReadByte()]?.Clear());
+                    await user.ModifyInventory(i =>
+                        i[(ItemInventoryType)reader.ReadByte()]?.Clear()
+                    );
                 break;
             case 0x2: // /exp <arg1>
                 if (canUseCommonCommand)
@@ -48,10 +49,10 @@ public class AdminHandler : AbstractFieldHandler
                 if (canUseCommonCommand)
                 {
                     var hidden = reader.ReadBool();
-                    using var packet =  new PacketWriter(PacketSendOperations.AdminResult)
+                    using var packet = new PacketWriter(PacketSendOperations.AdminResult)
                         .WriteByte(0x12)
                         .WriteBool(hidden);
-                    
+
                     await user.Hide(hidden);
                     await user.Dispatch(packet.Build());
                 }

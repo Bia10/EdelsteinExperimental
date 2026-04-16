@@ -24,13 +24,16 @@ public class MigrationService : IMigrationService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
             var now = DateTime.UtcNow;
-            var existing = await db.Migrations
-                .FirstOrDefaultAsync(m => m.AccountID == request.Migration.AccountID);
+            var existing = await db.Migrations.FirstOrDefaultAsync(m =>
+                m.AccountID == request.Migration.AccountID
+            );
 
             if (existing != null)
             {
-                if (existing.DateExpire < now) db.Migrations.Remove(existing);
-                else return new MigrationResponse(MigrationResult.FailedAlreadyStarted);
+                if (existing.DateExpire < now)
+                    db.Migrations.Remove(existing);
+                else
+                    return new MigrationResponse(MigrationResult.FailedAlreadyStarted);
             }
 
             var entity = _mapper.Map<MigrationEntity>(request.Migration);
@@ -54,8 +57,9 @@ public class MigrationService : IMigrationService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
             var now = DateTime.UtcNow;
-            var existing = await db.Migrations
-                .FirstOrDefaultAsync(m => m.CharacterID == request.CharacterID);
+            var existing = await db.Migrations.FirstOrDefaultAsync(m =>
+                m.CharacterID == request.CharacterID
+            );
 
             if (existing == null || existing.DateExpire < now)
                 return new MigrationClaimResponse(MigrationResult.FailedNotStarted);

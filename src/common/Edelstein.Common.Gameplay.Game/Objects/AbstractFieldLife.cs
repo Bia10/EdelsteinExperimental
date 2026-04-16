@@ -6,18 +6,23 @@ using Edelstein.Protocol.Utilities.Spatial;
 
 namespace Edelstein.Common.Gameplay.Game.Objects;
 
-public abstract class AbstractFieldLife<TMovePath, TMoveAction> :
-    AbstractFieldObject, IFieldLife<TMovePath, TMoveAction>
+public abstract class AbstractFieldLife<TMovePath, TMoveAction>
+    : AbstractFieldObject,
+        IFieldLife<TMovePath, TMoveAction>
     where TMovePath : IMovePath<TMoveAction>
     where TMoveAction : IMoveAction
 {
-
-    protected AbstractFieldLife(TMoveAction action, IPoint2D position, IFieldFoothold? foothold = null) : base(position)
+    protected AbstractFieldLife(
+        TMoveAction action,
+        IPoint2D position,
+        IFieldFoothold? foothold = null
+    )
+        : base(position)
     {
         Action = action;
         Foothold = foothold;
     }
-    
+
     public TMoveAction Action { get; protected set; }
     public IFieldFoothold? Foothold { get; private set; }
 
@@ -31,14 +36,15 @@ public abstract class AbstractFieldLife<TMovePath, TMoveAction> :
 
     public async Task Move(TMovePath ctx, IFieldObject? controller = null)
     {
-        if (Field == null) return;
+        if (Field == null)
+            return;
 
-        if (ctx.Action != null) Action = ctx.Action;
-        if (ctx.Position != null) Position = ctx.Position;
+        if (ctx.Action != null)
+            Action = ctx.Action;
+        if (ctx.Position != null)
+            Position = ctx.Position;
 
-        Foothold = Field.Template.Footholds
-            .Find(Position)
-            .FirstOrDefault();
+        Foothold = Field.Template.Footholds.Find(Position).FirstOrDefault();
 
         await UpdateFieldSplit();
 
@@ -52,11 +58,13 @@ public abstract class AbstractFieldLife<TMovePath, TMoveAction> :
 
         if (split == null)
         {
-            if (Field != null) await Field.Enter(this);
+            if (Field != null)
+                await Field.Enter(this);
             return;
         }
 
-        if (FieldSplit != split) await split.Enter(this);
+        if (FieldSplit != split)
+            await split.Enter(this);
     }
 
     protected abstract IPacket GetMovePacket(TMovePath ctx);

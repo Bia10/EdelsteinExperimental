@@ -14,7 +14,8 @@ public class ItemCommand : AbstractTemplateCommand<IItemTemplate>
     public ItemCommand(
         ITemplateManager<IItemTemplate> templates,
         ITemplateManager<IItemStringTemplate> strings
-    ) : base(templates)
+    )
+        : base(templates)
     {
         _strings = strings;
 
@@ -36,7 +37,11 @@ public class ItemCommand : AbstractTemplateCommand<IItemTemplate>
         return result;
     }
 
-    protected override async Task Execute(IFieldUser user, IItemTemplate template, TemplateCommandArgs args)
+    protected override async Task Execute(
+        IFieldUser user,
+        IItemTemplate template,
+        TemplateCommandArgs args
+    )
     {
         var quantity = 1;
 

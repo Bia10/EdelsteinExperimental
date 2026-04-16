@@ -9,8 +9,11 @@ public class SkillStringTemplateLoader : ITemplateLoader
 {
     private readonly IDataNamespace _data;
     private readonly ITemplateManager<ISkillStringTemplate> _manager;
-    
-    public SkillStringTemplateLoader(IDataNamespace data, ITemplateManager<ISkillStringTemplate> manager)
+
+    public SkillStringTemplateLoader(
+        IDataNamespace data,
+        ITemplateManager<ISkillStringTemplate> manager
+    )
     {
         _data = data;
         _manager = manager;
@@ -18,20 +21,23 @@ public class SkillStringTemplateLoader : ITemplateLoader
 
     public async Task<int> Load()
     {
-        await Task.WhenAll(_data.ResolvePath("String/Skill.img")?.Children
-            .Where(c => c.Name.Length > 3)
-            .Where(c => c.Name.All(char.IsDigit))
-            .Select(async n =>
-            {
-                var id = Convert.ToInt32(n.Name);
-                await _manager.Insert(new TemplateProviderEager<ISkillStringTemplate>(
-                    id,
-                    new SkillStringTemplate(
-                        id,
-                        n.Cache()
-                    )
-                ));
-            }) ?? Array.Empty<Task>());
+        await Task.WhenAll(
+            _data
+                .ResolvePath("String/Skill.img")
+                ?.Children.Where(c => c.Name.Length > 3)
+                .Where(c => c.Name.All(char.IsDigit))
+                .Select(async n =>
+                {
+                    var id = Convert.ToInt32(n.Name);
+                    await _manager.Insert(
+                        new TemplateProviderEager<ISkillStringTemplate>(
+                            id,
+                            new SkillStringTemplate(id, n.Cache())
+                        )
+                    );
+                })
+                ?? Array.Empty<Task>()
+        );
 
         _manager.Freeze();
         return _manager.Count;

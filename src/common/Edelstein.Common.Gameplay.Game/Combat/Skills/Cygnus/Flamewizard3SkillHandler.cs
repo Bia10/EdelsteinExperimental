@@ -21,7 +21,7 @@ public class Flamewizard3SkillHandler : Flamewizard2SkillHandler
                 context.AddAffectedAreaBurnedInfo();
                 break;
         }
-        
+
         return base.HandleAttack(context, user);
     }
 

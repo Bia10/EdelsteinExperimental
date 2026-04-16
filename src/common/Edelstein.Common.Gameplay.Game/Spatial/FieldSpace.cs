@@ -7,7 +7,8 @@ using Edelstein.Protocol.Utilities.Spatial.Collections;
 
 namespace Edelstein.Common.Gameplay.Game.Spatial;
 
-public class FieldSpace<TObject> : IFieldSpace<TObject> where TObject : IFieldSpaceObject
+public class FieldSpace<TObject> : IFieldSpace<TObject>
+    where TObject : IFieldSpaceObject
 {
     private readonly IDictionary<int, TObject> _objects;
     private readonly ISpace2D<TObject> _space;
@@ -22,7 +23,6 @@ public class FieldSpace<TObject> : IFieldSpace<TObject> where TObject : IFieldSp
     public IReadOnlyCollection<TObject> Objects => _objects.Values.ToImmutableArray();
     public IRectangle2D Bounds { get; }
 
-
     public void Insert(IEnumerable<TObject> obj)
     {
         var objects = obj.ToImmutableArray();
@@ -31,18 +31,13 @@ public class FieldSpace<TObject> : IFieldSpace<TObject> where TObject : IFieldSp
         _space.Insert(objects);
     }
 
-    public TObject? FindByID(int id) => _objects.TryGetValue(id, out var obj)
-        ? obj
-        : default;
+    public TObject? FindByID(int id) => _objects.TryGetValue(id, out var obj) ? obj : default;
 
     public IEnumerable<TObject> Find(IObject2D obj) => _space.Find(obj);
 
-    public IEnumerable<TObject> FindClosest(IPoint2D point, int n = 1) 
-        => _space
-            .FindClosest(point, n);
+    public IEnumerable<TObject> FindClosest(IPoint2D point, int n = 1) =>
+        _space.FindClosest(point, n);
 
-    public IEnumerable<TObject> FindBelow(IPoint2D point) 
-        => _space
-            .Find(new Segment2D(point, new Point2D(point.X, Bounds.Bottom)))
-            .OrderBy(o => o.MinY);
+    public IEnumerable<TObject> FindBelow(IPoint2D point) =>
+        _space.Find(new Segment2D(point, new Point2D(point.X, Bounds.Bottom))).OrderBy(o => o.MinY);
 }

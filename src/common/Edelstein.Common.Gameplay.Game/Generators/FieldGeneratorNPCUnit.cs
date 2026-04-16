@@ -27,11 +27,13 @@ public class FieldGeneratorNPCUnit : IFieldGeneratorUnit
 
     public IFieldObject? Generate()
     {
-        if (NPC != null) return null;
+        if (NPC != null)
+            return null;
 
         NPC = new FieldNPC(
             _template,
-            _field.Template.Footholds.FindByID(_life.FootholdID)?.Line.AtX(_life.Position.X) ?? _life.Position,
+            _field.Template.Footholds.FindByID(_life.FootholdID)?.Line.AtX(_life.Position.X)
+                ?? _life.Position,
             _field.Template.Footholds.FindByID(_life.FootholdID),
             _life.Bounds,
             _life.IsFacingLeft

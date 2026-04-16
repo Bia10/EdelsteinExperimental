@@ -22,9 +22,7 @@ public class NotifyGuildDisbandedPlug : IPipelinePlug<NotifyGuildDisbanded>
     public async Task Handle(IPipelineContext ctx, NotifyGuildDisbanded message)
     {
         var users = await _stage.Users.RetrieveAll();
-        var guildMembers = users
-            .Where(u => u.Guild?.ID == message.GuildID)
-            .ToImmutableArray();
+        var guildMembers = users.Where(u => u.Guild?.ID == message.GuildID).ToImmutableArray();
 
         foreach (var user in guildMembers)
         {

@@ -11,22 +11,21 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 public class NotifyPartyMemberWithdrawnPlug : IPipelinePlug<NotifyPartyMemberWithdrawn>
 {
     private readonly IGameStage _stage;
-    
+
     public NotifyPartyMemberWithdrawnPlug(IGameStage stage) => _stage = stage;
-    
+
     public async Task Handle(IPipelineContext ctx, NotifyPartyMemberWithdrawn message)
     {
         var users = await _stage.Users.RetrieveAll();
-        var partied = users
-            .Where(u => u.Party?.PartyID == message.PartyID)
-            .ToImmutableArray();
-        
+        var partied = users.Where(u => u.Party?.PartyID == message.PartyID).ToImmutableArray();
+
         foreach (var user in partied)
         {
-            if (user.Party == null) continue;
-            
+            if (user.Party == null)
+                continue;
+
             user.Party.Members.Remove(message.CharacterID);
-            
+
             using var packet = new PacketWriter(PacketSendOperations.PartyResult);
             packet.WriteByte((byte)PartyResultOperations.WithdrawPartyDone);
             packet.WriteInt(message.PartyID);
@@ -38,7 +37,7 @@ public class NotifyPartyMemberWithdrawnPlug : IPipelinePlug<NotifyPartyMemberWit
 
             if (user.Party.CharacterID == message.CharacterID)
                 user.Party = null;
-            
+
             _ = user.Dispatch(packet.Build());
         }
     }

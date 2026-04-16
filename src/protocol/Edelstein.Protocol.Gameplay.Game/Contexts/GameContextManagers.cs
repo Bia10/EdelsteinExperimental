@@ -1,4 +1,4 @@
-using Duey.Abstractions;
+﻿using Duey.Abstractions;
 using Edelstein.Protocol.Gameplay.Game.Combat;
 using Edelstein.Protocol.Gameplay.Game.Continents;
 using Edelstein.Protocol.Gameplay.Game.Conversations;
@@ -14,7 +14,6 @@ namespace Edelstein.Protocol.Gameplay.Game.Contexts;
 public record GameContextManagers(
     IDataNamespace Data,
     ITickerManager Ticker,
-    
     IInventoryManager Inventory,
     IFieldManager Field,
     IContiMoveManager ContiMove,

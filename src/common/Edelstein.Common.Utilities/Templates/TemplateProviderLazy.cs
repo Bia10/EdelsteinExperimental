@@ -2,7 +2,8 @@
 
 namespace Edelstein.Common.Utilities.Templates;
 
-public class TemplateProviderLazy<TTemplate> : ITemplateProvider<TTemplate> where TTemplate : ITemplate
+public class TemplateProviderLazy<TTemplate> : ITemplateProvider<TTemplate>
+    where TTemplate : ITemplate
 {
     private readonly Func<TTemplate> _func;
     private TTemplate? _template;
@@ -16,6 +17,5 @@ public class TemplateProviderLazy<TTemplate> : ITemplateProvider<TTemplate> wher
 
     public int ID { get; }
 
-    public Task<TTemplate> Provide() 
-        => Task.FromResult(_template ??= _func.Invoke());
+    public Task<TTemplate> Provide() => Task.FromResult(_template ??= _func.Invoke());
 }

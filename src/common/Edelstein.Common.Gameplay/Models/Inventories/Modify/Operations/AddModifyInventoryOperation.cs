@@ -9,13 +9,8 @@ public class AddModifyInventoryOperation : AbstractModifyInventoryOperation
 {
     private readonly IItemSlot _item;
 
-    public AddModifyInventoryOperation(
-        ItemInventoryType inventory,
-        short slot,
-        IItemSlot item
-    ) : base(ModifyInventoryOperationType.Add, inventory, slot) =>
-        _item = item;
+    public AddModifyInventoryOperation(ItemInventoryType inventory, short slot, IItemSlot item)
+        : base(ModifyInventoryOperationType.Add, inventory, slot) => _item = item;
 
-    protected override void WriteData(IPacketWriter writer) =>
-        writer.WriteItemData(_item);
+    protected override void WriteData(IPacketWriter writer) => writer.WriteItemData(_item);
 }

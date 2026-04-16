@@ -8,7 +8,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class PirateViper4SkillHandler : PirateViper3SkillHandler
 {
     public override int ID => Job.Viper;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

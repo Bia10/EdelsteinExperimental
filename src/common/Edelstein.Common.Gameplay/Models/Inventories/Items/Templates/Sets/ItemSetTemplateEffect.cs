@@ -23,7 +23,7 @@ public record ItemSetTemplateEffect : IItemSetTemplateEffect
         IncSpeed = node.ResolveShort("incSpeed") ?? 0;
         IncJump = node.ResolveShort("incJump") ?? 0;
     }
-    
+
     public short IncSTR { get; }
     public short IncDEX { get; }
     public short IncINT { get; }

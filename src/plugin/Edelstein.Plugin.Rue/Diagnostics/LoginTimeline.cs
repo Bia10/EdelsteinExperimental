@@ -9,7 +9,8 @@ public record LoginTimeline(
     TimeSpan TotalDuration,
     DiagnosticEvent[] Events,
     MemorySnapshot? FinalState,
-    Dictionary<string, DateTime> Milestones)
+    Dictionary<string, DateTime> Milestones
+)
 {
     public static LoginTimeline Capture(LoginDiagnostics diagnostics, string mode)
     {
@@ -19,6 +20,7 @@ public record LoginTimeline(
             DateTime.UtcNow - diagnostics.StartTime,
             [.. diagnostics.GetEvents()],
             diagnostics.GetLastSnapshot(),
-            new Dictionary<string, DateTime>(diagnostics.FlowMilestones));
+            new Dictionary<string, DateTime>(diagnostics.FlowMilestones)
+        );
     }
 }

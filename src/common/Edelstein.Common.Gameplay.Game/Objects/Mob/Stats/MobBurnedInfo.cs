@@ -2,10 +2,10 @@
 
 namespace Edelstein.Common.Gameplay.Game.Objects.Mob.Stats;
 
-public record  MobBurnedInfo(
-    int CharacterID, 
+public record MobBurnedInfo(
+    int CharacterID,
     int SkillID,
-    int Damage, 
+    int Damage,
     TimeSpan Interval,
     DateTime DateStart,
     DateTime DateExpire

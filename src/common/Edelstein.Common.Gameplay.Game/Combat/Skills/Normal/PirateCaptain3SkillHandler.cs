@@ -12,7 +12,11 @@ public class PirateCaptain3SkillHandler : PirateCaptain2SkillHandler
 {
     public override int ID => Job.Valkyrie;
 
-    public override async Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
+    public override async Task HandleAttackMob(
+        ISkillContext context,
+        IFieldUser user,
+        IFieldMob mob
+    )
     {
         switch (context.Skill?.ID)
         {
@@ -20,14 +24,16 @@ public class PirateCaptain3SkillHandler : PirateCaptain2SkillHandler
                 context.ResetSummoned();
                 break;
             case Skill.ValkyrieFireBurner:
-                context.AddMobBurnedInfo(await user.Damage.CalculateBurnedDamage(
-                    user.Character,
-                    user.Stats,
-                    mob,
-                    mob.Stats,
-                    context.Skill!.ID,
-                    context.SkillLevel!.Level
-                ));
+                context.AddMobBurnedInfo(
+                    await user.Damage.CalculateBurnedDamage(
+                        user.Character,
+                        user.Stats,
+                        mob,
+                        mob.Stats,
+                        context.Skill!.ID,
+                        context.SkillLevel!.Level
+                    )
+                );
                 break;
             case Skill.ValkyrieCoolingEffect:
                 context.AddMobTemporaryStat(MobTemporaryStatType.Freeze, 1);
@@ -36,10 +42,10 @@ public class PirateCaptain3SkillHandler : PirateCaptain2SkillHandler
                 context.SetTwoStateGuidedBullet(context.SkillLevel!.X, mob.ObjectID ?? 0);
                 break;
         }
-        
+
         await base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -53,7 +59,7 @@ public class PirateCaptain3SkillHandler : PirateCaptain2SkillHandler
             case Skill.ValkyrieDice:
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

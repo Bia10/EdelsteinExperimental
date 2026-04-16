@@ -12,7 +12,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Cygnus;
 public class Nightwalker1SkillHandler : NoblesseSkillHandler
 {
     public override int ID => Job.Nightwalker;
-    
+
     public override Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
     {
         switch (context.Skill?.ID)
@@ -22,10 +22,10 @@ public class Nightwalker1SkillHandler : NoblesseSkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.PDR, context.SkillLevel!.Y);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

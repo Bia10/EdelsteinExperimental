@@ -30,5 +30,4 @@ public static partial class V95ClientStructs
                 target[kv.Key] = kv.Value;
         }
     }
-
 }

@@ -13,7 +13,11 @@ public class NettyTransportConnectorHandler : ChannelHandlerAdapter
     private readonly IRepository<string, ISocket> _sockets;
     private readonly TransportVersion _version;
 
-    public NettyTransportConnectorHandler(TransportVersion version, IAdapterInitializer initializer, IRepository<string, ISocket> sockets)
+    public NettyTransportConnectorHandler(
+        TransportVersion version,
+        IAdapterInitializer initializer,
+        IRepository<string, ISocket> sockets
+    )
     {
         _version = version;
         _initializer = initializer;
@@ -38,15 +42,14 @@ public class NettyTransportConnectorHandler : ChannelHandlerAdapter
             var seqRecv = reader.ReadUInt();
             var locale = reader.ReadByte();
 
-            if (version != _version.Major) return;
-            if (patch != _version.Patch) return;
-            if (locale != _version.Locale) return;
+            if (version != _version.Major)
+                return;
+            if (patch != _version.Patch)
+                return;
+            if (locale != _version.Locale)
+                return;
 
-            var newSocket = new NettySocket(
-                context.Channel,
-                seqSend,
-                seqRecv
-            );
+            var newSocket = new NettySocket(context.Channel, seqSend, seqRecv);
             var newAdapter = _initializer.Initialize(newSocket);
 
             context.Channel.GetAttribute(NettyAttributes.SocketKey).Set(newSocket);
@@ -63,11 +66,11 @@ public class NettyTransportConnectorHandler : ChannelHandlerAdapter
         adapter?.OnDisconnect();
         base.ChannelInactive(context);
 
-        if (adapter == null) return;
+        if (adapter == null)
+            return;
 
         _ = _sockets.Delete(adapter.Socket);
     }
-
 
     public override void ExceptionCaught(IChannelHandlerContext context, Exception exception)
     {

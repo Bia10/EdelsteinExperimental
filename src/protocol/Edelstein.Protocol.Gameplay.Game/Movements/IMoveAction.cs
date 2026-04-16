@@ -1,4 +1,4 @@
-namespace Edelstein.Protocol.Gameplay.Game.Movements;
+﻿namespace Edelstein.Protocol.Gameplay.Game.Movements;
 
 public interface IMoveAction
 {

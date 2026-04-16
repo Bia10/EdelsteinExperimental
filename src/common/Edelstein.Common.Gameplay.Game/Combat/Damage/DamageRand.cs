@@ -21,7 +21,7 @@ public class DamageRand
 
         return S1 ^ S2 ^ S3;
     }
-    
+
     public void Next(uint[] arr)
     {
         for (var i = 0; i < arr.Length; i++)

@@ -6,7 +6,6 @@ namespace Edelstein.Common.Gameplay.Login.Handling.Plugs;
 
 public class UserOnPacketPlug : AbstractUserOnPacketPlug<ILoginStageUser>
 {
-    public UserOnPacketPlug(IPacketHandlerManager<ILoginStageUser> handler) : base(handler)
-    {
-    }
+    public UserOnPacketPlug(IPacketHandlerManager<ILoginStageUser> handler)
+        : base(handler) { }
 }

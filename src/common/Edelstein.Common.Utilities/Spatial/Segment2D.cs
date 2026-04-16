@@ -47,5 +47,6 @@ public readonly record struct Segment2D : ISegment2D
     public bool Intersects(IPoint2D point) =>
         Math.Abs(point.Distance(P1) + point.Distance(P2) - P1.Distance(P2)) < 0.01;
 
-    private float Cross(IPoint2D point) => (point.X - P1.X) * (P2.Y - P1.Y) - (point.Y - P1.Y) * (P2.X - P1.X);
+    private float Cross(IPoint2D point) =>
+        (point.X - P1.X) * (P2.Y - P1.Y) - (point.Y - P1.Y) * (P2.X - P1.X);
 }

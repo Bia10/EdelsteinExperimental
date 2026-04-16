@@ -27,8 +27,9 @@ public class SessionService : ISessionService
 
             if (existing != null)
             {
-                var migration = await db.Migrations
-                    .FirstOrDefaultAsync(m => m.AccountID == request.Session.ActiveAccount);
+                var migration = await db.Migrations.FirstOrDefaultAsync(m =>
+                    m.AccountID == request.Session.ActiveAccount
+                );
 
                 if (migration == null || migration.DateExpire > now)
                     return new SessionResponse(SessionResult.FailedAlreadyStarted);
@@ -109,12 +110,16 @@ public class SessionService : ISessionService
         }
     }
 
-    public async Task<SessionGetOneResponse> GetByActiveAccount(SessionGetByActiveAccountRequest request)
+    public async Task<SessionGetOneResponse> GetByActiveAccount(
+        SessionGetByActiveAccountRequest request
+    )
     {
         try
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
-            var session = await db.Sessions.FirstOrDefaultAsync(s => s.ActiveAccount == request.AccountID);
+            var session = await db.Sessions.FirstOrDefaultAsync(s =>
+                s.ActiveAccount == request.AccountID
+            );
 
             return session == null
                 ? new SessionGetOneResponse(SessionResult.FailedNotFound)
@@ -126,12 +131,16 @@ public class SessionService : ISessionService
         }
     }
 
-    public async Task<SessionGetOneResponse> GetByActiveCharacter(SessionGetByActiveCharacterRequest request)
+    public async Task<SessionGetOneResponse> GetByActiveCharacter(
+        SessionGetByActiveCharacterRequest request
+    )
     {
         try
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
-            var session = await db.Sessions.FirstOrDefaultAsync(s => s.ActiveCharacter == request.CharacterID);
+            var session = await db.Sessions.FirstOrDefaultAsync(s =>
+                s.ActiveCharacter == request.CharacterID
+            );
 
             return session == null
                 ? new SessionGetOneResponse(SessionResult.FailedNotFound)

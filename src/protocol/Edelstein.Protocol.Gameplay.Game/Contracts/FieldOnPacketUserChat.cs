@@ -2,8 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketUserChat(
-    IFieldUser User,
-    string Message,
-    bool IsOnlyBalloon
-);
+public record FieldOnPacketUserChat(IFieldUser User, string Message, bool IsOnlyBalloon);

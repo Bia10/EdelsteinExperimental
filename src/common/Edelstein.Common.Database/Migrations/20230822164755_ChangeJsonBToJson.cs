@@ -16,7 +16,8 @@ namespace Edelstein.Common.Database.Migrations
                 type: "json",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "jsonb");
+                oldType: "jsonb"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Trunk",
@@ -24,7 +25,8 @@ namespace Edelstein.Common.Database.Migrations
                 type: "json",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "jsonb");
+                oldType: "jsonb"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Locker",
@@ -32,7 +34,8 @@ namespace Edelstein.Common.Database.Migrations
                 type: "json",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "jsonb");
+                oldType: "jsonb"
+            );
         }
 
         /// <inheritdoc />
@@ -44,7 +47,8 @@ namespace Edelstein.Common.Database.Migrations
                 type: "jsonb",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "json");
+                oldType: "json"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Trunk",
@@ -52,7 +56,8 @@ namespace Edelstein.Common.Database.Migrations
                 type: "jsonb",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "json");
+                oldType: "json"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Locker",
@@ -60,7 +65,8 @@ namespace Edelstein.Common.Database.Migrations
                 type: "jsonb",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "json");
+                oldType: "json"
+            );
         }
     }
 }

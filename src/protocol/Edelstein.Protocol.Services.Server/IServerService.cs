@@ -15,11 +15,13 @@ public interface IServerService
 
     Task<ServerGetOneResponse<IServer>> GetByID(ServerGetByIDRequest request);
 
-    Task<ServerGetOneResponse<IServerGame>> GetGameByWorldAndChannel(ServerGetGameByWorldAndChannelRequest request);
+    Task<ServerGetOneResponse<IServerGame>> GetGameByWorldAndChannel(
+        ServerGetGameByWorldAndChannelRequest request
+    );
     Task<ServerGetAllResponse<IServerGame>> GetGameByWorld(ServerGetGameByWorldRequest request);
 
     Task<ServerGetOneResponse<IServerShop>> GetShopByWorld(ServerGetShopByWorldRequest request);
-    
+
     Task<ServerGetOneResponse<IServerTrade>> GetTradeByWorld(ServerGetTradeByWorldRequest request);
 
     Task<ServerGetAllResponse<IServer>> GetAll();

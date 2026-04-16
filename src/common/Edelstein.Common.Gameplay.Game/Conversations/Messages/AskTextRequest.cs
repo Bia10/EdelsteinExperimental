@@ -13,8 +13,12 @@ public class AskTextRequest : AbstractConversationMessageRequest<string>
 
     public AskTextRequest(
         IConversationSpeaker speaker,
-        string text, string @default, short minLength, short maxLength
-    ) : base(speaker)
+        string text,
+        string @default,
+        short minLength,
+        short maxLength
+    )
+        : base(speaker)
     {
         _text = text;
         _default = @default;

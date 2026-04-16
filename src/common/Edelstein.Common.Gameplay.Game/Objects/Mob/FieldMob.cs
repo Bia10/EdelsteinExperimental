@@ -25,11 +25,11 @@ using Edelstein.Protocol.Utilities.Tickers;
 
 namespace Edelstein.Common.Gameplay.Game.Objects.Mob;
 
-public class FieldMob : 
-    AbstractFieldControllable<IFieldMobMovePath, IFieldMobMoveAction>, 
-    IFieldMob, 
-    IPacketWritable, 
-    ITickable
+public class FieldMob
+    : AbstractFieldControllable<IFieldMobMovePath, IFieldMobMoveAction>,
+        IFieldMob,
+        IPacketWritable,
+        ITickable
 {
     private readonly SemaphoreSlim _lock;
 
@@ -39,44 +39,47 @@ public class FieldMob :
         IFieldFoothold? foothold = null,
         IFieldFoothold? footholdHome = null,
         bool isFacingLeft = true
-    ) : base(new FieldMobMoveAction(template.MoveAbility, isFacingLeft), position, foothold)
+    )
+        : base(new FieldMobMoveAction(template.MoveAbility, isFacingLeft), position, foothold)
     {
         _lock = new SemaphoreSlim(1, 1);
         LastUpdateBurned = DateTime.UtcNow;
-        
+
         Template = template;
-        
+
         FootholdHome = footholdHome;
 
         Stats = new FieldMobStats();
         TemporaryStats = new MobTemporaryStats();
         HP = template.MaxHP;
         MP = template.MaxMP;
-        
+
         UpdateStats().Wait();
     }
 
     public override FieldObjectType Type => FieldObjectType.Mob;
 
     public IMobTemplate Template { get; }
-    
+
     public IFieldFoothold? FootholdHome { get; }
 
     public IFieldMobStats Stats { get; }
     public IMobTemporaryStats TemporaryStats { get; }
     public int HP { get; private set; }
     public int MP { get; private set; }
-    
+
     private DateTime LastUpdateBurned { get; set; }
-    
+
     public async Task Damage(int damage, IFieldUser? attacker = null, IPoint2D? positionHit = null)
     {
         await _lock.WaitAsync();
-        
+
         try
         {
-            if (Field == null) return;
-            if (attacker != null) await Control(attacker);
+            if (Field == null)
+                return;
+            if (attacker != null)
+                await Control(attacker);
 
             HP -= damage;
 
@@ -103,7 +106,7 @@ public class FieldMob :
                     var rewards = await rewardPool.CalculateRewards(attacker, this);
                     var offset = 0;
                     var index = 0;
-                    
+
                     foreach (var reward in rewards)
                     {
                         var position = positionHit ?? Position;
@@ -111,31 +114,35 @@ public class FieldMob :
 
                         positionOffset = Math.Min(Field.Template.Bounds.MaxX - 25, positionOffset);
                         positionOffset = Math.Max(Field.Template.Bounds.MinX + 25, positionOffset);
-                        
-                        var foothold = Field.Template.Footholds
-                            .FindBelow(new Point2D(
-                                positionOffset,
-                                position.Y - 100
-                            ))
+
+                        var foothold = Field
+                            .Template.Footholds.FindBelow(
+                                new Point2D(positionOffset, position.Y - 100)
+                            )
                             .FirstOrDefault();
                         AbstractFieldDrop? drop = null;
 
                         if (reward.ItemID > 0)
                         {
-                            if (reward.ItemID == null) continue;
-                            var template = await attacker.StageUser.Context.Templates.Item.Retrieve(reward.ItemID.Value);
-                            if (template == null) continue;
+                            if (reward.ItemID == null)
+                                continue;
+                            var template = await attacker.StageUser.Context.Templates.Item.Retrieve(
+                                reward.ItemID.Value
+                            );
+                            if (template == null)
+                                continue;
                             var item = template.ToItemSlot(ItemVariationOption.Normal);
 
                             if (item is ItemSlotBundle bundle)
-                                bundle.Number = (short)random.Next(reward.NumberMin ?? 1, reward.NumberMax ?? 1);
-                            
+                                bundle.Number = (short)
+                                    random.Next(reward.NumberMin ?? 1, reward.NumberMax ?? 1);
+
                             drop = new FieldDropItem(
                                 foothold?.Line.AtX(positionOffset) ?? position,
                                 item,
                                 sourceID: ObjectID ?? 0
                             );
-                        } 
+                        }
                         else if (reward.Money > 0)
                         {
                             drop = new FieldDropMoney(
@@ -145,9 +152,13 @@ public class FieldMob :
                             );
                         }
 
-                        if (drop == null) continue;
-                        
-                        await Field.Enter(drop, () => drop.GetEnterFieldPacket(1, position, (short)(0 * index)));
+                        if (drop == null)
+                            continue;
+
+                        await Field.Enter(
+                            drop,
+                            () => drop.GetEnterFieldPacket(1, position, (short)(0 * index))
+                        );
 
                         offset = offset < 0 ? Math.Abs(offset) : -(offset + 25);
                         index++;
@@ -156,7 +167,10 @@ public class FieldMob :
                     if (Template.EXP > 0)
                     {
                         var rates = attacker.StageUser.Context.Managers.Rates;
-                        var rateContext = new RateContext(attacker, attacker.StageUser.Context.Options);
+                        var rateContext = new RateContext(
+                            attacker,
+                            attacker.StageUser.Context.Options
+                        );
                         var expRate = await rates.GetFinalRateAsync(RateType.Exp, rateContext);
                         var expAmount = RateModifier.Apply(Template.EXP, expRate);
 
@@ -167,9 +181,12 @@ public class FieldMob :
                         }
                     }
 
-                    _ = attacker.StageUser.Context.Managers.Quest.UpdateMobKill(attacker, Template.ID);
+                    _ = attacker.StageUser.Context.Managers.Quest.UpdateMobKill(
+                        attacker,
+                        Template.ID
+                    );
                 }
-                
+
                 await Field.Leave(this, () => GetLeaveFieldPacket(FieldMobLeaveType.Etc));
             }
         }
@@ -178,6 +195,7 @@ public class FieldMob :
             _lock.Release();
         }
     }
+
     public async Task ModifyTemporaryStats(Action<IModifyMobTemporaryStatContext> action)
     {
         var context = new ModifyMobTemporaryStatsContext(TemporaryStats);
@@ -201,11 +219,11 @@ public class FieldMob :
                     resetPacket.WriteInt(burned.SkillID);
                 }
             }
-            
+
             resetPacket.WriteByte(0); // CalcDamageStatIndex
             resetPacket.WriteBool(false); // Movement stuff
 
-            if (FieldSplit != null) 
+            if (FieldSplit != null)
                 await FieldSplit.Dispatch(resetPacket.Build());
         }
 
@@ -219,7 +237,7 @@ public class FieldMob :
             setPacket.WriteByte(0); // CalcDamageStatIndex
             setPacket.WriteBool(false); // Movement stuff
 
-            if (FieldSplit != null) 
+            if (FieldSplit != null)
                 await FieldSplit.Dispatch(setPacket.Build());
         }
     }
@@ -227,7 +245,7 @@ public class FieldMob :
     public override IPacket GetEnterFieldPacket() => GetEnterFieldPacket(FieldMobAppearType.Normal);
 
     public override IPacket GetLeaveFieldPacket() => GetLeaveFieldPacket(FieldMobLeaveType.None);
-    
+
     public void WriteTo(IPacketWriter writer) => WriteTo(writer, FieldMobAppearType.Normal);
 
     public IPacket GetEnterFieldPacket(FieldMobAppearType appear, int? appearOption = null)
@@ -238,7 +256,7 @@ public class FieldMob :
         WriteTo(packet, appear, appearOption);
         return packet.Build();
     }
-    
+
     public IPacket GetLeaveFieldPacket(FieldMobLeaveType leaveType)
     {
         using var packet = new PacketWriter(PacketSendOperations.MobLeaveField);
@@ -247,7 +265,7 @@ public class FieldMob :
         packet.WriteByte((byte)leaveType);
         return packet.Build();
     }
-    
+
     private void WriteTo(IPacketWriter writer, FieldMobAppearType appear, int? appearOption = null)
     {
         writer.WriteByte(1); // CalcDamageStatIndex
@@ -290,9 +308,8 @@ public class FieldMob :
             WriteTo(packet, FieldMobAppearType.Regen);
         return packet.Build();
     }
-    
-    private Task UpdateStats() 
-        => Stats.Apply(this);
+
+    private Task UpdateStats() => Stats.Apply(this);
 
     public async Task OnTick(DateTime now)
     {
@@ -300,11 +317,12 @@ public class FieldMob :
         {
             foreach (var burned in TemporaryStats.BurnedInfo)
             {
-                var attacker = Field?
-                    .GetPool(FieldObjectType.User)?
-                    .GetObject(burned.CharacterID) 
+                var attacker =
+                    Field?.GetPool(FieldObjectType.User)?.GetObject(burned.CharacterID)
                     as IFieldUser;
-                var times = (int)((now - LastUpdateBurned).TotalMilliseconds / burned.Interval.TotalMilliseconds);
+                var times = (int)(
+                    (now - LastUpdateBurned).TotalMilliseconds / burned.Interval.TotalMilliseconds
+                );
                 var damage = times * burned.Damage;
 
                 // fixedDamage check
@@ -315,12 +333,12 @@ public class FieldMob :
         }
 
         LastUpdateBurned = now;
-        
-        var expiredStats = TemporaryStats.Records
-            .Where(kv => kv.Value.DateExpire < now)
+
+        var expiredStats = TemporaryStats
+            .Records.Where(kv => kv.Value.DateExpire < now)
             .ToImmutableArray();
-        var expiredBurned = TemporaryStats.BurnedInfo
-            .Where(b => b.DateExpire < now)
+        var expiredBurned = TemporaryStats
+            .BurnedInfo.Where(b => b.DateExpire < now)
             .ToImmutableArray();
 
         if (expiredStats.Length > 0)

@@ -8,7 +8,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Third;
 public class Evan3SkillHandler : Evan2SkillHandler
 {
     public override int ID => Job.Evan3;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -17,7 +17,7 @@ public class Evan3SkillHandler : Evan2SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.MagicGuard, context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

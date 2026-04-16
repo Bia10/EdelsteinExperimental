@@ -10,33 +10,44 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Shop.Handling.Plugs;
 
-public class ShopOnPacketCashItemMoveSToLRequestPlug : IPipelinePlug<ShopOnPacketCashItemMoveSToLRequest>
+public class ShopOnPacketCashItemMoveSToLRequestPlug
+    : IPipelinePlug<ShopOnPacketCashItemMoveSToLRequest>
 {
     public async Task Handle(IPipelineContext ctx, ShopOnPacketCashItemMoveSToLRequest message)
     {
-        if (message.User.Character == null) return;
-        if (message.User.AccountWorld == null) return;
-        if (message.User.AccountWorld.Locker.Items.Count >= message.User.AccountWorld.Locker.SlotMax) return;
+        if (message.User.Character == null)
+            return;
+        if (message.User.AccountWorld == null)
+            return;
+        if (
+            message.User.AccountWorld.Locker.Items.Count >= message.User.AccountWorld.Locker.SlotMax
+        )
+            return;
 
         var inventory = message.User.Character.Inventories[message.Type];
 
-        if (inventory == null) return;
-        
-        var (slot, item) = inventory.Items
-            .FirstOrDefault(kv => (kv.Value as IItemSlotBase)?.CashItemSN == message.CashItemSN);
+        if (inventory == null)
+            return;
 
-        if (item is not IItemSlotBase itemBase) return;
-        if (itemBase.CashItemSN != message.CashItemSN) return;
-        
-        var context = new ModifyInventoryContext(message.Type, inventory, message.User.Context.Templates.Item);
-        var lockerSlot = new ItemLockerSlot
-        {
-            Item = item
-        };
-        
+        var (slot, item) = inventory.Items.FirstOrDefault(kv =>
+            (kv.Value as IItemSlotBase)?.CashItemSN == message.CashItemSN
+        );
+
+        if (item is not IItemSlotBase itemBase)
+            return;
+        if (itemBase.CashItemSN != message.CashItemSN)
+            return;
+
+        var context = new ModifyInventoryContext(
+            message.Type,
+            inventory,
+            message.User.Context.Templates.Item
+        );
+        var lockerSlot = new ItemLockerSlot { Item = item };
+
         context.RemoveSlot(slot);
         message.User.AccountWorld.Locker.Items.Add(lockerSlot);
-        
+
         using var packet = new PacketWriter(PacketSendOperations.CashShopCashItemResult);
 
         packet.WriteByte((byte)ShopResultOperations.MoveStoL_Done);

@@ -7,5 +7,5 @@ public enum AuthResult
     FailedUnknown = 0x2,
     FailedInvalidUsername = 0x3,
     FailedInvalidPassword = 0x4,
-    FailedUsernameExists = 0x5
+    FailedUsernameExists = 0x5,
 }

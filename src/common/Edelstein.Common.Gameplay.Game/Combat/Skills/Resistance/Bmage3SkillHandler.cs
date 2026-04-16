@@ -12,19 +12,28 @@ public class Bmage3SkillHandler : Bmage2SkillHandler
 {
     public override int ID => Job.Bmage3;
 
-    public override async Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
+    public override async Task HandleAttackMob(
+        ISkillContext context,
+        IFieldUser user,
+        IFieldMob mob
+    )
     {
-        if (user.Character.TemporaryStats[TemporaryStatType.Revive] != null && context.Skill?.ID != Skill.BmageRevive)
+        if (
+            user.Character.TemporaryStats[TemporaryStatType.Revive] != null
+            && context.Skill?.ID != Skill.BmageRevive
+        )
         {
-            var reviveSkill = await user.StageUser.Context.Templates.Skill.Retrieve(Skill.BmageRevive);
+            var reviveSkill = await user.StageUser.Context.Templates.Skill.Retrieve(
+                Skill.BmageRevive
+            );
             var reviveLevel = reviveSkill?[user.Stats.SkillLevels[Skill.BmageRevive]];
 
             if (reviveLevel != null && context.Random.Next(0, 100) <= reviveLevel.Prop)
                 context.AddSummoned(
-                    MoveAbilityType.WalkRandom, 
-                    SummonedAssistType.Attack, 
-                    Skill.BmageRevive, 
-                    reviveLevel.Level, 
+                    MoveAbilityType.WalkRandom,
+                    SummonedAssistType.Attack,
+                    Skill.BmageRevive,
+                    reviveLevel.Level,
                     true,
                     DateTime.UtcNow.AddSeconds(reviveLevel.X),
                     mob.Position
@@ -45,20 +54,24 @@ public class Bmage3SkillHandler : Bmage2SkillHandler
                 int? superBodyID =
                     user.Character.TemporaryStats[TemporaryStatType.DarkAura] != null
                         ? Skill.BmageSuperBodyDark
-                        : user.Character.TemporaryStats[TemporaryStatType.BlueAura] != null
-                            ? Skill.BmageSuperBodyBlue
-                            : user.Character.TemporaryStats[TemporaryStatType.YellowAura] != null
-                                ? Skill.BmageSuperBodyYellow
-                                : null;
-                if (superBodyID == null) break;
+                    : user.Character.TemporaryStats[TemporaryStatType.BlueAura] != null
+                        ? Skill.BmageSuperBodyBlue
+                    : user.Character.TemporaryStats[TemporaryStatType.YellowAura] != null
+                        ? Skill.BmageSuperBodyYellow
+                    : null;
+                if (superBodyID == null)
+                    break;
 
-                var superBodySkill = await user.StageUser.Context.Templates.Skill.Retrieve(superBodyID.Value);
+                var superBodySkill = await user.StageUser.Context.Templates.Skill.Retrieve(
+                    superBodyID.Value
+                );
                 var superBodyLevel = superBodySkill?[user.Stats.SkillLevels[Skill.BmageSuperBody]];
 
-                if (superBodyLevel == null) break;
+                if (superBodyLevel == null)
+                    break;
 
                 context.AddTemporaryStat(
-                    TemporaryStatType.SuperBody, 
+                    TemporaryStatType.SuperBody,
                     context.SkillLevel!.Level,
                     superBodyID,
                     DateTime.UtcNow.AddSeconds(superBodyLevel.Time)
@@ -69,7 +82,11 @@ public class Bmage3SkillHandler : Bmage2SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.Revive, context.SkillLevel!.X);
                 break;
             case Skill.BmageTeleportMastery:
-                context.AddTemporaryStat(TemporaryStatType.TeleportMasteryOn, context.SkillLevel!.X, expire: DateTime.MaxValue);
+                context.AddTemporaryStat(
+                    TemporaryStatType.TeleportMasteryOn,
+                    context.SkillLevel!.X,
+                    expire: DateTime.MaxValue
+                );
                 break;
         }
 

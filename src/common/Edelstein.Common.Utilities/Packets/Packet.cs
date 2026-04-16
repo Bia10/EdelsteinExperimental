@@ -9,10 +9,10 @@ public class Packet : IPacket
     {
         Length = buffer.Length;
         Buffer = ArrayPool<byte>.Shared.Rent(Length);
-        
+
         Array.Copy(buffer, Buffer, Length);
     }
-    
+
     public Packet(Stream stream)
     {
         Length = (int)stream.Length;
@@ -24,10 +24,9 @@ public class Packet : IPacket
         _ = stream.Read(Buffer, 0, Length);
         stream.Position = position;
     }
-    
+
     public int Length { get; }
     public byte[] Buffer { get; }
-    
-    public void Dispose() 
-        => ArrayPool<byte>.Shared.Return(Buffer);
+
+    public void Dispose() => ArrayPool<byte>.Shared.Return(Buffer);
 }

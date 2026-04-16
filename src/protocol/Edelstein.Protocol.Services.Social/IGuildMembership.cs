@@ -1,4 +1,4 @@
-namespace Edelstein.Protocol.Services.Social;
+﻿namespace Edelstein.Protocol.Services.Social;
 
 /// <summary>
 /// The full in-memory snapshot of a user's guild, maintained once for each

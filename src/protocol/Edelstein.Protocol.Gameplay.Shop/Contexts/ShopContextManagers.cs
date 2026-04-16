@@ -7,7 +7,6 @@ namespace Edelstein.Protocol.Gameplay.Shop.Contexts;
 public record ShopContextManagers(
     IDataNamespace Data,
     ITickerManager Ticker,
-    
     INotSaleManager NotSale,
     ICommodityManager Commodity,
     IModifiedCommodityManager ModifiedCommodity

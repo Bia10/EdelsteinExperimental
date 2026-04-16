@@ -13,13 +13,12 @@ public class ScriptedConversation : INamedConversation
         _script = script;
         ID = id;
     }
-    
+
     public string ID { get; }
 
-    public Task Start(IConversationContext ctx, IConversationSpeaker self, IConversationSpeaker target) =>
-        _script.Run(new Dictionary<string, object>
-        {
-            ["self"] = self,
-            ["target"] = target
-        });
+    public Task Start(
+        IConversationContext ctx,
+        IConversationSpeaker self,
+        IConversationSpeaker target
+    ) => _script.Run(new Dictionary<string, object> { ["self"] = self, ["target"] = target });
 }

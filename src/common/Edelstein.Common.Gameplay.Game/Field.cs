@@ -38,8 +38,10 @@ public class Field : AbstractFieldObjectPool, IField, ITickable
         foreach (var type in Enum.GetValues<FieldObjectType>())
             _pools[type] = new FieldObjectPool();
 
-        var splitRowCount = (int)(template.Bounds.Height + (ScreenHeightOffset - 1)) / ScreenHeightOffset;
-        var splitColCount = (int)(template.Bounds.Width + (ScreenWidthOffset - 1)) / ScreenWidthOffset;
+        var splitRowCount =
+            (int)(template.Bounds.Height + (ScreenHeightOffset - 1)) / ScreenHeightOffset;
+        var splitColCount =
+            (int)(template.Bounds.Width + (ScreenWidthOffset - 1)) / ScreenWidthOffset;
 
         _splits = new IFieldSplit[splitRowCount, splitColCount];
 
@@ -54,7 +56,7 @@ public class Field : AbstractFieldObjectPool, IField, ITickable
     public IFieldTemplate Template { get; }
 
     public IFieldGeneratorRegistry Generators { get; }
-    
+
     private DateTime NextGeneratorTick { get; set; }
 
     public override IReadOnlyCollection<IFieldObject> Objects =>
@@ -66,7 +68,7 @@ public class Field : AbstractFieldObjectPool, IField, ITickable
         var col = (position.X - Template.Bounds.Left) / ScreenWidthOffset;
         return GetSplit(row, col);
     }
-    
+
     public IFieldSplit?[] GetSplits(IRectangle2D bounds)
     {
         var minRow = (bounds.Top - Template.Bounds.Top) / ScreenHeightOffset;
@@ -75,7 +77,7 @@ public class Field : AbstractFieldObjectPool, IField, ITickable
         var maxCol = (bounds.Right - Template.Bounds.Left) / ScreenWidthOffset;
         var splits = new IFieldSplit?[(maxRow - minRow + 1) * (maxCol - minCol + 1)];
         var index = 0;
-        
+
         for (var row = minRow; row <= maxRow; row++)
         for (var col = minCol; col <= maxCol; col++)
             splits[index++] = GetSplit(row, col);
@@ -93,14 +95,14 @@ public class Field : AbstractFieldObjectPool, IField, ITickable
         GetEnclosingSplits(split.Row, split.Col);
 
     public IFieldObjectPool? GetPool(FieldObjectType type) =>
-        _pools.TryGetValue(type, out var pool)
-            ? pool
-            : null;
+        _pools.TryGetValue(type, out var pool) ? pool : null;
 
     public override Task Enter(IFieldObject obj) => Enter(obj, null);
+
     public override Task Leave(IFieldObject obj) => Leave(obj, null);
 
     public Task Enter(IFieldUser user) => Enter(user, 0);
+
     public Task Leave(IFieldUser user) => Leave(user, null);
 
     public async Task Enter(IFieldUser user, byte portal, Func<IPacket>? getEnterPacket = null)
@@ -111,9 +113,9 @@ public class Field : AbstractFieldObjectPool, IField, ITickable
 
     public async Task Enter(IFieldUser user, string portal, Func<IPacket>? getEnterPacket = null)
     {
-        user.Character.FieldPortal = (byte)(Template.Portals.Objects
-            .FirstOrDefault(o => o.Name == portal)?
-            .ID ?? 0);
+        user.Character.FieldPortal = (byte)(
+            Template.Portals.Objects.FirstOrDefault(o => o.Name == portal)?.ID ?? 0
+        );
         await Enter((IFieldObject)user, null);
     }
 
@@ -129,32 +131,40 @@ public class Field : AbstractFieldObjectPool, IField, ITickable
         {
             var isFirstUser = !Objects.OfType<IFieldUser>().Any();
             var portal =
-                Template.Portals.FindByID(user.Character.FieldPortal) ??
-                Template.Portals.FindClosest(obj.Position).FirstOrDefault();
+                Template.Portals.FindByID(user.Character.FieldPortal)
+                ?? Template.Portals.FindClosest(obj.Position).FirstOrDefault();
 
             user.Character.FieldID = ID;
             if (portal != null)
                 await user.Move(
-                    portal.Position, 
-                    Template.Footholds.Find(portal.Position).FirstOrDefault(), 
+                    portal.Position,
+                    Template.Footholds.Find(portal.Position).FirstOrDefault(),
                     true
                 );
 
             await user.Dispatch(user.GetSetFieldPacket());
-            
+
             if (Template.ScriptFirstUserEnter != null || Template.ScriptUserEnter != null)
             {
-                var script = isFirstUser ? Template.ScriptFirstUserEnter ?? Template.ScriptUserEnter : Template.ScriptUserEnter;
-                
+                var script = isFirstUser
+                    ? Template.ScriptFirstUserEnter ?? Template.ScriptUserEnter
+                    : Template.ScriptUserEnter;
+
                 if (script != null)
                 {
-                    var conversation = await user.StageUser.Context.Managers.Conversation.Retrieve(script) as IConversation ??
-                                       new FallbackConversation(script, user);
+                    var conversation =
+                        await user.StageUser.Context.Managers.Conversation.Retrieve(script)
+                            as IConversation
+                        ?? new FallbackConversation(script, user);
 
                     _ = user.Converse(
                         conversation,
                         c => new ConversationSpeaker(c),
-                        c => new ConversationSpeakerUser(user, c, flags: ConversationSpeakerFlags.NPCReplacedByUser)
+                        c => new ConversationSpeakerUser(
+                            user,
+                            c,
+                            flags: ConversationSpeakerFlags.NPCReplacedByUser
+                        )
                     );
                 }
             }
@@ -162,22 +172,27 @@ public class Field : AbstractFieldObjectPool, IField, ITickable
             if (user.IsInstantiated)
             {
                 if (user.StageUser.Party != null)
-                    _ = user.StageUser.Context.Services.Party.UpdateChannelOrField(new PartyUpdateChannelOrFieldRequest(
-                        user.StageUser.Party.ID,
-                        user.Character.ID,
-                        user.StageUser.Context.Options.ChannelID,
-                        ID
-                    ));
+                    _ = user.StageUser.Context.Services.Party.UpdateChannelOrField(
+                        new PartyUpdateChannelOrFieldRequest(
+                            user.StageUser.Party.ID,
+                            user.Character.ID,
+                            user.StageUser.Context.Options.ChannelID,
+                            ID
+                        )
+                    );
             }
 
-            if (!user.IsInstantiated) user.IsInstantiated = true;
+            if (!user.IsInstantiated)
+                user.IsInstantiated = true;
         }
 
         var split = GetSplit(obj.Position);
 
-        if (pool != null) await pool.Enter(obj);
-        if (split != null) await split.Enter(obj, getEnterPacket);
-        
+        if (pool != null)
+            await pool.Enter(obj);
+        if (split != null)
+            await split.Enter(obj, getEnterPacket);
+
         if (obj is IFieldUser owner)
             foreach (var owned in owner.Owned)
             {
@@ -200,16 +215,19 @@ public class Field : AbstractFieldObjectPool, IField, ITickable
             await obj.FieldSplit.Leave(obj, getLeavePacket: getLeavePacket);
         }
 
-        if (pool != null) await pool.Leave(obj);
+        if (pool != null)
+            await pool.Leave(obj);
 
         if (obj is IFieldUser owner)
             foreach (var owned in owner.Owned)
                 await Leave(owned);
     }
 
-    public override IFieldObject? GetObject(int id) => Objects.FirstOrDefault(o => o.ObjectID == id);
-    public T? GetObject<T>(int id) where T : IFieldObject => Objects.OfType<T>().FirstOrDefault(o => o.ObjectID == id);
+    public override IFieldObject? GetObject(int id) =>
+        Objects.FirstOrDefault(o => o.ObjectID == id);
 
+    public T? GetObject<T>(int id)
+        where T : IFieldObject => Objects.OfType<T>().FirstOrDefault(o => o.ObjectID == id);
 
     private IFieldSplit?[] GetEnclosingSplits(int row, int col)
     {
@@ -232,28 +250,22 @@ public class Field : AbstractFieldObjectPool, IField, ITickable
 
     private IFieldSplit? GetSplit(int row, int col)
     {
-        if (
-            row < 0 || row >= _splits.GetLength(0) ||
-            col < 0 || col >= _splits.GetLength(1)
-        ) return null;
+        if (row < 0 || row >= _splits.GetLength(0) || col < 0 || col >= _splits.GetLength(1))
+            return null;
         return _splits[row, col];
     }
-    
+
     public async Task OnTick(DateTime now)
     {
-        if (GetPool(FieldObjectType.User)?.Objects.Count == 0) return;
+        if (GetPool(FieldObjectType.User)?.Objects.Count == 0)
+            return;
 
-        await Task.WhenAll(
-            Objects
-                .OfType<ITickable>()
-                .Select(o => o.OnTick(now))
-        );
+        await Task.WhenAll(Objects.OfType<ITickable>().Select(o => o.OnTick(now)));
 
         if (now > NextGeneratorTick)
         {
             NextGeneratorTick = now.AddSeconds(7);
-            await Task.WhenAll((await Generators.RetrieveAll())
-                .Select(g => g.Generate()));
+            await Task.WhenAll((await Generators.RetrieveAll()).Select(g => g.Generate()));
         }
     }
 }

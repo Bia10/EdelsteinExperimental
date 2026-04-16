@@ -11,7 +11,11 @@ public class Mechanic2SkillHandler : Mechanic1SkillHandler
 {
     public override int ID => Job.Mechanic2;
 
-    public override async Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
+    public override async Task HandleAttackMob(
+        ISkillContext context,
+        IFieldUser user,
+        IFieldMob mob
+    )
     {
         switch (context.Skill?.ID)
         {
@@ -22,7 +26,7 @@ public class Mechanic2SkillHandler : Mechanic1SkillHandler
             case Skill.MechanicFlamethrowerUp:
                 var flamethrowerSkillLevel = user.Stats.SkillLevels[Skill.MechanicWeaponmastery];
                 var flamethrowerLevel = context.Skill[flamethrowerSkillLevel];
-                
+
                 context.AddMobBurnedInfo(
                     await user.Damage.CalculateBurnedDamage(
                         user.Character,
@@ -33,13 +37,14 @@ public class Mechanic2SkillHandler : Mechanic1SkillHandler
                         flamethrowerSkillLevel
                     ),
                     interval: TimeSpan.FromSeconds(flamethrowerLevel?.DotInterval ?? 0),
-                    expire: DateTime.UtcNow.AddSeconds(flamethrowerLevel?.DotTime ?? 0));
+                    expire: DateTime.UtcNow.AddSeconds(flamethrowerLevel?.DotTime ?? 0)
+                );
                 break;
         }
-        
+
         await base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override async Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

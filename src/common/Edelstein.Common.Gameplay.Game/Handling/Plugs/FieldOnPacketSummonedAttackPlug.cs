@@ -13,8 +13,11 @@ public class FieldOnPacketSummonedAttackPlug : IPipelinePlug<FieldOnPacketSummon
 {
     private readonly ILogger _logger;
     private readonly ISkillManager _skillManager;
-    
-    public FieldOnPacketSummonedAttackPlug(ILogger<FieldOnPacketSummonedAttackPlug> logger, ISkillManager skillManager)
+
+    public FieldOnPacketSummonedAttackPlug(
+        ILogger<FieldOnPacketSummonedAttackPlug> logger,
+        ISkillManager skillManager
+    )
     {
         _logger = logger;
         _skillManager = skillManager;
@@ -31,15 +34,16 @@ public class FieldOnPacketSummonedAttackPlug : IPipelinePlug<FieldOnPacketSummon
         packet.WriteInt(message.User.Character.ID);
         packet.WriteInt(message.Summoned.ObjectID ?? 0);
         packet.WriteByte(message.User.Character.Level);
-        
+
         packet.WriteByte(message.Attack.AttackActionAndDir);
-        
+
         packet.WriteByte(message.Attack.MobCount);
-        
+
         foreach (var entry in message.Attack.MobEntries)
         {
             var mob = mobs.TryGetValue(entry.MobID, out var e) ? e : null;
-            if (mob == null) continue;
+            if (mob == null)
+                continue;
             var damage = await message.User.Damage.CalculateMDamage(
                 message.User.Character,
                 message.User.Stats,
@@ -56,27 +60,38 @@ public class FieldOnPacketSummonedAttackPlug : IPipelinePlug<FieldOnPacketSummon
                     entry.Damage[0],
                     damage
                 );
-            
+
             packet.WriteInt(entry.MobID);
             packet.WriteBool(false);
             packet.WriteInt(entry.Damage[0]);
         }
 
         packet.WriteByte(0);
-        
+
         if (message.User.FieldSplit != null)
             await message.User.FieldSplit.Dispatch(packet.Build(), message.User);
 
         if (!await _skillManager.Check(message.User, message.Summoned.SkillID))
             return;
 
-        await _skillManager.HandleAttack(message.User, message.Summoned.SkillID, message.Attack.MobEntries.Length > 0);
+        await _skillManager.HandleAttack(
+            message.User,
+            message.Summoned.SkillID,
+            message.Attack.MobEntries.Length > 0
+        );
 
         foreach (var entry in message.Attack.MobEntries)
         {
             var mob = mobs.TryGetValue(entry.MobID, out var e) ? e : null;
-            if (mob == null) continue;
-            await _skillManager.HandleAttackMob(message.User, mob, message.Summoned.SkillID, entry.Damage.Sum(), entry.PositionHit);
+            if (mob == null)
+                continue;
+            await _skillManager.HandleAttackMob(
+                message.User,
+                mob,
+                message.Summoned.SkillID,
+                entry.Damage.Sum(),
+                entry.PositionHit
+            );
         }
     }
 }

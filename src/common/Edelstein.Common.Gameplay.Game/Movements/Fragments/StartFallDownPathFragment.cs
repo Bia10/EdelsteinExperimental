@@ -11,9 +11,8 @@ public class StartFallDownPathFragment<TMoveAction> : ActionPathFragment<TMoveAc
     private short _fallStartFootholdID;
     private IPoint2D _vPosition;
 
-    public StartFallDownPathFragment(MovePathFragmentType type) : base(type)
-    {
-    }
+    public StartFallDownPathFragment(MovePathFragmentType type)
+        : base(type) { }
 
     protected override void ReadBody(IPacketReader reader)
     {

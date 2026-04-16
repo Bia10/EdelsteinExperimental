@@ -5,7 +5,7 @@ namespace Edelstein.Protocol.Gameplay.Game.Objects.Mob;
 public interface IFieldMobStats
 {
     int Level { get; }
-    
+
     int PAD { get; }
     int PDD { get; }
     int PDR { get; }
@@ -15,9 +15,9 @@ public interface IFieldMobStats
 
     int ACC { get; }
     int EVA { get; }
-    
+
     IDictionary<Element, ElementAttribute> ElementAttributes { get; }
-    
+
     Task Apply(IFieldMob mob);
     void Reset();
 }

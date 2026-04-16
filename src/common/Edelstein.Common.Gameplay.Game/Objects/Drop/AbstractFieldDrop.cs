@@ -11,13 +11,9 @@ namespace Edelstein.Common.Gameplay.Game.Objects.Drop;
 public abstract class AbstractFieldDrop : AbstractFieldObject, IFieldDrop
 {
     private readonly SemaphoreSlim _lock;
-    
-    protected AbstractFieldDrop(
-        IPoint2D position, 
-        DropOwnType ownType, 
-        int ownerID, 
-        int sourceID
-    ) : base(position)
+
+    protected AbstractFieldDrop(IPoint2D position, DropOwnType ownType, int ownerID, int sourceID)
+        : base(position)
     {
         _lock = new SemaphoreSlim(1, 1);
         OwnType = ownType;
@@ -26,22 +22,25 @@ public abstract class AbstractFieldDrop : AbstractFieldObject, IFieldDrop
     }
 
     public override FieldObjectType Type => FieldObjectType.Drop;
-    
+
     public abstract bool IsMoney { get; }
     public abstract int Info { get; }
-    
+
     public DropOwnType OwnType { get; set; }
     public int OwnerID { get; set; }
     public int SourceID { get; set; }
-    
+
     private bool IsPickedUp { get; set; }
 
-    public override IPacket GetEnterFieldPacket()
-        => GetEnterFieldPacket(2, Position);
-    public override IPacket GetLeaveFieldPacket()
-        => GetLeaveFieldPacket(1);
+    public override IPacket GetEnterFieldPacket() => GetEnterFieldPacket(2, Position);
 
-    public IPacket GetEnterFieldPacket(byte enterType, IPoint2D? sourcePosition = null, short delay = 0)
+    public override IPacket GetLeaveFieldPacket() => GetLeaveFieldPacket(1);
+
+    public IPacket GetEnterFieldPacket(
+        byte enterType,
+        IPoint2D? sourcePosition = null,
+        short delay = 0
+    )
     {
         using var packet = new PacketWriter(PacketSendOperations.DropEnterField);
 
@@ -69,11 +68,16 @@ public abstract class AbstractFieldDrop : AbstractFieldObject, IFieldDrop
 
         packet.WriteBool(false); // ByPet - allow pet pickup
         packet.WriteBool(false); // Putz?
-        
+
         return packet.Build();
     }
 
-    public IPacket GetLeaveFieldPacket(byte leaveType, int pickupID = 0, short delay = 0, int petIndex = 0)
+    public IPacket GetLeaveFieldPacket(
+        byte leaveType,
+        int pickupID = 0,
+        short delay = 0,
+        int petIndex = 0
+    )
     {
         using var packet = new PacketWriter(PacketSendOperations.DropLeaveField);
 
@@ -102,15 +106,16 @@ public abstract class AbstractFieldDrop : AbstractFieldObject, IFieldDrop
 
     public async Task PickUp(IFieldUser user)
     {
-        if (IsPickedUp) return;
-        
+        if (IsPickedUp)
+            return;
+
         await _lock.WaitAsync();
-        
+
         try
         {
             if (!await Check(user))
                 return;
-            
+
             IsPickedUp = true;
 
             if (Field != null)

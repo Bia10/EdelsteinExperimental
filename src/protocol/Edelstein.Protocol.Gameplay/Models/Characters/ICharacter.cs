@@ -41,12 +41,12 @@ public interface ICharacter : IIdentifiable<int>
     int PlayTime { get; set; }
 
     short SubJob { get; set; }
-    
+
     byte FriendMax { get; set; }
 
     ICharacterFuncKeys FuncKeys { get; }
     ICharacterQuickslotKeys QuickslotKeys { get; }
-    
+
     ICharacterWishlist Wishlist { get; }
 
     ICharacterInventories Inventories { get; }
@@ -54,7 +54,7 @@ public interface ICharacter : IIdentifiable<int>
     ICharacterQuestCompletes QuestCompletes { get; }
     ICharacterQuestRecords QuestRecords { get; }
     ICharacterQuestRecordsEx QuestRecordsEx { get; }
-    
+
     ICharacterWildHunterInfo WildHunterInfo { get; }
 
     ICharacterTemporaryStats TemporaryStats { get; }

@@ -12,8 +12,11 @@ public class SayRequest : AbstractConversationMessageRequest<byte>
 
     public SayRequest(
         IConversationSpeaker speaker,
-        string text, bool isPrevEnabled, bool isNextEnabled
-    ) : base(speaker)
+        string text,
+        bool isPrevEnabled,
+        bool isNextEnabled
+    )
+        : base(speaker)
     {
         _text = text;
         _isPrevEnabled = isPrevEnabled;

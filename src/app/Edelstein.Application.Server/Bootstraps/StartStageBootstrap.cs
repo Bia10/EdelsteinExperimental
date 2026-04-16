@@ -17,5 +17,6 @@ public class StartStageBootstrap : IBootstrap
     public int Priority => BootstrapPriority.Start;
 
     public Task Start() => _stageStart.Process(new StageStart());
+
     public Task Stop() => _stageStop.Process(new StageStop());
 }

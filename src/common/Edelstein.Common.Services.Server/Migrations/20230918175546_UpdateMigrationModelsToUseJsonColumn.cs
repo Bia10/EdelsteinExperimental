@@ -10,33 +10,30 @@ namespace Edelstein.Common.Services.Server.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Character",
-                table: "migrations");
-            migrationBuilder.DropColumn(
-                name: "AccountWorld",
-                table: "migrations");
-            migrationBuilder.DropColumn(
-                name: "Account",
-                table: "migrations");
-            
+            migrationBuilder.DropColumn(name: "Character", table: "migrations");
+            migrationBuilder.DropColumn(name: "AccountWorld", table: "migrations");
+            migrationBuilder.DropColumn(name: "Account", table: "migrations");
+
             migrationBuilder.AddColumn<string>(
                 name: "Character",
                 table: "migrations",
                 type: "json",
-                nullable: false);
+                nullable: false
+            );
 
             migrationBuilder.AddColumn<string>(
                 name: "AccountWorld",
                 table: "migrations",
                 type: "json",
-                nullable: false);
+                nullable: false
+            );
 
             migrationBuilder.AddColumn<string>(
                 name: "Account",
                 table: "migrations",
                 type: "json",
-                nullable: false);
+                nullable: false
+            );
         }
 
         /// <inheritdoc />
@@ -48,7 +45,8 @@ namespace Edelstein.Common.Services.Server.Migrations
                 type: "text",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "json");
+                oldType: "json"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "AccountWorld",
@@ -56,7 +54,8 @@ namespace Edelstein.Common.Services.Server.Migrations
                 type: "text",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "json");
+                oldType: "json"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Account",
@@ -64,7 +63,8 @@ namespace Edelstein.Common.Services.Server.Migrations
                 type: "text",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "json");
+                oldType: "json"
+            );
         }
     }
 }

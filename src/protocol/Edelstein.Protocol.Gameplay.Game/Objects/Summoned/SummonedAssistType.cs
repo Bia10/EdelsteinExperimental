@@ -8,5 +8,5 @@ public enum SummonedAssistType
     AttackEx = 0x3,
     Summon = 0x4,
     AttackManual = 0x5,
-    AttackCounter = 0x6
+    AttackCounter = 0x6,
 }

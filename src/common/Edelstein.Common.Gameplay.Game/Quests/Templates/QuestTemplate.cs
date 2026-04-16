@@ -8,12 +8,12 @@ public record QuestTemplate : IQuestTemplate
     public int ID { get; }
 
     public string Name { get; }
-    
+
     public bool IsAutoAccept { get; }
     public bool IsAutoStart { get; }
     public bool IsAutoComplete { get; }
     public bool IsAutoPreComplete { get; }
-    
+
     public IQuestTemplateAct ActStart { get; }
     public IQuestTemplateAct ActEnd { get; }
     public IQuestTemplateCheck CheckStart { get; }
@@ -24,7 +24,7 @@ public record QuestTemplate : IQuestTemplate
         ID = id;
 
         Name = info?.ResolveString("name") ?? "NO-NAME";
-            
+
         IsAutoAccept = (info?.ResolveInt("autoAccept") ?? 0) > 0;
         IsAutoStart = (info?.ResolveInt("autoStart") ?? 0) > 0;
         IsAutoComplete = (info?.ResolveInt("autoComplete") ?? 0) > 0;

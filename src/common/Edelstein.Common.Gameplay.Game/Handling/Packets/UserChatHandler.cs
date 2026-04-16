@@ -8,12 +8,11 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
 public class UserChatHandler : AbstractPipedFieldHandler<FieldOnPacketUserChat>
 {
-    public UserChatHandler(IPipeline<FieldOnPacketUserChat> pipeline) : base(pipeline)
-    {
-    }
-    
+    public UserChatHandler(IPipeline<FieldOnPacketUserChat> pipeline)
+        : base(pipeline) { }
+
     public override short Operation => (short)PacketRecvOperations.UserChat;
 
-    protected override FieldOnPacketUserChat? Serialize(IFieldUser user, IPacketReader reader) 
-        => new(user, reader.Skip(4).ReadString(), reader.ReadBool());
+    protected override FieldOnPacketUserChat? Serialize(IFieldUser user, IPacketReader reader) =>
+        new(user, reader.Skip(4).ReadString(), reader.ReadBool());
 }

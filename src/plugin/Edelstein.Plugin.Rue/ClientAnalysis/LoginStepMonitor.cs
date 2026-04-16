@@ -20,10 +20,12 @@ public sealed class LoginStepMonitor(
     LoginDiagnostics? diagnostics = null,
     LoginMilestonesTracker? tracker = null,
     int pollIntervalMs = 50,
-    int defaultTimeoutMs = 10000) : IDisposable
+    int defaultTimeoutMs = 10000
+) : IDisposable
 {
     private readonly ILogger? _logger = logger;
-    private readonly MemoryWriter _memoryWriter = memoryWriter ?? throw new ArgumentNullException(nameof(memoryWriter));
+    private readonly MemoryWriter _memoryWriter =
+        memoryWriter ?? throw new ArgumentNullException(nameof(memoryWriter));
     private readonly LoginDiagnostics? _diagnostics = diagnostics;
     private readonly LoginMilestonesTracker? _tracker = tracker;
     private readonly int _pollIntervalMs = pollIntervalMs > 0 ? pollIntervalMs : 50;
@@ -49,7 +51,9 @@ public sealed class LoginStepMonitor(
     private readonly List<StepTransitionWaiter> _stepTransitionWaiters = [];
 
     private record SingletonWaiter(string Name, TaskCompletionSource<bool> Tcs);
+
     private record LoginStepWaiter(LoginStep TargetStep, TaskCompletionSource<bool> Tcs);
+
     private record StepTransitionWaiter(TaskCompletionSource<bool> Tcs);
 
     /// <summary>
@@ -149,7 +153,9 @@ public sealed class LoginStepMonitor(
             if (name == "CUIChannelSelect" && _channelSelectExists)
                 return Task.CompletedTask;
 
-            var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var tcs = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
             ct.Register(() => tcs.TrySetCanceled(ct));
             _singletonWaiters.Add(new SingletonWaiter(name, tcs));
             return tcs.Task;
@@ -168,7 +174,9 @@ public sealed class LoginStepMonitor(
             if (_loginStep.HasValue && _loginStep.Value >= (int)step)
                 return Task.CompletedTask;
 
-            var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var tcs = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
             ct.Register(() => tcs.TrySetCanceled(ct));
             _loginStepWaiters.Add(new LoginStepWaiter(step, tcs));
             return tcs.Task;
@@ -187,20 +195,26 @@ public sealed class LoginStepMonitor(
             if (_loginStep.HasValue && _stepChanging.HasValue && _stepChanging.Value == 0)
                 return Task.CompletedTask;
 
-            var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+            var tcs = new TaskCompletionSource<bool>(
+                TaskCreationOptions.RunContinuationsAsynchronously
+            );
             ct.Register(() => tcs.TrySetCanceled(ct));
             _stepTransitionWaiters.Add(new StepTransitionWaiter(tcs));
             return tcs.Task;
         }
     }
 
-    public Task WaitForStepStable(CancellationToken ct = default) => WaitForStepTransitionComplete(ct);
+    public Task WaitForStepStable(CancellationToken ct = default) =>
+        WaitForStepTransitionComplete(ct);
 
     /// <summary>
     /// Wraps a wait call with the configured default timeout.
     /// Returns true if the condition was met, false if timed out.
     /// </summary>
-    public async Task<bool> WaitWithTimeout(Func<CancellationToken, Task> waitFactory, string description)
+    public async Task<bool> WaitWithTimeout(
+        Func<CancellationToken, Task> waitFactory,
+        string description
+    )
     {
         using var cts = new CancellationTokenSource(_defaultTimeoutMs);
         try
@@ -211,7 +225,11 @@ public sealed class LoginStepMonitor(
         }
         catch (OperationCanceledException) when (cts.IsCancellationRequested)
         {
-            _logger?.LogWarning("[Rue-Monitor] {Description} timeout ({TimeoutMs}ms)", description, _defaultTimeoutMs);
+            _logger?.LogWarning(
+                "[Rue-Monitor] {Description} timeout ({TimeoutMs}ms)",
+                description,
+                _defaultTimeoutMs
+            );
             return false;
         }
     }
@@ -263,7 +281,9 @@ public sealed class LoginStepMonitor(
 
                 var prevLoginStep = _loginStep;
                 var prevStepChanging = _stepChanging;
-                var prevStable = prevStepChanging.HasValue ? prevStepChanging.Value == 0 : (bool?)null;
+                var prevStable = prevStepChanging.HasValue
+                    ? prevStepChanging.Value == 0
+                    : (bool?)null;
                 var currentStable = stepChg.HasValue ? stepChg.Value == 0 : (bool?)null;
 
                 _loginGradeWndExists = lgwExists;
@@ -273,11 +293,20 @@ public sealed class LoginStepMonitor(
                 _stepChanging = stepChg;
 
                 if (lgwChanged)
-                    _logger?.LogDebug("[Rue-Monitor] CLoginGradeWnd: {State}", lgwExists ? "created" : "destroyed");
+                    _logger?.LogDebug(
+                        "[Rue-Monitor] CLoginGradeWnd: {State}",
+                        lgwExists ? "created" : "destroyed"
+                    );
                 if (wsChanged)
-                    _logger?.LogDebug("[Rue-Monitor] CUIWorldSelect: {State}", wsExists ? "created" : "destroyed");
+                    _logger?.LogDebug(
+                        "[Rue-Monitor] CUIWorldSelect: {State}",
+                        wsExists ? "created" : "destroyed"
+                    );
                 if (csChanged)
-                    _logger?.LogDebug("[Rue-Monitor] CUIChannelSelect: {State}", csExists ? "created" : "destroyed");
+                    _logger?.LogDebug(
+                        "[Rue-Monitor] CUIChannelSelect: {State}",
+                        csExists ? "created" : "destroyed"
+                    );
                 if (stepChanged)
                     _tracker?.RecordClientStep(prevLoginStep, step);
                 if (prevStable != currentStable && currentStable.HasValue)
@@ -287,9 +316,10 @@ public sealed class LoginStepMonitor(
                 for (var i = _singletonWaiters.Count - 1; i >= 0; i--)
                 {
                     var w = _singletonWaiters[i];
-                    var satisfied = (w.Name == "CLoginGradeWnd" && lgwExists)
-                                 || (w.Name == "CUIWorldSelect" && wsExists)
-                                 || (w.Name == "CUIChannelSelect" && csExists);
+                    var satisfied =
+                        (w.Name == "CLoginGradeWnd" && lgwExists)
+                        || (w.Name == "CUIWorldSelect" && wsExists)
+                        || (w.Name == "CUIChannelSelect" && csExists);
                     if (satisfied)
                     {
                         w.Tcs.TrySetResult(true);
@@ -333,5 +363,4 @@ public sealed class LoginStepMonitor(
         _disposed = true;
         Stop();
     }
-
 }

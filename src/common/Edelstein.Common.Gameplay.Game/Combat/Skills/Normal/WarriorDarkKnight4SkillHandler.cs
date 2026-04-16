@@ -12,7 +12,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class WarriorDarkKnight4SkillHandler : WarriorDarkKnight3SkillHandler
 {
     public override int ID => Job.DarkKnight;
-    
+
     public override Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
     {
         switch (context.Skill?.ID)
@@ -21,10 +21,10 @@ public class WarriorDarkKnight4SkillHandler : WarriorDarkKnight3SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

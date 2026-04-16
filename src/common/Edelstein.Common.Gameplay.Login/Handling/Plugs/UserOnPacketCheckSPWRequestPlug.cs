@@ -32,10 +32,12 @@ public class UserOnPacketCheckSPWRequestPlug : IPipelinePlug<UserOnPacketCheckSP
                 message.User.AccountWorld!.ID,
                 message.CharacterID
             );
-            var response = await _serverService.GetGameByWorldAndChannel(new ServerGetGameByWorldAndChannelRequest(
-                (int)message.User.SelectedWorldID!,
-                (int)message.User.SelectedChannelID!
-            ));
+            var response = await _serverService.GetGameByWorldAndChannel(
+                new ServerGetGameByWorldAndChannelRequest(
+                    (int)message.User.SelectedWorldID!,
+                    (int)message.User.SelectedChannelID!
+                )
+            );
 
             if (character == null)
             {
@@ -64,7 +66,10 @@ public class UserOnPacketCheckSPWRequestPlug : IPipelinePlug<UserOnPacketCheckSP
                 return;
             }
 
-            var endpoint = new IPEndPoint(IPAddress.Parse(response.Server.Host), response.Server.Port);
+            var endpoint = new IPEndPoint(
+                IPAddress.Parse(response.Server.Host),
+                response.Server.Port
+            );
             var address = endpoint.Address.MapToIPv4().GetAddressBytes();
             var port = endpoint.Port;
             using var packet = new PacketWriter(PacketSendOperations.SelectCharacterResult);

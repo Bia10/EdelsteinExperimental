@@ -18,22 +18,22 @@ namespace Edelstein.Common.Database.Migrations
                 defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterTemporaryStats, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[Edelstein.Protocol.Gameplay.Models.Characters.Stats.TemporaryStatType, Edelstein.Protocol.Gameplay],[Edelstein.Protocol.Gameplay.Models.Characters.Stats.ITemporaryStatRecord, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"},\"EnergyChargedRecord\":null,\"DashSpeedRecord\":null,\"DashJumpRecord\":null,\"RideVehicleRecord\":null,\"PartyBoosterRecord\":null,\"GuidedBulletRecord\":null,\"UndeadRecord\":null}",
                 oldClrType: typeof(string),
                 oldType: "json",
-                oldDefaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterTemporaryStats, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[Edelstein.Protocol.Gameplay.Models.Characters.Stats.TemporaryStatType, Edelstein.Protocol.Gameplay],[Edelstein.Protocol.Gameplay.Models.Characters.Stats.ITemporaryStatRecord, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"}}");
+                oldDefaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterTemporaryStats, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[Edelstein.Protocol.Gameplay.Models.Characters.Stats.TemporaryStatType, Edelstein.Protocol.Gameplay],[Edelstein.Protocol.Gameplay.Models.Characters.Stats.ITemporaryStatRecord, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"}}"
+            );
 
             migrationBuilder.AddColumn<string>(
                 name: "WildHunterInfo",
                 table: "characters",
                 type: "json",
                 nullable: false,
-                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterWildHunterInfo, Edelstein.Common.Gameplay\",\"RidingType\":0,\"CaptureMob\":{\"$type\":\"System.Int32[], System.Private.CoreLib\",\"$values\":[0,0,0,0,0]}}");
+                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterWildHunterInfo, Edelstein.Common.Gameplay\",\"RidingType\":0,\"CaptureMob\":{\"$type\":\"System.Int32[], System.Private.CoreLib\",\"$values\":[0,0,0,0,0]}}"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "WildHunterInfo",
-                table: "characters");
+            migrationBuilder.DropColumn(name: "WildHunterInfo", table: "characters");
 
             migrationBuilder.AlterColumn<string>(
                 name: "TemporaryStats",
@@ -43,7 +43,8 @@ namespace Edelstein.Common.Database.Migrations
                 defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterTemporaryStats, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[Edelstein.Protocol.Gameplay.Models.Characters.Stats.TemporaryStatType, Edelstein.Protocol.Gameplay],[Edelstein.Protocol.Gameplay.Models.Characters.Stats.ITemporaryStatRecord, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"}}",
                 oldClrType: typeof(string),
                 oldType: "json",
-                oldDefaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterTemporaryStats, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[Edelstein.Protocol.Gameplay.Models.Characters.Stats.TemporaryStatType, Edelstein.Protocol.Gameplay],[Edelstein.Protocol.Gameplay.Models.Characters.Stats.ITemporaryStatRecord, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"},\"EnergyChargedRecord\":null,\"DashSpeedRecord\":null,\"DashJumpRecord\":null,\"RideVehicleRecord\":null,\"PartyBoosterRecord\":null,\"GuidedBulletRecord\":null,\"UndeadRecord\":null}");
+                oldDefaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterTemporaryStats, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[Edelstein.Protocol.Gameplay.Models.Characters.Stats.TemporaryStatType, Edelstein.Protocol.Gameplay],[Edelstein.Protocol.Gameplay.Models.Characters.Stats.ITemporaryStatRecord, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"},\"EnergyChargedRecord\":null,\"DashSpeedRecord\":null,\"DashJumpRecord\":null,\"RideVehicleRecord\":null,\"PartyBoosterRecord\":null,\"GuidedBulletRecord\":null,\"UndeadRecord\":null}"
+            );
         }
     }
 }

@@ -25,7 +25,7 @@ public record ItemTemplate : IItemTemplate
 
         Cash = info.ResolveBool("cash") ?? false;
     }
-    
+
     public int ID { get; }
 
     public int SellPrice { get; }

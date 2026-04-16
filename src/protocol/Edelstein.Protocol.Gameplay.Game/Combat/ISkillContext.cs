@@ -12,10 +12,10 @@ namespace Edelstein.Protocol.Gameplay.Game.Combat;
 public interface ISkillContext
 {
     Random Random { get; }
-    
+
     ISkillTemplate? Skill { get; }
     ISkillTemplateLevel? SkillLevel { get; }
-    
+
     bool IsHitMob { get; }
 
     void TargetField(bool active = true, int? limit = null, IRectangle2D? bounds = null);
@@ -28,18 +28,60 @@ public interface ISkillContext
     void SetTwoStateDashSpeed(int value, int? reason = null, TimeSpan? term = null);
     void SetTwoStateDashJump(int value, int? reason = null, TimeSpan? term = null);
     void SetTwoStateRideVehicle(int value, int? reason = null);
-    void SetTwoStatePartyBooster(int value, int? reason = null, DateTime? dateStart = null, TimeSpan? term = null);
+    void SetTwoStatePartyBooster(
+        int value,
+        int? reason = null,
+        DateTime? dateStart = null,
+        TimeSpan? term = null
+    );
     void SetTwoStateGuidedBullet(int value, int mobID, int? reason = null);
-    
-    void AddTemporaryStat(TemporaryStatType type, int value, int? reason = null, DateTime? expire = null);
-    
-    void AddMobTemporaryStat(MobTemporaryStatType type, int value, int? reason = null, DateTime? expire = null);
-    void AddMobBurnedInfo(int damage, int? skillID = null, TimeSpan? interval = null, DateTime? expire = null);
-    
-    void AddSummoned(MoveAbilityType moveAbilityType, SummonedAssistType summonedAssistType, int? skillID = null, int? skillLevel = null, bool? allowDuplicate = false, DateTime? expire = null, IPoint2D? position = null);
 
-    void AddAffectedArea(AffectedAreaType type, int? skillID = null, int? skillLevel = null, int? info = null, int? phase = null, IRectangle2D? bounds = null, DateTime? expire = null);
-    void AddAffectedAreaBurnedInfo(int? skillID = null, int? skillLevel = null, TimeSpan? interval = null, TimeSpan? duration = null, IFieldUser? user = null);
+    void AddTemporaryStat(
+        TemporaryStatType type,
+        int value,
+        int? reason = null,
+        DateTime? expire = null
+    );
+
+    void AddMobTemporaryStat(
+        MobTemporaryStatType type,
+        int value,
+        int? reason = null,
+        DateTime? expire = null
+    );
+    void AddMobBurnedInfo(
+        int damage,
+        int? skillID = null,
+        TimeSpan? interval = null,
+        DateTime? expire = null
+    );
+
+    void AddSummoned(
+        MoveAbilityType moveAbilityType,
+        SummonedAssistType summonedAssistType,
+        int? skillID = null,
+        int? skillLevel = null,
+        bool? allowDuplicate = false,
+        DateTime? expire = null,
+        IPoint2D? position = null
+    );
+
+    void AddAffectedArea(
+        AffectedAreaType type,
+        int? skillID = null,
+        int? skillLevel = null,
+        int? info = null,
+        int? phase = null,
+        IRectangle2D? bounds = null,
+        DateTime? expire = null
+    );
+    void AddAffectedAreaBurnedInfo(
+        int? skillID = null,
+        int? skillLevel = null,
+        TimeSpan? interval = null,
+        TimeSpan? duration = null,
+        IFieldUser? user = null
+    );
 
     void ResetTemporaryStatBySkill(int? skillID = null);
     void ResetTemporaryStatByType(TemporaryStatType type);
@@ -53,6 +95,6 @@ public interface ISkillContext
 
     void ResetMobTemporaryStatBySkill(int? skillID = null);
     void ResetMobTemporaryStatByType(MobTemporaryStatType type);
-    
+
     void ResetSummoned(int? skillID = null);
 }

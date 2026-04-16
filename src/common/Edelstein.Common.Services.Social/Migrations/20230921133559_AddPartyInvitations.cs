@@ -16,11 +16,18 @@ namespace Edelstein.Common.Services.Social.Migrations
                 name: "party_invitations",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ID = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     PartyID = table.Column<int>(type: "integer", nullable: false),
                     CharacterID = table.Column<int>(type: "integer", nullable: false),
-                    DateExpire = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    DateExpire = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
                 },
                 constraints: table =>
                 {
@@ -30,21 +37,23 @@ namespace Edelstein.Common.Services.Social.Migrations
                         column: x => x.PartyID,
                         principalTable: "parties",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_party_invitations_PartyID_CharacterID",
                 table: "party_invitations",
                 columns: new[] { "PartyID", "CharacterID" },
-                unique: true);
+                unique: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "party_invitations");
+            migrationBuilder.DropTable(name: "party_invitations");
         }
     }
 }

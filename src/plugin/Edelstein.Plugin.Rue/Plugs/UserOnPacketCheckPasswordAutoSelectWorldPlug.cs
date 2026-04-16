@@ -38,7 +38,8 @@ public class UserOnPacketCheckPasswordAutoSelectWorldPlug : IPipelinePlug<UserOn
         LoginContext context,
         LoginDiagnostics? diagnostics = null,
         MemoryContext? memoryContext = null,
-        LoginMilestonesTracker? tracker = null)
+        LoginMilestonesTracker? tracker = null
+    )
     {
         _logger = logger;
         _config = options.Value;
@@ -64,16 +65,27 @@ public class UserOnPacketCheckPasswordAutoSelectWorldPlug : IPipelinePlug<UserOn
 
         // In passive mode, skip auto-login intervention but let diagnostics run
         var watchMode = _config.ClientMemory?.WatchMode ?? RueConfigClientMemory.WatchModeActive;
-        if (watchMode.Equals(RueConfigClientMemory.WatchModePassive, StringComparison.OrdinalIgnoreCase))
+        if (
+            watchMode.Equals(
+                RueConfigClientMemory.WatchModePassive,
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
         {
-            _logger?.LogInformation("[Rue-AutoLogin] Passive mode - skipping world select for {Username}", message.User.Account?.Username);
+            _logger?.LogInformation(
+                "[Rue-AutoLogin] Passive mode - skipping world select for {Username}",
+                message.User.Account?.Username
+            );
             _diagnostics?.RecordMilestone("PassiveModeStart");
             return;
         }
 
         if (message.User.State != LoginState.SelectWorld)
         {
-            _logger?.LogWarning("[Rue-AutoLogin] Skipping - state is {State}, expected SelectWorld", message.User.State);
+            _logger?.LogWarning(
+                "[Rue-AutoLogin] Skipping - state is {State}, expected SelectWorld",
+                message.User.State
+            );
             return;
         }
 
@@ -95,10 +107,18 @@ public class UserOnPacketCheckPasswordAutoSelectWorldPlug : IPipelinePlug<UserOn
             // Ensure memory context is initialized (idempotent — may have been initialized by CreateSecurityHandlePlug)
             var clientMemoryEnabled = _config.ClientMemory?.Enabled ?? false;
             if (clientMemoryEnabled && _memoryContext != null)
-                _memoryContext.TryInitialize(_config.ClientMemory!, _logger, _diagnostics, _config.DiagnosticsEnabled);
+                _memoryContext.TryInitialize(
+                    _config.ClientMemory!,
+                    _logger,
+                    _diagnostics,
+                    _config.DiagnosticsEnabled
+                );
 
-            _logger?.LogInformation("[Rue-AutoLogin] Selecting world {WorldID}, channel {ChannelID}",
-                _config.AutoSelectWorldID, _config.AutoSelectChannelID);
+            _logger?.LogInformation(
+                "[Rue-AutoLogin] Selecting world {WorldID}, channel {ChannelID}",
+                _config.AutoSelectWorldID,
+                _config.AutoSelectChannelID
+            );
 
             // Wait for CUIWorldSelect to exist before sending CheckUserLimitResult
             // If CUIWorldSelect is NULL when CheckUserLimitResult arrives, client crashes
@@ -106,16 +126,22 @@ public class UserOnPacketCheckPasswordAutoSelectWorldPlug : IPipelinePlug<UserOn
             {
                 var worldSelectOk = await Monitor.WaitWithTimeout(
                     ct => Monitor.WaitForSingleton("CUIWorldSelect", ct),
-                    "CUIWorldSelect");
+                    "CUIWorldSelect"
+                );
 
                 if (!worldSelectOk)
-                    _logger?.LogWarning("[Rue-AutoLogin] CUIWorldSelect timeout - proceeding anyway");
+                    _logger?.LogWarning(
+                        "[Rue-AutoLogin] CUIWorldSelect timeout - proceeding anyway"
+                    );
                 else
                     _diagnostics?.RecordMilestone("CUIWorldSelectCreated");
             }
             else if (delay > 0)
             {
-                _logger?.LogInformation("[Rue-AutoLogin] Waiting {Delay}ms for WorldInformation (delay-based)", delay);
+                _logger?.LogInformation(
+                    "[Rue-AutoLogin] Waiting {Delay}ms for WorldInformation (delay-based)",
+                    delay
+                );
                 await Task.Delay(delay);
                 _diagnostics?.RecordMilestone("CUIWorldSelectCreated");
             }
@@ -133,17 +159,27 @@ public class UserOnPacketCheckPasswordAutoSelectWorldPlug : IPipelinePlug<UserOn
                 _diagnostics?.LogMemoryWrite("CUIWorldSelect->m_nWorldIdx", -1, worldId);
 
                 if (Writer.SetWorldSelectWorldIdx(worldId))
-                    _logger?.LogInformation("[Rue-AutoLogin] Set CUIWorldSelect.m_nWorldIdx={WorldId}", worldId);
+                    _logger?.LogInformation(
+                        "[Rue-AutoLogin] Set CUIWorldSelect.m_nWorldIdx={WorldId}",
+                        worldId
+                    );
                 else
                     _logger?.LogWarning("[Rue-AutoLogin] Failed to set CUIWorldSelect.m_nWorldIdx");
             }
 
             _logger?.LogInformation("[Rue-AutoLogin] Sending CheckUserLimitResult");
             _diagnostics?.RecordMilestone("CheckUserLimitResult");
-            _diagnostics?.LogPacketSent("CheckUserLimitResult", (int)PacketSendOperations.CheckUserLimitResult,
-                new Dictionary<string, object?> { ["bOverUserLimit"] = 0, ["bPopulateLevel"] = 0 });
+            _diagnostics?.LogPacketSent(
+                "CheckUserLimitResult",
+                (int)PacketSendOperations.CheckUserLimitResult,
+                new Dictionary<string, object?> { ["bOverUserLimit"] = 0, ["bPopulateLevel"] = 0 }
+            );
 
-            using (var checkUserLimitPacket = new PacketWriter(PacketSendOperations.CheckUserLimitResult))
+            using (
+                var checkUserLimitPacket = new PacketWriter(
+                    PacketSendOperations.CheckUserLimitResult
+                )
+            )
             {
                 checkUserLimitPacket.WriteByte(0); // bOverUserLimit = 0
                 checkUserLimitPacket.WriteByte(0); // bPopulateLevel = 0
@@ -155,10 +191,13 @@ public class UserOnPacketCheckPasswordAutoSelectWorldPlug : IPipelinePlug<UserOn
             {
                 var channelSelectOk = await Monitor.WaitWithTimeout(
                     ct => Monitor.WaitForSingleton("CUIChannelSelect", ct),
-                    "CUIChannelSelect");
+                    "CUIChannelSelect"
+                );
 
                 if (!channelSelectOk)
-                    _logger?.LogWarning("[Rue-AutoLogin] CUIChannelSelect timeout - proceeding anyway");
+                    _logger?.LogWarning(
+                        "[Rue-AutoLogin] CUIChannelSelect timeout - proceeding anyway"
+                    );
                 else
                     _diagnostics?.RecordMilestone("CUIChannelSelectCreated");
             }
@@ -178,9 +217,10 @@ public class UserOnPacketCheckPasswordAutoSelectWorldPlug : IPipelinePlug<UserOn
             }
             else
             {
-                _logger?.LogInformation("[Rue-AutoLogin] Channel select ready - click channel to continue (no ClientMemory)");
+                _logger?.LogInformation(
+                    "[Rue-AutoLogin] Channel select ready - click channel to continue (no ClientMemory)"
+                );
             }
-
         }
         finally
         {
@@ -198,7 +238,9 @@ public class UserOnPacketCheckPasswordAutoSelectWorldPlug : IPipelinePlug<UserOn
     {
         if (Writer == null)
         {
-            _logger?.LogError("[Rue-AutoLogin] ClientMemory writer not available - check config and permissions");
+            _logger?.LogError(
+                "[Rue-AutoLogin] ClientMemory writer not available - check config and permissions"
+            );
             return;
         }
 
@@ -218,7 +260,9 @@ public class UserOnPacketCheckPasswordAutoSelectWorldPlug : IPipelinePlug<UserOn
         var clientMemoryConfig = _config.ClientMemory;
         if (clientMemoryConfig?.DumpFunctionsOnLogin ?? false)
         {
-            _logger?.LogInformation("[Rue-AutoLogin] Dumping SendLoginPacket chain for analysis...");
+            _logger?.LogInformation(
+                "[Rue-AutoLogin] Dumping SendLoginPacket chain for analysis..."
+            );
             var reportPath = _memoryContext?.DumpSendLoginPacketChain(clientMemoryConfig, _logger);
             if (reportPath != null)
                 _logger?.LogInformation("[Rue-AutoLogin] Function dump saved: {Path}", reportPath);
@@ -239,10 +283,10 @@ public class UserOnPacketCheckPasswordAutoSelectWorldPlug : IPipelinePlug<UserOn
             _context,
             user,
             worldId,
-            channelId);
+            channelId
+        );
 
         var strategy = useDirectCall ? _directStrategy : _manualStrategy;
         await strategy.Execute(strategyContext);
     }
-
 }

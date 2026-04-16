@@ -2,9 +2,7 @@
 
 namespace Edelstein.Common.Gameplay.Game.Objects.User.Messages;
 
-public record IncPOPMessage(
-    int Amount
-) : IPacketWritable
+public record IncPOPMessage(int Amount) : IPacketWritable
 {
     public void WriteTo(IPacketWriter writer)
     {

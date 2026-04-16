@@ -11,7 +11,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Resistance;
 public class Bmage4SkillHandler : Bmage3SkillHandler
 {
     public override int ID => Job.Bmage4;
-    
+
     public override Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
     {
         switch (context.Skill?.ID)
@@ -21,10 +21,10 @@ public class Bmage4SkillHandler : Bmage3SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -47,7 +47,7 @@ public class Bmage4SkillHandler : Bmage3SkillHandler
                 context.ResetTemporaryStatNegative();
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

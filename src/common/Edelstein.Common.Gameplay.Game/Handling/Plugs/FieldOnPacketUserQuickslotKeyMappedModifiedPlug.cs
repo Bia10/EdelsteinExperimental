@@ -3,7 +3,8 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class FieldOnPacketUserQuickslotKeyMappedModifiedPlug : IPipelinePlug<FieldOnPacketUserQuickslotKeyMappedModified>
+public class FieldOnPacketUserQuickslotKeyMappedModifiedPlug
+    : IPipelinePlug<FieldOnPacketUserQuickslotKeyMappedModified>
 {
     public Task Handle(IPipelineContext ctx, FieldOnPacketUserQuickslotKeyMappedModified message)
     {

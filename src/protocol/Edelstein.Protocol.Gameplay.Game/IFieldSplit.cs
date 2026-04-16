@@ -10,7 +10,11 @@ public interface IFieldSplit : IFieldObjectPool
 
     IReadOnlyCollection<IFieldSplitObserver> Observers { get; }
 
-    Task Enter(IFieldObject obj, Func<IPacket>? getEnterPacket = null, Func<IPacket>? getLeavePacket = null);
+    Task Enter(
+        IFieldObject obj,
+        Func<IPacket>? getEnterPacket = null,
+        Func<IPacket>? getLeavePacket = null
+    );
     Task Leave(IFieldObject obj, Func<IPacket>? getLeavePacket = null);
 
     Task MigrateIn(IFieldObject obj);

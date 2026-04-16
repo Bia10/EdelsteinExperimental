@@ -7,7 +7,8 @@ public sealed class FieldAccessor(
     MemoryAccessor memory,
     SingletonResolver resolver,
     NativeAllocator allocator,
-    ILogger? logger)
+    ILogger? logger
+)
 {
     private readonly MemoryAccessor _memory = memory;
     private readonly SingletonResolver _resolver = resolver;
@@ -45,14 +46,17 @@ public sealed class FieldAccessor(
             worldId,
             worldIdAddr.ToInt32(),
             channelId,
-            channelIdAddr.ToInt32());
+            channelIdAddr.ToInt32()
+        );
 
         return true;
     }
 
     public bool SetQuestManWorldId(int worldId)
     {
-        var ptrAddress = new IntPtr(unchecked((int)V95ClientStructs.Addresses.CQuestManSingletonPtr));
+        var ptrAddress = new IntPtr(
+            unchecked((int)V95ClientStructs.Addresses.CQuestManSingletonPtr)
+        );
         if (!_memory.TryReadInt32(ptrAddress, out var questManPtr))
         {
             _logger?.LogError("[Rue-CMemory] Failed to read CQuestMan pointer");
@@ -70,8 +74,11 @@ public sealed class FieldAccessor(
         if (!_memory.WriteInt32WithVerification(worldIdAddr, worldId))
             return false;
 
-        _logger?.LogInformation("[Rue-CMemory] Write CQuestMan.m_nWorldID=0x{WorldId:X} at 0x{Addr:X8}",
-            worldId, worldIdAddr.ToInt32());
+        _logger?.LogInformation(
+            "[Rue-CMemory] Write CQuestMan.m_nWorldID=0x{WorldId:X} at 0x{Addr:X8}",
+            worldId,
+            worldIdAddr.ToInt32()
+        );
 
         return true;
     }
@@ -227,8 +234,11 @@ public sealed class FieldAccessor(
         if (!_memory.WriteInt32WithVerification(addr, selected))
             return false;
 
-        _logger?.LogInformation("[Rue-CMemory] Write CUIChannelSelect.m_nSelect=0x{Selected:X} at 0x{Addr:X8}",
-            selected, addr.ToInt32());
+        _logger?.LogInformation(
+            "[Rue-CMemory] Write CUIChannelSelect.m_nSelect=0x{Selected:X} at 0x{Addr:X8}",
+            selected,
+            addr.ToInt32()
+        );
 
         return true;
     }
@@ -246,8 +256,11 @@ public sealed class FieldAccessor(
         if (!_memory.WriteInt32WithVerification(addr, ptr))
             return false;
 
-        _logger?.LogInformation("[Rue-CMemory] Write CUIChannelSelect.m_pWorldItem=0x{Ptr:X} at 0x{Addr:X8}",
-            ptr, addr.ToInt32());
+        _logger?.LogInformation(
+            "[Rue-CMemory] Write CUIChannelSelect.m_pWorldItem=0x{Ptr:X} at 0x{Addr:X8}",
+            ptr,
+            addr.ToInt32()
+        );
 
         return true;
     }
@@ -273,26 +286,44 @@ public sealed class FieldAccessor(
     {
         if (!_resolver.FindCWvsContext())
         {
-            _logger?.LogWarning("[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: CWvsContext not found");
+            _logger?.LogWarning(
+                "[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: CWvsContext not found"
+            );
             return false;
         }
 
         if (!_resolver.FindCLogin())
         {
-            _logger?.LogWarning("[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: CLogin not found");
+            _logger?.LogWarning(
+                "[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: CLogin not found"
+            );
             return false;
         }
 
-        if (!TryResolveWorldItemInternal(worldId, out var worldItemPtr, out var channelItemsPtr, out var channelCount))
+        if (
+            !TryResolveWorldItemInternal(
+                worldId,
+                out var worldItemPtr,
+                out var channelItemsPtr,
+                out var channelCount
+            )
+        )
         {
-            _logger?.LogWarning("[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: world item not resolved (worldId={WorldId})", worldId);
+            _logger?.LogWarning(
+                "[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: world item not resolved (worldId={WorldId})",
+                worldId
+            );
             return false;
         }
 
         if (channelCount <= 0)
         {
-            _logger?.LogWarning("[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: channelCount={Count} (worldId={WorldId}, ci=0x{Ptr:X8})",
-                channelCount, worldId, channelItemsPtr.ToInt32());
+            _logger?.LogWarning(
+                "[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: channelCount={Count} (worldId={WorldId}, ci=0x{Ptr:X8})",
+                channelCount,
+                worldId,
+                channelItemsPtr.ToInt32()
+            );
             return false;
         }
 
@@ -301,9 +332,15 @@ public sealed class FieldAccessor(
 
         for (var i = 0; i < channelCount; i++)
         {
-            var baseAddr = IntPtr.Add(channelItemsPtr, i * V95ClientStructs.Offsets.ChannelItem.Stride);
+            var baseAddr = IntPtr.Add(
+                channelItemsPtr,
+                i * V95ClientStructs.Offsets.ChannelItem.Stride
+            );
             var namePtr = _memory.ReadInt32Stable(baseAddr) ?? 0;
-            var adult = _memory.ReadInt32Stable(IntPtr.Add(baseAddr, V95ClientStructs.Offsets.ChannelItem.AdultFlag)) ?? 0;
+            var adult =
+                _memory.ReadInt32Stable(
+                    IntPtr.Add(baseAddr, V95ClientStructs.Offsets.ChannelItem.AdultFlag)
+                ) ?? 0;
 
             channelNames.Add(ZXString.FromPointer(new IntPtr(namePtr)));
             adultChannels.Add(adult);
@@ -315,9 +352,13 @@ public sealed class FieldAccessor(
             var samples = new List<string>(sampleCount);
             for (var i = 0; i < sampleCount; i++)
             {
-                var itemPtr = IntPtr.Add(channelItemsPtr, i * V95ClientStructs.Offsets.ChannelItem.Stride);
+                var itemPtr = IntPtr.Add(
+                    channelItemsPtr,
+                    i * V95ClientStructs.Offsets.ChannelItem.Stride
+                );
                 var namePtr = _memory.ReadInt32Stable(itemPtr) ?? 0;
-                var name = namePtr != 0 ? _memory.ReadCString(new IntPtr(namePtr), 48) : string.Empty;
+                var name =
+                    namePtr != 0 ? _memory.ReadCString(new IntPtr(namePtr), 48) : string.Empty;
                 var adult = adultChannels[i];
                 var label = string.IsNullOrWhiteSpace(name) ? "<null>" : name;
                 samples.Add($"#{i} name={label}(0x{namePtr:X}) adult={adult}");
@@ -329,20 +370,25 @@ public sealed class FieldAccessor(
                 worldItemPtr.ToInt32(),
                 channelItemsPtr.ToInt32(),
                 channelCount,
-                string.Join(", ", samples));
+                string.Join(", ", samples)
+            );
         }
 
         var channelNameArray = ZArray<ZXString>.Create(_allocator, channelNames);
         if (channelNameArray == IntPtr.Zero)
         {
-            _logger?.LogWarning("[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: create channel name ZArray");
+            _logger?.LogWarning(
+                "[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: create channel name ZArray"
+            );
             return false;
         }
 
         var adultChannelArray = ZArray<int>.Create(_allocator, adultChannels);
         if (adultChannelArray == IntPtr.Zero)
         {
-            _logger?.LogWarning("[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: create adult channel ZArray");
+            _logger?.LogWarning(
+                "[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: create adult channel ZArray"
+            );
             return false;
         }
 
@@ -354,12 +400,20 @@ public sealed class FieldAccessor(
         _channelNameArrayPtr = channelNameArray;
         _adultChannelArrayPtr = adultChannelArray;
 
-        var cwvsChannelNameAddr = IntPtr.Add(_resolver.CWvsContextBase, V95ClientStructs.Offsets.CWvsContext.ChannelName);
-        var cwvsAdultChannelAddr = IntPtr.Add(_resolver.CWvsContextBase, V95ClientStructs.Offsets.CWvsContext.AdultChannel);
+        var cwvsChannelNameAddr = IntPtr.Add(
+            _resolver.CWvsContextBase,
+            V95ClientStructs.Offsets.CWvsContext.ChannelName
+        );
+        var cwvsAdultChannelAddr = IntPtr.Add(
+            _resolver.CWvsContextBase,
+            V95ClientStructs.Offsets.CWvsContext.AdultChannel
+        );
 
         if (!_memory.WriteInt32WithVerification(cwvsChannelNameAddr, channelNameArray.ToInt32()))
         {
-            _logger?.LogWarning("[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: write CWvsContext ChannelName ptr");
+            _logger?.LogWarning(
+                "[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: write CWvsContext ChannelName ptr"
+            );
             return false;
         }
 
@@ -367,11 +421,14 @@ public sealed class FieldAccessor(
             "[Rue-CMemory] Write CWvsContext.m_aChannelName.a count={Count} ptr=0x{Ptr:X8} at 0x{Addr:X8}",
             channelCount,
             channelNameArray.ToInt32(),
-            cwvsChannelNameAddr.ToInt32());
+            cwvsChannelNameAddr.ToInt32()
+        );
 
         if (!_memory.WriteInt32WithVerification(cwvsAdultChannelAddr, adultChannelArray.ToInt32()))
         {
-            _logger?.LogWarning("[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: write CWvsContext AdultChannel ptr");
+            _logger?.LogWarning(
+                "[Rue-CMemory] EnsureContextChannelArraysFromWorldItem failed: write CWvsContext AdultChannel ptr"
+            );
             return false;
         }
 
@@ -379,12 +436,18 @@ public sealed class FieldAccessor(
             "[Rue-CMemory] Write CWvsContext.m_aAdultChannel.a count={Count} ptr=0x{Ptr:X8} at 0x{Addr:X8}",
             channelCount,
             adultChannelArray.ToInt32(),
-            cwvsAdultChannelAddr.ToInt32());
+            cwvsAdultChannelAddr.ToInt32()
+        );
 
         return true;
     }
 
-    private bool TryResolveWorldItemInternal(int worldId, out IntPtr worldItemPtr, out IntPtr channelItemsPtr, out int channelCount)
+    private bool TryResolveWorldItemInternal(
+        int worldId,
+        out IntPtr worldItemPtr,
+        out IntPtr channelItemsPtr,
+        out int channelCount
+    )
     {
         worldItemPtr = IntPtr.Zero;
         channelItemsPtr = IntPtr.Zero;
@@ -393,7 +456,9 @@ public sealed class FieldAccessor(
         if (_resolver.CLoginBase == IntPtr.Zero)
             return false;
 
-        var worldArrayPtrValue = _memory.ReadInt32Stable(IntPtr.Add(_resolver.CLoginBase, V95ClientStructs.Offsets.CLogin.WorldItem));
+        var worldArrayPtrValue = _memory.ReadInt32Stable(
+            IntPtr.Add(_resolver.CLoginBase, V95ClientStructs.Offsets.CLogin.WorldItem)
+        );
         if (!worldArrayPtrValue.HasValue || worldArrayPtrValue.Value == 0)
             return false;
 
@@ -405,14 +470,18 @@ public sealed class FieldAccessor(
             if (!_memory.IsReadable(itemPtr, V95ClientStructs.Offsets.WorldItem.Stride))
                 break;
 
-            var id = _memory.ReadInt32Stable(IntPtr.Add(itemPtr, V95ClientStructs.Offsets.WorldItem.Id));
+            var id = _memory.ReadInt32Stable(
+                IntPtr.Add(itemPtr, V95ClientStructs.Offsets.WorldItem.Id)
+            );
             if (!id.HasValue)
                 break;
 
             if (id.Value < 0 || id.Value > MaxWorldId)
                 break;
 
-            var namePtr = _memory.ReadInt32Stable(IntPtr.Add(itemPtr, V95ClientStructs.Offsets.WorldItem.NamePtr));
+            var namePtr = _memory.ReadInt32Stable(
+                IntPtr.Add(itemPtr, V95ClientStructs.Offsets.WorldItem.NamePtr)
+            );
             if (namePtr.HasValue && namePtr.Value != 0)
             {
                 if (!_memory.IsReadable(new IntPtr(namePtr.Value), 1))
@@ -423,7 +492,9 @@ public sealed class FieldAccessor(
                 continue;
 
             worldItemPtr = itemPtr;
-            var ciPtrValue = _memory.ReadInt32Stable(IntPtr.Add(itemPtr, V95ClientStructs.Offsets.WorldItem.ChannelItemsPtr));
+            var ciPtrValue = _memory.ReadInt32Stable(
+                IntPtr.Add(itemPtr, V95ClientStructs.Offsets.WorldItem.ChannelItemsPtr)
+            );
             channelItemsPtr = ciPtrValue.HasValue ? new IntPtr(ciPtrValue.Value) : IntPtr.Zero;
             channelCount = ScanChannelCount(channelItemsPtr, worldId);
             return true;
@@ -441,19 +512,28 @@ public sealed class FieldAccessor(
 
         for (var i = 0; i < MaxChannelItems; i++)
         {
-            var chPtr = IntPtr.Add(channelItemsPtr, i * V95ClientStructs.Offsets.ChannelItem.Stride);
+            var chPtr = IntPtr.Add(
+                channelItemsPtr,
+                i * V95ClientStructs.Offsets.ChannelItem.Stride
+            );
             if (!_memory.IsReadable(chPtr, V95ClientStructs.Offsets.ChannelItem.Stride))
                 break;
 
-            var namePtr = _memory.ReadInt32Stable(IntPtr.Add(chPtr, V95ClientStructs.Offsets.ChannelItem.NamePtr));
+            var namePtr = _memory.ReadInt32Stable(
+                IntPtr.Add(chPtr, V95ClientStructs.Offsets.ChannelItem.NamePtr)
+            );
             if (namePtr.HasValue && namePtr.Value != 0)
             {
                 if (!_memory.IsReadable(new IntPtr(namePtr.Value), 1))
                     break;
             }
 
-            var chWorld = _memory.ReadInt32Stable(IntPtr.Add(chPtr, V95ClientStructs.Offsets.ChannelItem.WorldId));
-            var chId = _memory.ReadInt32Stable(IntPtr.Add(chPtr, V95ClientStructs.Offsets.ChannelItem.ChannelId));
+            var chWorld = _memory.ReadInt32Stable(
+                IntPtr.Add(chPtr, V95ClientStructs.Offsets.ChannelItem.WorldId)
+            );
+            var chId = _memory.ReadInt32Stable(
+                IntPtr.Add(chPtr, V95ClientStructs.Offsets.ChannelItem.ChannelId)
+            );
             if (!chWorld.HasValue || !chId.HasValue)
                 break;
 
@@ -519,8 +599,11 @@ public sealed class FieldAccessor(
         if (!_memory.WriteInt32WithVerification(addr, worldIdx))
             return false;
 
-        _logger?.LogInformation("[Rue-CMemory] Write CUIWorldSelect.m_nWorldIdx=0x{WorldIdx:X} at 0x{Addr:X8}",
-            worldIdx, addr.ToInt32());
+        _logger?.LogInformation(
+            "[Rue-CMemory] Write CUIWorldSelect.m_nWorldIdx=0x{WorldIdx:X} at 0x{Addr:X8}",
+            worldIdx,
+            addr.ToInt32()
+        );
 
         return true;
     }
@@ -537,7 +620,10 @@ public sealed class FieldAccessor(
         var stepChanging = ReadStepChanging(baseAddr);
         if (stepChanging is > 0)
         {
-            _logger?.LogWarning("[Rue-CMemory] Refusing to write m_bRequestSent while m_tStepChanging={Value}", stepChanging);
+            _logger?.LogWarning(
+                "[Rue-CMemory] Refusing to write m_bRequestSent while m_tStepChanging={Value}",
+                stepChanging
+            );
             return false;
         }
 
@@ -545,8 +631,11 @@ public sealed class FieldAccessor(
         if (!_memory.WriteInt32WithVerification(requestSentAddr, value ? 1 : 0))
             return false;
 
-        _logger?.LogInformation("[Rue-CMemory] Write CLogin.m_bRequestSent={Value} at 0x{Addr:X8}",
-            value ? 1 : 0, requestSentAddr.ToInt32());
+        _logger?.LogInformation(
+            "[Rue-CMemory] Write CLogin.m_bRequestSent={Value} at 0x{Addr:X8}",
+            value ? 1 : 0,
+            requestSentAddr.ToInt32()
+        );
 
         return true;
     }

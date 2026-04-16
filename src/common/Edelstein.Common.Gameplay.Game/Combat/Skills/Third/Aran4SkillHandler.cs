@@ -8,7 +8,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Third;
 public class Aran4SkillHandler : Aran3SkillHandler
 {
     public override int ID => Job.Aran4;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

@@ -6,14 +6,18 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
-public class UserClientTimerEndRequestHandler : AbstractPipedFieldHandler<FieldOnPacketUserClientTimerEndRequest>
+public class UserClientTimerEndRequestHandler
+    : AbstractPipedFieldHandler<FieldOnPacketUserClientTimerEndRequest>
 {
-    public UserClientTimerEndRequestHandler(IPipeline<FieldOnPacketUserClientTimerEndRequest> pipeline) : base(pipeline)
-    {
-    }
+    public UserClientTimerEndRequestHandler(
+        IPipeline<FieldOnPacketUserClientTimerEndRequest> pipeline
+    )
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.UserClientTimerEndRequest;
 
-    protected override FieldOnPacketUserClientTimerEndRequest? Serialize(IFieldUser user, IPacketReader reader)
-        => new(user);
+    protected override FieldOnPacketUserClientTimerEndRequest? Serialize(
+        IFieldUser user,
+        IPacketReader reader
+    ) => new(user);
 }

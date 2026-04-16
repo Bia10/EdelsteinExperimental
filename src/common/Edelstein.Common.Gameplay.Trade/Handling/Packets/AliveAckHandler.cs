@@ -7,7 +7,6 @@ namespace Edelstein.Common.Gameplay.Trade.Handling.Packets;
 
 public class AliveAckHandler : AbstractAliveAckHandler<ITradeStageUser>
 {
-    public AliveAckHandler(IPipeline<UserOnPacketAliveAck<ITradeStageUser>> pipeline) : base(pipeline)
-    {
-    }
+    public AliveAckHandler(IPipeline<UserOnPacketAliveAck<ITradeStageUser>> pipeline)
+        : base(pipeline) { }
 }

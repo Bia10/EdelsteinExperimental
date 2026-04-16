@@ -19,7 +19,7 @@ public class PirateCaptain4SkillHandler : PirateCaptain3SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Dazzle, user.Character.ID);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
 
@@ -31,7 +31,7 @@ public class PirateCaptain4SkillHandler : PirateCaptain3SkillHandler
                 context.SetTwoStateRideVehicle(1932000);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 
@@ -43,7 +43,7 @@ public class PirateCaptain4SkillHandler : PirateCaptain3SkillHandler
                 context.ResetTwoStateRideVehicle();
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

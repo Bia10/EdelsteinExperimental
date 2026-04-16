@@ -12,8 +12,11 @@ public class AskSlideMenuRequest : AbstractConversationMessageRequest<int>
 
     public AskSlideMenuRequest(
         IConversationSpeaker speaker,
-        int slideMenuType, int selected, IDictionary<int, string> menu
-    ) : base(speaker)
+        int slideMenuType,
+        int selected,
+        IDictionary<int, string> menu
+    )
+        : base(speaker)
     {
         _slideMenuType = slideMenuType;
         _selected = selected;
@@ -28,9 +31,8 @@ public class AskSlideMenuRequest : AbstractConversationMessageRequest<int>
     {
         writer.WriteInt(_slideMenuType);
         writer.WriteInt(_selected);
-        writer.WriteString(string.Join(
-            string.Empty,
-            _menu.Select(p => "#" + p.Key + "#" + p.Value)
-        ));
+        writer.WriteString(
+            string.Join(string.Empty, _menu.Select(p => "#" + p.Key + "#" + p.Value))
+        );
     }
 }

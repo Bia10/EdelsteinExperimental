@@ -16,7 +16,8 @@ namespace Edelstein.Common.Services.Server.Migrations
                 type: "text",
                 nullable: false,
                 oldClrType: typeof(byte[]),
-                oldType: "bytea");
+                oldType: "bytea"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "AccountWorld",
@@ -24,7 +25,8 @@ namespace Edelstein.Common.Services.Server.Migrations
                 type: "text",
                 nullable: false,
                 oldClrType: typeof(byte[]),
-                oldType: "bytea");
+                oldType: "bytea"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Account",
@@ -32,7 +34,8 @@ namespace Edelstein.Common.Services.Server.Migrations
                 type: "text",
                 nullable: false,
                 oldClrType: typeof(byte[]),
-                oldType: "bytea");
+                oldType: "bytea"
+            );
         }
 
         /// <inheritdoc />
@@ -44,7 +47,8 @@ namespace Edelstein.Common.Services.Server.Migrations
                 type: "bytea",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<byte[]>(
                 name: "AccountWorld",
@@ -52,7 +56,8 @@ namespace Edelstein.Common.Services.Server.Migrations
                 type: "bytea",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
 
             migrationBuilder.AlterColumn<byte[]>(
                 name: "Account",
@@ -60,7 +65,8 @@ namespace Edelstein.Common.Services.Server.Migrations
                 type: "bytea",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "text");
+                oldType: "text"
+            );
         }
     }
 }

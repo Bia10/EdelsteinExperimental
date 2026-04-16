@@ -8,12 +8,13 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
 public class ContiStateHandler : AbstractPipedFieldHandler<FieldOnPacketUserContiState>
 {
-    public ContiStateHandler(IPipeline<FieldOnPacketUserContiState> pipeline) : base(pipeline)
-    {
-    }
+    public ContiStateHandler(IPipeline<FieldOnPacketUserContiState> pipeline)
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.CONTISTATE;
 
-    protected override FieldOnPacketUserContiState? Serialize(IFieldUser user, IPacketReader reader)
-        => new(user);
+    protected override FieldOnPacketUserContiState? Serialize(
+        IFieldUser user,
+        IPacketReader reader
+    ) => new(user);
 }

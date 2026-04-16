@@ -8,7 +8,7 @@ public class NotSaleTemplateLoader : ITemplateLoader
 {
     private readonly IDataNamespace _data;
     private readonly ITemplateManager<NotSaleTemplate> _manager;
-    
+
     public NotSaleTemplateLoader(IDataNamespace data, ITemplateManager<NotSaleTemplate> manager)
     {
         _data = data;
@@ -17,15 +17,18 @@ public class NotSaleTemplateLoader : ITemplateLoader
 
     public async Task<int> Load()
     {
-        await Task.WhenAll(_data.ResolvePath("Server/NotSale.img")?.Children
-            .Select(async n =>
-            {
-                var sn = n.ResolveInt() ?? 0;
-                await _manager.Insert(new TemplateProviderEager<NotSaleTemplate>(
-                    sn,
-                    new NotSaleTemplate(sn)
-                ));
-            }) ?? Array.Empty<Task>());
+        await Task.WhenAll(
+            _data
+                .ResolvePath("Server/NotSale.img")
+                ?.Children.Select(async n =>
+                {
+                    var sn = n.ResolveInt() ?? 0;
+                    await _manager.Insert(
+                        new TemplateProviderEager<NotSaleTemplate>(sn, new NotSaleTemplate(sn))
+                    );
+                })
+                ?? Array.Empty<Task>()
+        );
 
         _manager.Freeze();
         return _manager.Count;

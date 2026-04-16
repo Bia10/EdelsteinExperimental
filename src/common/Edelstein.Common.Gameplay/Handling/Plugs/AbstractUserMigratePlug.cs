@@ -7,7 +7,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Edelstein.Common.Gameplay.Handling.Plugs;
 
-public abstract class AbstractUserMigratePlug<TStage, TStageUser> : IPipelinePlug<UserMigrate<TStageUser>>
+public abstract class AbstractUserMigratePlug<TStage, TStageUser>
+    : IPipelinePlug<UserMigrate<TStageUser>>
     where TStage : IStage<TStageUser>
     where TStageUser : class, IStageUser<TStageUser>
 {
@@ -28,8 +29,11 @@ public abstract class AbstractUserMigratePlug<TStage, TStageUser> : IPipelinePlu
 
     public async Task Handle(IPipelineContext ctx, UserMigrate<TStageUser> message)
     {
-
-        if (message.User.Account == null || message.User.AccountWorld == null || message.User.Character == null)
+        if (
+            message.User.Account == null
+            || message.User.AccountWorld == null
+            || message.User.Character == null
+        )
         {
             await message.User.Disconnect();
             return;
@@ -52,7 +56,8 @@ public abstract class AbstractUserMigratePlug<TStage, TStageUser> : IPipelinePlu
             await message.User.Disconnect();
             _logger.LogDebug(
                 "Failed to migrate out for user {Name} due to {Reason}",
-                message.User.Character.Name, response.Result
+                message.User.Character.Name,
+                response.Result
             );
             return;
         }
@@ -62,7 +67,9 @@ public abstract class AbstractUserMigratePlug<TStage, TStageUser> : IPipelinePlu
             await message.User.Dispatch(message.Packet);
         _logger.LogDebug(
             "Migrated out character {Name} from service {From} to service {To} ",
-            message.User.Character.Name, _stage.ID, message.ServerID
+            message.User.Character.Name,
+            _stage.ID,
+            message.ServerID
         );
     }
 }

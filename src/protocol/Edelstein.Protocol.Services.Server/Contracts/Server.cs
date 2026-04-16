@@ -1,7 +1,3 @@
 ﻿namespace Edelstein.Protocol.Services.Server.Contracts;
 
-public record Server(
-    string ID,
-    string Host,
-    int Port
-) : IServer;
+public record Server(string ID, string Host, int Port) : IServer;

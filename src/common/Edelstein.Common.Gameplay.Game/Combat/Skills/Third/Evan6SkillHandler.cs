@@ -15,7 +15,7 @@ public class Evan6SkillHandler : Evan5SkillHandler
         // TODO EvanSlow
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -27,7 +27,7 @@ public class Evan6SkillHandler : Evan5SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.EvanSlow, 1);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

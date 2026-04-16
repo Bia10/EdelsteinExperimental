@@ -24,7 +24,8 @@ public class FieldOnPacketGuildLeaveRequestPlug : IPipelinePlug<FieldOnPacketGui
                 message.User.StageUser.Guild.ID,
                 message.User.Character.ID,
                 message.User.Character.Name
-            ));
+            )
+        );
 
         // Success → NotifyGuildMemberWithdrawn handles broadcast.
         if (response.Result == GuildResult.Success)

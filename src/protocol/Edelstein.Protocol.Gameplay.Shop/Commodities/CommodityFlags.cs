@@ -21,5 +21,5 @@ public enum CommodityFlags
     PbCash = 0x2000,
     PbPoint = 0x4000,
     PbGift = 0x80000,
-    PackageSN = 0x10000
+    PackageSN = 0x10000,
 }

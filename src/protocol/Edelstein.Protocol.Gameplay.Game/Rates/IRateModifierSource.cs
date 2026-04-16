@@ -1,4 +1,4 @@
-namespace Edelstein.Protocol.Gameplay.Game.Rates;
+﻿namespace Edelstein.Protocol.Gameplay.Game.Rates;
 
 public interface IRateModifierSource
 {

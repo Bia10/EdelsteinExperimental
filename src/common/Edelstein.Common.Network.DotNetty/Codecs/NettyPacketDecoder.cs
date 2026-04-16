@@ -17,18 +17,19 @@ public class NettyPacketDecoder : ReplayingDecoder<NettyPacketState>
 
     private short _sequence;
 
-    public NettyPacketDecoder(
-        TransportVersion version,
-        AESCipher aesCipher,
-        IGCipher igCipher
-    ) : base(NettyPacketState.DecodingHeader)
+    public NettyPacketDecoder(TransportVersion version, AESCipher aesCipher, IGCipher igCipher)
+        : base(NettyPacketState.DecodingHeader)
     {
         _version = version;
         _aesCipher = aesCipher;
         _igCipher = igCipher;
     }
 
-    protected override void Decode(IChannelHandlerContext context, IByteBuffer input, List<object> output)
+    protected override void Decode(
+        IChannelHandlerContext context,
+        IByteBuffer input,
+        List<object> output
+    )
     {
         var socket = context.Channel.GetAttribute(NettyAttributes.SocketKey).Get();
 
@@ -46,7 +47,8 @@ public class NettyPacketDecoder : ReplayingDecoder<NettyPacketState>
                     var sequence = input.ReadShortLE();
                     var length = input.ReadShortLE();
 
-                    if (socket.IsDataEncrypted) length ^= sequence;
+                    if (socket.IsDataEncrypted)
+                        length ^= sequence;
 
                     _sequence = sequence;
                     _length = length;
@@ -76,15 +78,16 @@ public class NettyPacketDecoder : ReplayingDecoder<NettyPacketState>
                 input.ReadBytes(buffer, 0, _length);
                 Checkpoint(NettyPacketState.DecodingHeader);
 
-                if (_length < 0x2) return;
+                if (_length < 0x2)
+                    return;
 
                 if (socket != null)
                 {
                     var seqRecv = socket.SeqRecv;
                     var version = (short)(seqRecv >> 16) ^ _sequence;
 
-                    if (!(version == -(_version.Major + 1) ||
-                          version == _version.Major)) return;
+                    if (!(version == -(_version.Major + 1) || version == _version.Major))
+                        return;
 
                     if (socket.IsDataEncrypted)
                     {

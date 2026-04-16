@@ -24,7 +24,7 @@ public class Striker3SkillHandler : Striker2SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.Spark, context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

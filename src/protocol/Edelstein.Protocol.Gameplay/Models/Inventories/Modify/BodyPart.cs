@@ -85,5 +85,5 @@ public enum BodyPart : short
     MechanicArm = 1101,
     MechanicLeg = 1102,
     MechanicFrame = 1103,
-    MechanicTransistor = 1104
+    MechanicTransistor = 1104,
 }

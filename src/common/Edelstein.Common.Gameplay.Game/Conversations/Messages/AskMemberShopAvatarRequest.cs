@@ -5,12 +5,8 @@ namespace Edelstein.Common.Gameplay.Game.Conversations.Messages;
 
 public class AskMemberShopAvatarRequest : AskAvatarRequest
 {
+    public AskMemberShopAvatarRequest(IConversationSpeaker speaker, string text, int[] styles)
+        : base(speaker, text, styles) { }
 
-    public AskMemberShopAvatarRequest(
-        IConversationSpeaker speaker,
-        string text, int[] styles
-    ) : base(speaker, text, styles)
-    {
-    }
     public override ConversationMessageType Type => ConversationMessageType.AskMemberShopAvatar;
 }

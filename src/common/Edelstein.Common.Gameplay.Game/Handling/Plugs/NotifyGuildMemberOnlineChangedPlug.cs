@@ -18,15 +18,12 @@ public class NotifyGuildMemberOnlineChangedPlug : IPipelinePlug<NotifyGuildMembe
 {
     private readonly IGameStage _stage;
 
-    public NotifyGuildMemberOnlineChangedPlug(IGameStage stage) =>
-        _stage = stage;
+    public NotifyGuildMemberOnlineChangedPlug(IGameStage stage) => _stage = stage;
 
     public async Task Handle(IPipelineContext ctx, NotifyGuildMemberOnlineChanged message)
     {
         var users = await _stage.Users.RetrieveAll();
-        var affected = users
-            .Where(u => u.Guild?.ID == message.GuildID)
-            .ToImmutableArray();
+        var affected = users.Where(u => u.Guild?.ID == message.GuildID).ToImmutableArray();
 
         // Offline sentinel used throughout the codebase is −2.
         var updatedChannelID = message.IsOnline ? 0 : -2;
@@ -34,8 +31,10 @@ public class NotifyGuildMemberOnlineChangedPlug : IPipelinePlug<NotifyGuildMembe
         foreach (var user in affected)
         {
             // Mirror the online status change into the local snapshot.
-            if (user.Guild?.Members.TryGetValue(message.CharacterID, out var member) == true
-                && member is GuildMembershipMember m)
+            if (
+                user.Guild?.Members.TryGetValue(message.CharacterID, out var member) == true
+                && member is GuildMembershipMember m
+            )
             {
                 m.ChannelID = updatedChannelID;
             }

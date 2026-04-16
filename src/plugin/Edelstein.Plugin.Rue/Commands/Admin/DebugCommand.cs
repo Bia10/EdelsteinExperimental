@@ -17,19 +17,26 @@ public class DebugCommand : AbstractCommand<DebugCommandArgs>
 
     protected override async Task Execute(IFieldUser user, DebugCommandArgs args)
     {
-        var answer = await user.Prompt(target => target.AskMenu(
-            "What would you like to debug?", new Dictionary<int, string>
-            {
-                [0] = "Stats",
-                [1] = "Temporary Stats Records",
-                [2] = "Skill Records",
-                [3] = "ExtendedSP Records",
-                [4] = "Quest Records",
-                [5] = "QuestEx Records",
-                [6] = "QuestCompleted Records",
-            }), -1);
+        var answer = await user.Prompt(
+            target =>
+                target.AskMenu(
+                    "What would you like to debug?",
+                    new Dictionary<int, string>
+                    {
+                        [0] = "Stats",
+                        [1] = "Temporary Stats Records",
+                        [2] = "Skill Records",
+                        [3] = "ExtendedSP Records",
+                        [4] = "Quest Records",
+                        [5] = "QuestEx Records",
+                        [6] = "QuestCompleted Records",
+                    }
+                ),
+            -1
+        );
 
-        if (answer == -1) return;
+        if (answer == -1)
+            return;
 
         switch (answer)
         {
@@ -50,9 +57,11 @@ public class DebugCommand : AbstractCommand<DebugCommandArgs>
                     "Temporary stats",
                     user.Character.TemporaryStats.Records.ToDictionary(
                         kvp => kvp.Key.ToString(),
-                        kvp => kvp.Value.ToString() ?? string.Empty),
+                        kvp => kvp.Value.ToString() ?? string.Empty
+                    ),
                     kvp => $"Type: {kvp.Key} Record: {kvp.Value}",
-                    args.ToChat);
+                    args.ToChat
+                );
                 break;
             case 2:
                 await DisplayRecordsToUser(
@@ -60,7 +69,8 @@ public class DebugCommand : AbstractCommand<DebugCommandArgs>
                     "Skill",
                     user.Stats.SkillLevels.Records,
                     kvp => $"Id: {kvp.Key} Level: {kvp.Value}",
-                    args.ToChat);
+                    args.ToChat
+                );
                 break;
             case 3:
                 await DisplayRecordsToUser(
@@ -68,7 +78,8 @@ public class DebugCommand : AbstractCommand<DebugCommandArgs>
                     "ExtendSP",
                     user.Character.ExtendSP.Records,
                     kvp => $"Id: {kvp.Key} Level: {kvp.Value}",
-                    args.ToChat);
+                    args.ToChat
+                );
                 break;
             case 4:
                 await DisplayRecordsToUser(
@@ -76,9 +87,11 @@ public class DebugCommand : AbstractCommand<DebugCommandArgs>
                     "Quest",
                     user.Character.QuestRecords.Records.ToDictionary(
                         kvp => kvp.Key.ToString(),
-                        kvp => kvp.Value.ToString() ?? string.Empty),
+                        kvp => kvp.Value.ToString() ?? string.Empty
+                    ),
                     kvp => $"Id: {kvp.Key} Value: {kvp.Value}",
-                    args.ToChat);
+                    args.ToChat
+                );
                 break;
             case 5:
                 await DisplayRecordsToUser(
@@ -86,9 +99,11 @@ public class DebugCommand : AbstractCommand<DebugCommandArgs>
                     "QuestEx",
                     user.Character.QuestRecordsEx.Records.ToDictionary(
                         kvp => kvp.Key.ToString(),
-                        kvp => kvp.Value.ToString() ?? string.Empty),
+                        kvp => kvp.Value.ToString() ?? string.Empty
+                    ),
                     kvp => $"Id: {kvp.Key} Value: {kvp.Value}",
-                    args.ToChat);
+                    args.ToChat
+                );
                 break;
             case 6:
                 await DisplayRecordsToUser(
@@ -96,9 +111,11 @@ public class DebugCommand : AbstractCommand<DebugCommandArgs>
                     "QuestCompleted",
                     user.Character.QuestCompletes.Records.ToDictionary(
                         kvp => kvp.Key.ToString(),
-                        kvp => kvp.Value.ToString() ?? string.Empty),
+                        kvp => kvp.Value.ToString() ?? string.Empty
+                    ),
                     kvp => $"Id: {kvp.Key} Value: {kvp.Value}",
-                    args.ToChat);
+                    args.ToChat
+                );
                 break;
         }
     }
@@ -108,7 +125,8 @@ public class DebugCommand : AbstractCommand<DebugCommandArgs>
         string header,
         IDictionary<T, T> record,
         Func<KeyValuePair<T, T>, string> formatting,
-        bool outputToChat = false)
+        bool outputToChat = false
+    )
     {
         var characterName = outputToChat ? user.Character.Name : "#e#b#h #";
         var newline = outputToChat ? string.Empty : "\\n";

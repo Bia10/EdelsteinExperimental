@@ -11,5 +11,5 @@ public enum AttackActionType : byte
     ThrowingGloves = 0x7,
     Knuckle = 0x8,
     Gun = 0x9,
-    DualDagger = 0xA
+    DualDagger = 0xA,
 }

@@ -36,47 +36,40 @@ public class RueGamePlugin : IGamePlugin
 
         ctx.Pipelines.FieldOnPacketUserChat.Add(
             PipelinePriority.High,
-            new FieldOnPacketUserChatCommandPlug(commandManager));
+            new FieldOnPacketUserChatCommandPlug(commandManager)
+        );
 
         _ = RunIndexingAsync(commandManager, host.Logger, _options);
     }
 
-    public Task OnStop()
-        => Task.CompletedTask;
+    public Task OnStop() => Task.CompletedTask;
 
     private static async Task RegisterCommands(
         CommandManager commandManager,
         IPluginHost<GameContext> host,
-        GameContext ctx)
+        GameContext ctx
+    )
     {
         // Core commands
         await commandManager.Insert(new HelpCommand(commandManager));
         await commandManager.Insert(new AliasCommand(commandManager));
 
         // Template-based commands (indexed)
-        await commandManager.Insert(new FieldCommand(
-            ctx.Managers.Field,
-            ctx.Templates.Field,
-            ctx.Templates.FieldString));
+        await commandManager.Insert(
+            new FieldCommand(ctx.Managers.Field, ctx.Templates.Field, ctx.Templates.FieldString)
+        );
 
-        await commandManager.Insert(new NPCCommand(
-            ctx.Templates.NPC,
-            ctx.Templates.NPCString));
+        await commandManager.Insert(new NPCCommand(ctx.Templates.NPC, ctx.Templates.NPCString));
 
-        await commandManager.Insert(new MobCommand(
-            ctx.Templates.Mob,
-            ctx.Templates.MobString));
+        await commandManager.Insert(new MobCommand(ctx.Templates.Mob, ctx.Templates.MobString));
 
-        await commandManager.Insert(new ItemCommand(
-            ctx.Templates.Item,
-            ctx.Templates.ItemString));
+        await commandManager.Insert(new ItemCommand(ctx.Templates.Item, ctx.Templates.ItemString));
 
-        await commandManager.Insert(new SkillCommand(
-            ctx.Templates.Skill,
-            ctx.Templates.SkillString));
+        await commandManager.Insert(
+            new SkillCommand(ctx.Templates.Skill, ctx.Templates.SkillString)
+        );
 
-        await commandManager.Insert(new QuestCommand(
-            ctx.Templates.Quest));
+        await commandManager.Insert(new QuestCommand(ctx.Templates.Quest));
 
         // Utility commands
         await commandManager.Insert(new MobTemporaryStatCommand());
@@ -93,7 +86,11 @@ public class RueGamePlugin : IGamePlugin
         await commandManager.Insert(new DebugCommand());
     }
 
-    private static async Task RunIndexingAsync(CommandManager commandManager, ILogger logger, IOptions<RueConfigGame> options)
+    private static async Task RunIndexingAsync(
+        CommandManager commandManager,
+        ILogger logger,
+        IOptions<RueConfigGame> options
+    )
     {
         try
         {
@@ -115,7 +112,8 @@ public class RueGamePlugin : IGamePlugin
             logger.LogInformation(
                 "Starting parallel indexing for {Count} commands: {Commands}",
                 indexedCommands.Count,
-                string.Join(", ", indexedCommands.Select(static c => c.Name)));
+                string.Join(", ", indexedCommands.Select(static c => c.Name))
+            );
 
             var totalStartTick = Environment.TickCount64;
             var logTrieTelemetry = options.Value.LogTrieTelemetry;
@@ -130,7 +128,10 @@ public class RueGamePlugin : IGamePlugin
                         var commandStartTick = Environment.TickCount64;
                         await command.Index(indexingStatus);
 
-                        if (logTrieTelemetry && indexingStatus.TryGetTrieTelemetry(command.Name, out var telemetry))
+                        if (
+                            logTrieTelemetry
+                            && indexingStatus.TryGetTrieTelemetry(command.Name, out var telemetry)
+                        )
                         {
                             logger.LogInformation(
                                 "Trie telemetry {Command}: enabled={Enabled} total={TotalIndices} added={AddedKeys} desc={DescriptionIndices} null={NormalizedNull} short={NormalizedTooShort} long={NormalizedTooLong} dup={DuplicateKeys} addArgEx={AddArgumentExceptions} addOorEx={AddOutOfRangeExceptions} addNreEx={AddNullReferenceExceptions} retrieveEx={RetrieveExceptions} buildMs={BuildElapsedMs}",
@@ -147,26 +148,28 @@ public class RueGamePlugin : IGamePlugin
                                 telemetry.AddOutOfRangeExceptions,
                                 telemetry.AddNullReferenceExceptions,
                                 telemetry.RetrieveExceptions,
-                                telemetry.BuildElapsedMs);
+                                telemetry.BuildElapsedMs
+                            );
                         }
 
                         logger.LogDebug(
                             "Finished indexing for command {Command} in {Elapsed}ms",
                             command.Name,
-                            Environment.TickCount64 - commandStartTick);
+                            Environment.TickCount64 - commandStartTick
+                        );
                     }
                     catch (Exception ex)
                     {
-                        logger.LogError(ex,
-                            "Failed to index command {Command}",
-                            command.Name);
+                        logger.LogError(ex, "Failed to index command {Command}", command.Name);
                     }
-                });
+                }
+            );
 
             logger.LogInformation(
                 "Indexing completed for all {Count} commands in {Elapsed}ms (parallel)",
                 indexedCommands.Count,
-                Environment.TickCount64 - totalStartTick);
+                Environment.TickCount64 - totalStartTick
+            );
         }
         catch (Exception ex)
         {

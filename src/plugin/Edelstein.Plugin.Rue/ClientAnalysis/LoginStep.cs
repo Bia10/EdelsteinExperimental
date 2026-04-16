@@ -28,5 +28,5 @@ public enum LoginStep : byte
     NewCharacterName = 4,
 
     /// <summary>View All Characters (VAC) mode. CUIAvatarVAC created.</summary>
-    VAC = 5
+    VAC = 5,
 }

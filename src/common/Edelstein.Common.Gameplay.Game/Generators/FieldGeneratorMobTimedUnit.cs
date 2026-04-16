@@ -24,7 +24,6 @@ public class FieldGeneratorMobTimedUnit : IFieldGeneratorUnit
     private DateTime NextRegen { get; set; }
     private IFieldMob? Mob { get; set; }
 
-
     public IPoint2D Position => _life.Position;
 
     public IFieldObject? Generate()
@@ -42,19 +41,18 @@ public class FieldGeneratorMobTimedUnit : IFieldGeneratorUnit
 
     private bool Check(DateTime now)
     {
-        if (Mob == null) return NextRegen < now;
-        if (Mob.Field != null) return false;
+        if (Mob == null)
+            return NextRegen < now;
+        if (Mob.Field != null)
+            return false;
 
         var random = new Random();
         var buffer = 7 * _life.MobTime / 10;
-        var interval = TimeSpan.FromSeconds(
-            13 * _life.MobTime / 10 + random.Next(buffer)
-        );
+        var interval = TimeSpan.FromSeconds(13 * _life.MobTime / 10 + random.Next(buffer));
 
         NextRegen = NextRegen.Add(interval);
         Mob = null;
 
         return false;
-
     }
 }

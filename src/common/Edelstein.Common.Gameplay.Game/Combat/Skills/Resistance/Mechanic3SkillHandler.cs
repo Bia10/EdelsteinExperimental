@@ -11,8 +11,12 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Resistance;
 public class Mechanic3SkillHandler : Mechanic2SkillHandler
 {
     public override int ID => Job.Mechanic3;
-    
-    public override async Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
+
+    public override async Task HandleAttackMob(
+        ISkillContext context,
+        IFieldUser user,
+        IFieldMob mob
+    )
     {
         switch (context.Skill?.ID)
         {
@@ -21,10 +25,10 @@ public class Mechanic3SkillHandler : Mechanic2SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         await base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

@@ -6,7 +6,7 @@ public interface IFieldDrop : IFieldObject
 {
     bool IsMoney { get; }
     int Info { get; }
-    
+
     DropOwnType OwnType { get; }
     int OwnerID { get; }
     int SourceID { get; }

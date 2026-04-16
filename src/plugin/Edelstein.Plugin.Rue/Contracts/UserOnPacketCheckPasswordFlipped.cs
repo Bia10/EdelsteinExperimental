@@ -7,8 +7,4 @@ public record UserOnPacketCheckPasswordFlipped(
     ILoginStageUser User,
     string Username,
     string Password
-) : UserOnPacketCheckPassword(
-    User,
-    Username,
-    Password
-);
+) : UserOnPacketCheckPassword(User, Username, Password);

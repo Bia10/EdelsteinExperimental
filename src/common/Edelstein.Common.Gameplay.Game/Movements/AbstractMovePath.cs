@@ -6,7 +6,8 @@ using Edelstein.Protocol.Utilities.Spatial;
 
 namespace Edelstein.Common.Gameplay.Game.Movements;
 
-public abstract class AbstractMovePath<TMoveAction> : IMovePath<TMoveAction> where TMoveAction : IMoveAction
+public abstract class AbstractMovePath<TMoveAction> : IMovePath<TMoveAction>
+    where TMoveAction : IMoveAction
 {
     private readonly ICollection<AbstractMovePathFragment<TMoveAction>> _fragments;
     private IPoint2D _position;
@@ -73,10 +74,14 @@ public abstract class AbstractMovePath<TMoveAction> : IMovePath<TMoveAction> whe
                     _fragments.Add(reader.Read(new TeleportPathFragment<TMoveAction>(attribute)));
                     break;
                 case MovePathFragmentType.StartFallDown:
-                    _fragments.Add(reader.Read(new StartFallDownPathFragment<TMoveAction>(attribute)));
+                    _fragments.Add(
+                        reader.Read(new StartFallDownPathFragment<TMoveAction>(attribute))
+                    );
                     break;
                 case MovePathFragmentType.FlyingBlock:
-                    _fragments.Add(reader.Read(new FlyingBlockPathFragment<TMoveAction>(attribute)));
+                    _fragments.Add(
+                        reader.Read(new FlyingBlockPathFragment<TMoveAction>(attribute))
+                    );
                     break;
                 case MovePathFragmentType.StatChange:
                     _fragments.Add(reader.Read(new StatChangePathFragment<TMoveAction>(attribute)));

@@ -7,22 +7,19 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Login.Handling.Packets;
 
-public class DeleteCharacterHandler : AbstractPipedPacketHandler<ILoginStageUser, UserOnPacketDeleteCharacter>
+public class DeleteCharacterHandler
+    : AbstractPipedPacketHandler<ILoginStageUser, UserOnPacketDeleteCharacter>
 {
-    public DeleteCharacterHandler(IPipeline<UserOnPacketDeleteCharacter> pipeline) : base(pipeline)
-    {
-    }
-    
+    public DeleteCharacterHandler(IPipeline<UserOnPacketDeleteCharacter> pipeline)
+        : base(pipeline) { }
+
     public override short Operation => (short)PacketRecvOperations.DeleteCharacter;
 
     public override bool Check(ILoginStageUser user) =>
-        user.State == LoginState.SelectCharacter &&
-        user.Account?.SPW != null;
+        user.State == LoginState.SelectCharacter && user.Account?.SPW != null;
 
-    public override UserOnPacketDeleteCharacter Serialize(ILoginStageUser user, IPacketReader reader)
-        => new(
-            user,
-            reader.ReadString(),
-            reader.ReadInt()
-        );
+    public override UserOnPacketDeleteCharacter Serialize(
+        ILoginStageUser user,
+        IPacketReader reader
+    ) => new(user, reader.ReadString(), reader.ReadInt());
 }

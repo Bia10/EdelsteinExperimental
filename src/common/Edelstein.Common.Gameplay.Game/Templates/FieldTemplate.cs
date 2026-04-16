@@ -1,4 +1,4 @@
-using System.Collections.Frozen;
+﻿using System.Collections.Frozen;
 using Duey.Abstractions;
 using Edelstein.Common.Gameplay.Game.Spatial;
 using Edelstein.Common.Utilities.Spatial;
@@ -10,7 +10,6 @@ namespace Edelstein.Common.Gameplay.Game.Templates;
 
 public record FieldTemplate : IFieldTemplate
 {
-
     public FieldTemplate(
         int id,
         IDataNode foothold,
@@ -26,31 +25,29 @@ public record FieldTemplate : IFieldTemplate
 
         FieldReturn = info.ResolveInt("returnMap");
         ForcedReturn = info.ResolveInt("forcedReturn");
-        if (FieldReturn == 999999999) FieldReturn = null;
-        if (ForcedReturn == 999999999) ForcedReturn = null;
+        if (FieldReturn == 999999999)
+            FieldReturn = null;
+        if (ForcedReturn == 999999999)
+            ForcedReturn = null;
 
         ScriptFirstUserEnter = info.ResolveString("onFirstUserEnter");
         ScriptUserEnter = info.ResolveString("onUserEnter");
-        if (string.IsNullOrWhiteSpace(ScriptFirstUserEnter)) ScriptFirstUserEnter = null;
-        if (string.IsNullOrWhiteSpace(ScriptUserEnter)) ScriptUserEnter = null;
+        if (string.IsNullOrWhiteSpace(ScriptFirstUserEnter))
+            ScriptFirstUserEnter = null;
+        if (string.IsNullOrWhiteSpace(ScriptUserEnter))
+            ScriptUserEnter = null;
 
-        var footholds = foothold.Children
-            .SelectMany(c => c.Children)
+        var footholds = foothold
+            .Children.SelectMany(c => c.Children)
             .SelectMany(c => c.Children)
             .Select(p => new FieldFoothold(Convert.ToInt32(p.Name), p.Cache()))
             .ToFrozenSet();
-        var portals = portal.Children
-            .Select(p => new FieldPortal(Convert.ToInt32(p.Name), p.Cache()))
+        var portals = portal
+            .Children.Select(p => new FieldPortal(Convert.ToInt32(p.Name), p.Cache()))
             .ToFrozenSet();
-        
-        var leftTop = new Point2D(
-            footholds.Min(f => f.MinX),
-            footholds.Min(f => f.MinY)
-        );
-        var rightBottom = new Point2D(
-            footholds.Max(f => f.MaxX),
-            footholds.Max(f => f.MaxY)
-        );
+
+        var leftTop = new Point2D(footholds.Min(f => f.MinX), footholds.Min(f => f.MinY));
+        var rightBottom = new Point2D(footholds.Max(f => f.MaxX), footholds.Max(f => f.MaxY));
 
         leftTop = new Point2D(
             info.ResolveInt("VRLeft") ?? leftTop.X,
@@ -72,8 +69,8 @@ public record FieldTemplate : IFieldTemplate
         Portals = new FieldSpace<IFieldPortal>(Bounds);
         Portals.Insert(portals);
 
-        Life = life.Children
-            .Select(p => new FieldTemplateLife(p.Cache()))
+        Life = life
+            .Children.Select(p => new FieldTemplateLife(p.Cache()))
             .ToFrozenSet<IFieldTemplateLife>();
 
         MobRate = info.ResolveDouble("mobRate") ?? 1.0;
@@ -86,6 +83,7 @@ public record FieldTemplate : IFieldTemplate
         MobCapacityMin = (int)mobCapacity;
         MobCapacityMax = (int)mobCapacity * 2;
     }
+
     public int ID { get; }
 
     public FieldLimitType Limit { get; }

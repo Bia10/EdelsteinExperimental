@@ -7,7 +7,4 @@
 /// as <c>nEntryListStart</c> (always a multiple of 10, e.g. 0, 10, 20 …).
 /// </para>
 /// </summary>
-public record GuildBBSLoadRequest(
-    int GuildID,
-    int EntryListStart = 0
-);
+public record GuildBBSLoadRequest(int GuildID, int EntryListStart = 0);

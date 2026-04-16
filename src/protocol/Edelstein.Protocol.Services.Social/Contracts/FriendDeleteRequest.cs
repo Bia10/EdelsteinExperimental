@@ -1,6 +1,3 @@
 ﻿namespace Edelstein.Protocol.Services.Social.Contracts;
 
-public record FriendDeleteRequest(
-    int CharacterID,
-    int FriendID
-);
+public record FriendDeleteRequest(int CharacterID, int FriendID);

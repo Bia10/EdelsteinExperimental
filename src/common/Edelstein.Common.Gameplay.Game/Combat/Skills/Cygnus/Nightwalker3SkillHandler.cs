@@ -10,7 +10,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Cygnus;
 public class Nightwalker3SkillHandler : Nightwalker2SkillHandler
 {
     public override int ID => Job.Nightwalker3;
-    
+
     public override Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
     {
         switch (context.Skill?.ID)
@@ -21,10 +21,10 @@ public class Nightwalker3SkillHandler : Nightwalker2SkillHandler
                 context.AddAffectedAreaBurnedInfo();
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -33,7 +33,7 @@ public class Nightwalker3SkillHandler : Nightwalker2SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.ShadowPartner, 1);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

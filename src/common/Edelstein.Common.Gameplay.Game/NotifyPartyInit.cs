@@ -15,16 +15,16 @@ public class NotifyPartyInit : IPipelinePlug<StageStart>
     private readonly IPipeline<NotifyPartyChangedBoss> _notifyPartyChangedBoss;
     private readonly IPipeline<NotifyPartyMemberUpdateChannelOrField> _notifyPartyMemberUpdateChannelOrField;
     private readonly IPipeline<NotifyPartyMemberUpdateLevelOrJob> _notifyPartyMemberUpdateLevelOrJob;
-    
+
     public NotifyPartyInit(
-        IMessageBus messaging, 
-        IPipeline<NotifyPartyCreated> notifyPartyCreated, 
-        IPipeline<NotifyPartyDisbanded> notifyPartyDisbanded, 
-        IPipeline<NotifyPartyMemberInvited> notifyPartyMemberInvited, 
-        IPipeline<NotifyPartyMemberJoined> notifyPartyMemberJoined, 
-        IPipeline<NotifyPartyMemberWithdrawn> notifyPartyMemberWithdrawn, 
-        IPipeline<NotifyPartyChangedBoss> notifyPartyChangedBoss, 
-        IPipeline<NotifyPartyMemberUpdateChannelOrField> notifyPartyMemberUpdateChannelOrField, 
+        IMessageBus messaging,
+        IPipeline<NotifyPartyCreated> notifyPartyCreated,
+        IPipeline<NotifyPartyDisbanded> notifyPartyDisbanded,
+        IPipeline<NotifyPartyMemberInvited> notifyPartyMemberInvited,
+        IPipeline<NotifyPartyMemberJoined> notifyPartyMemberJoined,
+        IPipeline<NotifyPartyMemberWithdrawn> notifyPartyMemberWithdrawn,
+        IPipeline<NotifyPartyChangedBoss> notifyPartyChangedBoss,
+        IPipeline<NotifyPartyMemberUpdateChannelOrField> notifyPartyMemberUpdateChannelOrField,
         IPipeline<NotifyPartyMemberUpdateLevelOrJob> notifyPartyMemberUpdateLevelOrJob
     )
     {
@@ -38,31 +38,30 @@ public class NotifyPartyInit : IPipelinePlug<StageStart>
         _notifyPartyMemberUpdateChannelOrField = notifyPartyMemberUpdateChannelOrField;
         _notifyPartyMemberUpdateLevelOrJob = notifyPartyMemberUpdateLevelOrJob;
     }
+
     public async Task Handle(IPipelineContext ctx, StageStart message)
     {
-        await _messaging.SubscribeAsync<NotifyPartyCreated>(
-            e => _notifyPartyCreated.Process(e)
+        await _messaging.SubscribeAsync<NotifyPartyCreated>(e => _notifyPartyCreated.Process(e));
+        await _messaging.SubscribeAsync<NotifyPartyDisbanded>(e =>
+            _notifyPartyDisbanded.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyPartyDisbanded>(
-            e => _notifyPartyDisbanded.Process(e)
+        await _messaging.SubscribeAsync<NotifyPartyMemberInvited>(e =>
+            _notifyPartyMemberInvited.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyPartyMemberInvited>(
-            e => _notifyPartyMemberInvited.Process(e)
+        await _messaging.SubscribeAsync<NotifyPartyMemberJoined>(e =>
+            _notifyPartyMemberJoined.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyPartyMemberJoined>(
-            e => _notifyPartyMemberJoined.Process(e)
+        await _messaging.SubscribeAsync<NotifyPartyMemberWithdrawn>(e =>
+            _notifyPartyMemberWithdrawn.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyPartyMemberWithdrawn>(
-            e => _notifyPartyMemberWithdrawn.Process(e)
+        await _messaging.SubscribeAsync<NotifyPartyChangedBoss>(e =>
+            _notifyPartyChangedBoss.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyPartyChangedBoss>(
-            e => _notifyPartyChangedBoss.Process(e)
+        await _messaging.SubscribeAsync<NotifyPartyMemberUpdateChannelOrField>(e =>
+            _notifyPartyMemberUpdateChannelOrField.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyPartyMemberUpdateChannelOrField>(
-            e => _notifyPartyMemberUpdateChannelOrField.Process(e)
-        );
-        await _messaging.SubscribeAsync<NotifyPartyMemberUpdateLevelOrJob>(
-            e => _notifyPartyMemberUpdateLevelOrJob.Process(e)
+        await _messaging.SubscribeAsync<NotifyPartyMemberUpdateLevelOrJob>(e =>
+            _notifyPartyMemberUpdateLevelOrJob.Process(e)
         );
     }
 }

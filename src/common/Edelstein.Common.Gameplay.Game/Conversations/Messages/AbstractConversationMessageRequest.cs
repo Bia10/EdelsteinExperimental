@@ -6,8 +6,8 @@ namespace Edelstein.Common.Gameplay.Game.Conversations.Messages;
 
 public abstract class AbstractConversationMessageRequest<T> : IConversationMessageRequest<T>
 {
-
     protected AbstractConversationMessageRequest(IConversationSpeaker speaker) => Speaker = speaker;
+
     protected IConversationSpeaker Speaker { get; }
     public abstract ConversationMessageType Type { get; }
 

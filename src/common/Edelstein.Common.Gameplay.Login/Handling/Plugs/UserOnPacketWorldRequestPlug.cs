@@ -20,7 +20,8 @@ public class UserOnPacketWorldRequestPlug : IPipelinePlug<UserOnPacketWorldReque
     public UserOnPacketWorldRequestPlug(
         ILogger<UserOnPacketWorldRequest> logger,
         ITemplateManager<IWorldTemplate> templates,
-        IServerService serverService)
+        IServerService serverService
+    )
     {
         _logger = logger;
         _templates = templates;
@@ -45,9 +46,10 @@ public class UserOnPacketWorldRequestPlug : IPipelinePlug<UserOnPacketWorldReque
             packet.WriteShort(0); // WorldEventDrop_WSE, WorldSpecificEvent
             packet.WriteBool(template?.BlockCharCreation ?? false);
 
-            var gameStages =
-                (await _serverService.GetGameByWorld(new ServerGetGameByWorldRequest(worldID))).Servers
-                .OrderBy(s => s.ChannelID)
+            var gameStages = (
+                await _serverService.GetGameByWorld(new ServerGetGameByWorldRequest(worldID))
+            )
+                .Servers.OrderBy(s => s.ChannelID)
                 .ToImmutableArray();
 
             packet.WriteByte((byte)gameStages.Length);
@@ -66,7 +68,9 @@ public class UserOnPacketWorldRequestPlug : IPipelinePlug<UserOnPacketWorldReque
             await message.User.Dispatch(packet.Build());
         }
 
-        using var failedPacket = new PacketWriter(PacketSendOperations.WorldInformation).WriteByte(0xFF);
+        using var failedPacket = new PacketWriter(PacketSendOperations.WorldInformation).WriteByte(
+            0xFF
+        );
         await message.User.Dispatch(failedPacket.Build());
     }
 }

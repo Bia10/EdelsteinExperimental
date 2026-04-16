@@ -34,5 +34,5 @@ public enum DbFlags
     VisitorLog4 = 0x8000000,
 
     All = int.MaxValue,
-    ItemSlot = ItemSlotEquip | ItemSlotConsume | ItemSlotInstall | ItemSlotEtc | ItemSlotCash
+    ItemSlot = ItemSlotEquip | ItemSlotConsume | ItemSlotInstall | ItemSlotEtc | ItemSlotCash,
 }

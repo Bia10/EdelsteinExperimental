@@ -45,50 +45,62 @@ public class RueLoginPlugin : ILoginPlugin
 
         if (options.Value.DiagnosticsEnabled)
         {
-            _diagnosticsPlug = new UserOnPacketDiagnosticsPlug(Logger, options, _diagnostics, _memoryContext);
+            _diagnosticsPlug = new UserOnPacketDiagnosticsPlug(
+                Logger,
+                options,
+                _diagnostics,
+                _memoryContext
+            );
             ctx.Pipelines.UserOnPacket.Add(PipelinePriority.Highest, _diagnosticsPlug);
         }
 
-        ctx.Pipelines.UserOnPacketCreateSecurityHandle.Add(PipelinePriority.High, new UserOnPacketCreateSecurityHandleAutoRegisterPlug(
-            Logger,
-            options,
-            ctx,
-            _memoryContext,
-            _diagnostics,
-            tracker
-        ));
+        ctx.Pipelines.UserOnPacketCreateSecurityHandle.Add(
+            PipelinePriority.High,
+            new UserOnPacketCreateSecurityHandleAutoRegisterPlug(
+                Logger,
+                options,
+                ctx,
+                _memoryContext,
+                _diagnostics,
+                tracker
+            )
+        );
 
-        ctx.Pipelines.UserOnPacketCheckPassword.Add(PipelinePriority.High, new UserOnPacketCheckPasswordAutoLoginPlug(
-            Logger,
-            options,
-            ctx
-        ));
+        ctx.Pipelines.UserOnPacketCheckPassword.Add(
+            PipelinePriority.High,
+            new UserOnPacketCheckPasswordAutoLoginPlug(Logger, options, ctx)
+        );
 
-        ctx.Pipelines.UserOnPacketCheckPassword.Add(PipelinePriority.Highest, new UserOnPacketCheckPasswordFlippedPlug(
-            Logger,
-            options,
-            ctx
-        ));
+        ctx.Pipelines.UserOnPacketCheckPassword.Add(
+            PipelinePriority.Highest,
+            new UserOnPacketCheckPasswordFlippedPlug(Logger, options, ctx)
+        );
 
         // Auto-login: after world list is sent, wait for client to process, then auto-select world
-        ctx.Pipelines.UserOnPacketWorldRequest.Add(PipelinePriority.PostNormal, new UserOnPacketCheckPasswordAutoSelectWorldPlug(
-            Logger,
-            options,
-            ctx,
-            _diagnostics,
-            _memoryContext,
-            tracker
-        ));
+        ctx.Pipelines.UserOnPacketWorldRequest.Add(
+            PipelinePriority.PostNormal,
+            new UserOnPacketCheckPasswordAutoSelectWorldPlug(
+                Logger,
+                options,
+                ctx,
+                _diagnostics,
+                _memoryContext,
+                tracker
+            )
+        );
 
         // Auto-login: after successful world selection, auto-select character and enter game
-        ctx.Pipelines.UserOnPacketSelectWorld.Add(PipelinePriority.PostNormal, new UserOnPacketSelectWorldAutoSelectCharacterPlug(
-            Logger,
-            options,
-            ctx,
-            ctx.Repositories.Character,
-            _memoryContext,
-            tracker
-        ));
+        ctx.Pipelines.UserOnPacketSelectWorld.Add(
+            PipelinePriority.PostNormal,
+            new UserOnPacketSelectWorldAutoSelectCharacterPlug(
+                Logger,
+                options,
+                ctx,
+                ctx.Repositories.Character,
+                _memoryContext,
+                tracker
+            )
+        );
 
         return Task.CompletedTask;
     }

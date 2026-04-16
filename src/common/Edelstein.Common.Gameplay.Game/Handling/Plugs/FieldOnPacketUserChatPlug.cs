@@ -13,25 +13,32 @@ public class FieldOnPacketUserChatPlug : IPipelinePlug<FieldOnPacketUserChat>
         using var chatPacket1 = new PacketWriter(PacketSendOperations.UserChat);
 
         chatPacket1.WriteInt(message.User.Character.ID);
-        chatPacket1.WriteBool(message.User.Account.GradeCode > 0 || message.User.Account.SubGradeCode > 0);
+        chatPacket1.WriteBool(
+            message.User.Account.GradeCode > 0 || message.User.Account.SubGradeCode > 0
+        );
         chatPacket1.WriteString(message.Message);
         chatPacket1.WriteBool(message.IsOnlyBalloon);
 
         await message.User.FieldSplit!.Dispatch(chatPacket1.Build());
 
-        if (message.IsOnlyBalloon) return;
+        if (message.IsOnlyBalloon)
+            return;
 
         using var chatPacket2 = new PacketWriter(PacketSendOperations.UserChatNLCPQ);
 
         chatPacket2.WriteInt(message.User.Character.ID);
-        chatPacket2.WriteBool(message.User.Account.GradeCode > 0 || message.User.Account.SubGradeCode > 0);
+        chatPacket2.WriteBool(
+            message.User.Account.GradeCode > 0 || message.User.Account.SubGradeCode > 0
+        );
         chatPacket2.WriteString(message.Message);
         chatPacket2.WriteBool(message.IsOnlyBalloon);
         chatPacket2.WriteString(message.User.Character.Name);
 
-        await Task.WhenAll(message.User.Field!.Objects
-            .OfType<IFieldSplitObserver>()
-            .Except(message.User.FieldSplit!.Observers)
-            .Select(u => u.Dispatch(chatPacket2.Build())));
+        await Task.WhenAll(
+            message
+                .User.Field!.Objects.OfType<IFieldSplitObserver>()
+                .Except(message.User.FieldSplit!.Observers)
+                .Select(u => u.Dispatch(chatPacket2.Build()))
+        );
     }
 }

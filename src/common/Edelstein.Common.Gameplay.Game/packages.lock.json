@@ -273,6 +273,9 @@
           "Edelstein.Protocol.Gameplay": "[1.0.0, )"
         }
       },
+      "edelstein.common.crypto": {
+        "type": "Project"
+      },
       "edelstein.common.gameplay": {
         "type": "Project",
         "dependencies": {

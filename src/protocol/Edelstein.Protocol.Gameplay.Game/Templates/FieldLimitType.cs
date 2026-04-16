@@ -26,5 +26,5 @@ public enum FieldLimitType
     NoDamageOnFalling = 0x100000,
     PacelOpenLimit = 0x200000,
     DropLimit = 0x400000,
-    RocketBoosterLimit = 0x800000
+    RocketBoosterLimit = 0x800000,
 }

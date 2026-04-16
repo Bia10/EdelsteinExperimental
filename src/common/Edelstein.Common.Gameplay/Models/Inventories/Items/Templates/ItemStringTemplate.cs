@@ -6,10 +6,10 @@ namespace Edelstein.Common.Gameplay.Models.Inventories.Items.Templates;
 public record ItemStringTemplate : IItemStringTemplate
 {
     public int ID { get; }
-    
+
     public string Name { get; }
     public string Desc { get; }
-    
+
     public ItemStringTemplate(int id, IDataNode node)
     {
         ID = id;

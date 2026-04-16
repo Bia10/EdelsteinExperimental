@@ -3,7 +3,8 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class FieldOnPacketUserFuncKeyMappedModifiedPlug : IPipelinePlug<FieldOnPacketUserFuncKeyMappedModified>
+public class FieldOnPacketUserFuncKeyMappedModifiedPlug
+    : IPipelinePlug<FieldOnPacketUserFuncKeyMappedModified>
 {
     public Task Handle(IPipelineContext ctx, FieldOnPacketUserFuncKeyMappedModified message)
     {

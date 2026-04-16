@@ -13,8 +13,12 @@ public class AskNumberRequest : AbstractConversationMessageRequest<int>
 
     public AskNumberRequest(
         IConversationSpeaker speaker,
-        string text, int @default, int minNumber, int maxNumber
-    ) : base(speaker)
+        string text,
+        int @default,
+        int minNumber,
+        int maxNumber
+    )
+        : base(speaker)
     {
         _text = text;
         _default = @default;

@@ -11,21 +11,24 @@ public class FieldOnPacketPartyCreateRequestPlug : IPipelinePlug<FieldOnPacketPa
 {
     public async Task Handle(IPipelineContext ctx, FieldOnPacketPartyCreateRequest message)
     {
-        var response = await message.User.StageUser.Context.Services.Party.Create(new PartyCreateRequest(
-            message.User.Character.ID,
-            message.User.Character.Name,
-            message.User.Character.Job,
-            message.User.Character.Level,
-            message.User.StageUser.Context.Options.ChannelID,
-            message.User.Field?.ID ?? 999999999
-        ));
-        
-        if (response.Result == PartyResult.Success) return;
-        
+        var response = await message.User.StageUser.Context.Services.Party.Create(
+            new PartyCreateRequest(
+                message.User.Character.ID,
+                message.User.Character.Name,
+                message.User.Character.Job,
+                message.User.Character.Level,
+                message.User.StageUser.Context.Options.ChannelID,
+                message.User.Field?.ID ?? 999999999
+            )
+        );
+
+        if (response.Result == PartyResult.Success)
+            return;
+
         var result = response.Result switch
         {
             PartyResult.FailedAlreadyInParty => PartyResultOperations.CreateNewPartyAlreayJoined,
-            _ => PartyResultOperations.CreateNewPartyUnknown
+            _ => PartyResultOperations.CreateNewPartyUnknown,
         };
         using var packet = new PacketWriter(PacketSendOperations.PartyResult);
         packet.WriteByte((byte)result);

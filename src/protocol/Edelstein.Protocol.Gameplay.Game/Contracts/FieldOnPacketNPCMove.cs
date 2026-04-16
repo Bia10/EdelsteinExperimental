@@ -3,8 +3,4 @@ using Edelstein.Protocol.Gameplay.Game.Objects.User;
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketNPCMove(
-    IFieldUser User,
-    IFieldNPC NPC,
-    IFieldNPCMovePath Path
-);
+public record FieldOnPacketNPCMove(IFieldUser User, IFieldNPC NPC, IFieldNPCMovePath Path);

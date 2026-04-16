@@ -11,19 +11,18 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 public class NotifyPartyChangedBossPlug : IPipelinePlug<NotifyPartyChangedBoss>
 {
     private readonly IGameStage _stage;
-    
+
     public NotifyPartyChangedBossPlug(IGameStage stage) => _stage = stage;
-    
+
     public async Task Handle(IPipelineContext ctx, NotifyPartyChangedBoss message)
     {
         var users = await _stage.Users.RetrieveAll();
-        var partied = users
-            .Where(u => u.Party?.PartyID == message.PartyID)
-            .ToImmutableArray();
-        
+        var partied = users.Where(u => u.Party?.PartyID == message.PartyID).ToImmutableArray();
+
         foreach (var user in partied)
         {
-            if (user.Party == null) continue;
+            if (user.Party == null)
+                continue;
             user.Party.BossCharacterID = message.BossID;
 
             using var packet = new PacketWriter(PacketSendOperations.PartyResult);

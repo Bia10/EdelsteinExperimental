@@ -8,13 +8,14 @@ using Edelstein.Protocol.Utilities.Templates;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class FieldOnPacketUserSkillCancelRequestPlug : IPipelinePlug<FieldOnPacketUserSkillCancelRequest>
+public class FieldOnPacketUserSkillCancelRequestPlug
+    : IPipelinePlug<FieldOnPacketUserSkillCancelRequest>
 {
     private readonly ISkillManager _skillManager;
     private readonly ITemplateManager<ISkillTemplate> _skillTemplates;
 
     public FieldOnPacketUserSkillCancelRequestPlug(
-        ISkillManager skillManager, 
+        ISkillManager skillManager,
         ITemplateManager<ISkillTemplate> skillTemplates
     )
     {
@@ -39,7 +40,7 @@ public class FieldOnPacketUserSkillCancelRequestPlug : IPipelinePlug<FieldOnPack
                     await message.User.FieldSplit.Dispatch(packet.Build());
             }
         }
-        
+
         await _skillManager.HandleSkillCancel(message.User, message.SkillID);
         await message.User.ModifyStats(exclRequest: true);
     }

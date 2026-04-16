@@ -24,10 +24,10 @@ public class ServerService : IServerService
 
     public Task<ServerResponse> RegisterGame(ServerRegisterRequest<IServerGame> request) =>
         Register(_mapper.Map<ServerGameEntity>(request.Server));
-    
+
     public Task<ServerResponse> RegisterShop(ServerRegisterRequest<IServerShop> request) =>
         Register(_mapper.Map<ServerShopEntity>(request.Server));
-    
+
     public Task<ServerResponse> RegisterTrade(ServerRegisterRequest<IServerTrade> request) =>
         Register(_mapper.Map<ServerTradeEntity>(request.Server));
 
@@ -87,7 +87,10 @@ public class ServerService : IServerService
             if (existing == null || existing.DateExpire < now)
                 return new ServerGetOneResponse<IServer>(ServerResult.FailedNotFound);
 
-            return new ServerGetOneResponse<IServer>(ServerResult.Success, _mapper.Map<Protocol.Services.Server.Contracts.Server>(existing));
+            return new ServerGetOneResponse<IServer>(
+                ServerResult.Success,
+                _mapper.Map<Protocol.Services.Server.Contracts.Server>(existing)
+            );
         }
         catch (Exception)
         {
@@ -96,19 +99,24 @@ public class ServerService : IServerService
     }
 
     public async Task<ServerGetOneResponse<IServerGame>> GetGameByWorldAndChannel(
-        ServerGetGameByWorldAndChannelRequest request)
+        ServerGetGameByWorldAndChannelRequest request
+    )
     {
         try
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
             var now = DateTime.UtcNow;
-            var existing = await db.GameServers
-                .FirstOrDefaultAsync(s => s.WorldID == request.WorldID && s.ChannelID == request.ChannelID);
+            var existing = await db.GameServers.FirstOrDefaultAsync(s =>
+                s.WorldID == request.WorldID && s.ChannelID == request.ChannelID
+            );
 
             if (existing == null || existing.DateExpire < now)
                 return new ServerGetOneResponse<IServerGame>(ServerResult.FailedNotFound);
 
-            return new ServerGetOneResponse<IServerGame>(ServerResult.Success, _mapper.Map<ServerGame>(existing));
+            return new ServerGetOneResponse<IServerGame>(
+                ServerResult.Success,
+                _mapper.Map<ServerGame>(existing)
+            );
         }
         catch (Exception)
         {
@@ -116,60 +124,80 @@ public class ServerService : IServerService
         }
     }
 
-    public async Task<ServerGetAllResponse<IServerGame>> GetGameByWorld(ServerGetGameByWorldRequest request)
+    public async Task<ServerGetAllResponse<IServerGame>> GetGameByWorld(
+        ServerGetGameByWorldRequest request
+    )
     {
         try
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
             var now = DateTime.UtcNow;
-            var existing = await db.GameServers
-                .Where(s => s.WorldID == request.WorldID)
+            var existing = await db
+                .GameServers.Where(s => s.WorldID == request.WorldID)
                 .ToListAsync();
 
-            return new ServerGetAllResponse<IServerGame>(ServerResult.Success, existing
-                .Where(s => s.DateExpire > now)
-                .Select(s => _mapper.Map<ServerGame>(s))
-                .ToImmutableArray());
+            return new ServerGetAllResponse<IServerGame>(
+                ServerResult.Success,
+                existing
+                    .Where(s => s.DateExpire > now)
+                    .Select(s => _mapper.Map<ServerGame>(s))
+                    .ToImmutableArray()
+            );
         }
         catch (Exception)
         {
-            return new ServerGetAllResponse<IServerGame>(ServerResult.FailedUnknown, Enumerable.Empty<IServerGame>());
+            return new ServerGetAllResponse<IServerGame>(
+                ServerResult.FailedUnknown,
+                Enumerable.Empty<IServerGame>()
+            );
         }
     }
 
-    public async Task<ServerGetOneResponse<IServerShop>> GetShopByWorld(ServerGetShopByWorldRequest request)
+    public async Task<ServerGetOneResponse<IServerShop>> GetShopByWorld(
+        ServerGetShopByWorldRequest request
+    )
     {
         try
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
             var now = DateTime.UtcNow;
-            var existing = await db.ShopServers
-                .FirstOrDefaultAsync(s => s.WorldID == request.WorldID);
+            var existing = await db.ShopServers.FirstOrDefaultAsync(s =>
+                s.WorldID == request.WorldID
+            );
 
             if (existing == null || existing.DateExpire < now)
                 return new ServerGetOneResponse<IServerShop>(ServerResult.FailedNotFound);
 
-            return new ServerGetOneResponse<IServerShop>(ServerResult.Success, _mapper.Map<ServerShop>(existing));
+            return new ServerGetOneResponse<IServerShop>(
+                ServerResult.Success,
+                _mapper.Map<ServerShop>(existing)
+            );
         }
         catch (Exception)
         {
             return new ServerGetOneResponse<IServerShop>(ServerResult.FailedUnknown);
         }
     }
-    
-    public async Task<ServerGetOneResponse<IServerTrade>> GetTradeByWorld(ServerGetTradeByWorldRequest request)
+
+    public async Task<ServerGetOneResponse<IServerTrade>> GetTradeByWorld(
+        ServerGetTradeByWorldRequest request
+    )
     {
         try
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
             var now = DateTime.UtcNow;
-            var existing = await db.TradeServers
-                .FirstOrDefaultAsync(s => s.WorldID == request.WorldID);
+            var existing = await db.TradeServers.FirstOrDefaultAsync(s =>
+                s.WorldID == request.WorldID
+            );
 
             if (existing == null || existing.DateExpire < now)
                 return new ServerGetOneResponse<IServerTrade>(ServerResult.FailedNotFound);
 
-            return new ServerGetOneResponse<IServerTrade>(ServerResult.Success, _mapper.Map<ServerTrade>(existing));
+            return new ServerGetOneResponse<IServerTrade>(
+                ServerResult.Success,
+                _mapper.Map<ServerTrade>(existing)
+            );
         }
         catch (Exception)
         {
@@ -185,14 +213,20 @@ public class ServerService : IServerService
             var now = DateTime.UtcNow;
             var existing = await db.Servers.ToListAsync();
 
-            return new ServerGetAllResponse<IServer>(ServerResult.Success, existing
-                .Where(s => s.DateExpire > now)
-                .Select(s => _mapper.Map<Protocol.Services.Server.Contracts.Server>(s))
-                .ToImmutableArray());
+            return new ServerGetAllResponse<IServer>(
+                ServerResult.Success,
+                existing
+                    .Where(s => s.DateExpire > now)
+                    .Select(s => _mapper.Map<Protocol.Services.Server.Contracts.Server>(s))
+                    .ToImmutableArray()
+            );
         }
         catch (Exception)
         {
-            return new ServerGetAllResponse<IServer>(ServerResult.FailedUnknown, Enumerable.Empty<IServer>());
+            return new ServerGetAllResponse<IServer>(
+                ServerResult.FailedUnknown,
+                Enumerable.Empty<IServer>()
+            );
         }
     }
 
@@ -211,7 +245,8 @@ public class ServerService : IServerService
                     db.Servers.Remove(existing);
                     await db.SaveChangesAsync();
                 }
-                else return new ServerResponse(ServerResult.FailedAlreadyRegistered);
+                else
+                    return new ServerResponse(ServerResult.FailedAlreadyRegistered);
             }
 
             entity.DateUpdated = now;
@@ -223,7 +258,11 @@ public class ServerService : IServerService
                     await db.LoginServers.AddAsync(login);
                     break;
                 case ServerGameEntity game:
-                    if (db.GameServers.Any(s => s.WorldID == game.WorldID && s.ChannelID == game.ChannelID))
+                    if (
+                        db.GameServers.Any(s =>
+                            s.WorldID == game.WorldID && s.ChannelID == game.ChannelID
+                        )
+                    )
                         return new ServerResponse(ServerResult.FailedAlreadyRegistered);
                     await db.GameServers.AddAsync(game);
                     break;

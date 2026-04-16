@@ -1,4 +1,4 @@
-namespace Edelstein.Protocol.Gameplay.Contracts;
+﻿namespace Edelstein.Protocol.Gameplay.Contracts;
 
 public record NotifyGuildMemberInvited(
     int InviterID,

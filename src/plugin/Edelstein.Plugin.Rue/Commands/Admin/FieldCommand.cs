@@ -17,7 +17,8 @@ public class FieldCommand : AbstractTemplateCommand<IFieldTemplate>
         IFieldManager manager,
         ITemplateManager<IFieldTemplate> templates,
         ITemplateManager<IFieldStringTemplate> strings
-    ) : base(templates)
+    )
+        : base(templates)
     {
         _manager = manager;
         _strings = strings;
@@ -43,7 +44,11 @@ public class FieldCommand : AbstractTemplateCommand<IFieldTemplate>
         return result;
     }
 
-    protected override async Task Execute(IFieldUser user, IFieldTemplate template, TemplateCommandArgs args)
+    protected override async Task Execute(
+        IFieldUser user,
+        IFieldTemplate template,
+        TemplateCommandArgs args
+    )
     {
         var field = await _manager.Retrieve(template.ID);
         if (field != null)

@@ -6,14 +6,18 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
-public class UserPortableChairSitRequestHandler : AbstractPipedFieldHandler<FieldOnPacketUserPortableChairSitRequest>
+public class UserPortableChairSitRequestHandler
+    : AbstractPipedFieldHandler<FieldOnPacketUserPortableChairSitRequest>
 {
-    public UserPortableChairSitRequestHandler(IPipeline<FieldOnPacketUserPortableChairSitRequest> pipeline) : base(pipeline)
-    {
-    }
+    public UserPortableChairSitRequestHandler(
+        IPipeline<FieldOnPacketUserPortableChairSitRequest> pipeline
+    )
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.UserPortableChairSitRequest;
 
-    protected override FieldOnPacketUserPortableChairSitRequest? Serialize(IFieldUser user, IPacketReader reader)
-        => new(user, reader.ReadInt());
+    protected override FieldOnPacketUserPortableChairSitRequest? Serialize(
+        IFieldUser user,
+        IPacketReader reader
+    ) => new(user, reader.ReadInt());
 }

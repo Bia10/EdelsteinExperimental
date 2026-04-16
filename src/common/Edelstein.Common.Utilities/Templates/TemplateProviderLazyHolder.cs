@@ -2,6 +2,5 @@
 
 namespace Edelstein.Common.Utilities.Templates;
 
-public record TemplateProviderLazyHolder<TTemplate>(
-    TTemplate Template
-) where TTemplate : ITemplate;
+public record TemplateProviderLazyHolder<TTemplate>(TTemplate Template)
+    where TTemplate : ITemplate;

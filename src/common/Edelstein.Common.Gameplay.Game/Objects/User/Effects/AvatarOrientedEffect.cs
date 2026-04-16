@@ -2,9 +2,7 @@
 
 namespace Edelstein.Common.Gameplay.Game.Objects.User.Effects;
 
-public record AvatarOrientedEffect(
-    string Path
-) : IPacketWritable
+public record AvatarOrientedEffect(string Path) : IPacketWritable
 {
     public void WriteTo(IPacketWriter writer)
     {

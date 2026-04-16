@@ -10,8 +10,8 @@ public class ConversationSpeakerQuest : ConversationSpeaker, IConversationSpeake
         IConversationContext context,
         int id = 9010000,
         ConversationSpeakerFlags flags = 0
-    ) : base(context, id, flags)
-        => QuestID = questID;
-    
+    )
+        : base(context, id, flags) => QuestID = questID;
+
     public int QuestID { get; }
 }

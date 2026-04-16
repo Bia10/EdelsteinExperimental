@@ -8,10 +8,11 @@ public class SayImageRequest : AbstractConversationMessageRequest<byte>
 {
     private readonly string[] _images;
 
-    public SayImageRequest(IConversationSpeaker speaker, string[] images) : base(speaker) => _images = images;
+    public SayImageRequest(IConversationSpeaker speaker, string[] images)
+        : base(speaker) => _images = images;
 
     public override ConversationMessageType Type => ConversationMessageType.SayImage;
-    
+
     protected override void WriteData(IPacketWriter writer)
     {
         writer.WriteByte((byte)_images.Length);

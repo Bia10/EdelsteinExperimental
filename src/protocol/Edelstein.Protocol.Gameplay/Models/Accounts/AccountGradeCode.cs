@@ -8,5 +8,5 @@ public enum AccountGradeCode : byte
     AdminLevel3 = 0x4,
     AdminLevel4 = 0x8,
     AdminLevel5 = 0x10,
-    AdminLevel10 = 0x20
+    AdminLevel10 = 0x20,
 }

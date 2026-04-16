@@ -7,7 +7,7 @@ namespace Edelstein.Common.Gameplay.Game.Objects.Mob;
 public record FieldMobStats : IFieldMobStats
 {
     public int Level { get; private set; }
-    
+
     public int PAD { get; private set; }
     public int PDD { get; private set; }
     public int PDR { get; private set; }
@@ -16,7 +16,7 @@ public record FieldMobStats : IFieldMobStats
     public int MDR { get; private set; }
     public int ACC { get; private set; }
     public int EVA { get; private set; }
-    
+
     public IDictionary<Element, ElementAttribute> ElementAttributes { get; }
 
     public FieldMobStats()
@@ -29,7 +29,7 @@ public record FieldMobStats : IFieldMobStats
     {
         Reset();
         Level = mob.Template.Level;
-        
+
         PAD = mob.Template.PAD;
         PDD = mob.Template.PDD;
         PDR = mob.Template.PDR;
@@ -49,7 +49,7 @@ public record FieldMobStats : IFieldMobStats
         MDR += mob.TemporaryStats[MobTemporaryStatType.MDR]?.Value ?? 0;
         ACC += mob.TemporaryStats[MobTemporaryStatType.ACC]?.Value ?? 0;
         EVA += mob.TemporaryStats[MobTemporaryStatType.EVA]?.Value ?? 0;
-        
+
         PAD = Math.Min(PAD, 29999);
         PDD = Math.Min(PDD, 30000);
         MAD = Math.Min(MAD, 29999);
@@ -58,11 +58,11 @@ public record FieldMobStats : IFieldMobStats
         EVA = Math.Min(EVA, 9999);
         return Task.CompletedTask;
     }
-    
+
     public void Reset()
     {
         Level = 0;
-        
+
         PAD = 0;
         PDD = 0;
         PDR = 0;
@@ -71,7 +71,7 @@ public record FieldMobStats : IFieldMobStats
         MDR = 0;
         ACC = 0;
         EVA = 0;
-        
+
         ElementAttributes.Clear();
     }
 }

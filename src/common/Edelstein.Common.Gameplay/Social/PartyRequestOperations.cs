@@ -8,5 +8,5 @@ public enum PartyRequestOperations
     JoinParty = 0x3,
     InviteParty = 0x4,
     KickParty = 0x5,
-    ChangePartyLeader = 0x6
+    ChangePartyLeader = 0x6,
 }

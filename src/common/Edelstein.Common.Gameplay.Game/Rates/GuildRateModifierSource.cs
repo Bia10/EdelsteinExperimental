@@ -7,7 +7,10 @@ public sealed class GuildRateModifierSource : IRateModifierSource
 {
     private static readonly int[] GuildSkillIds = [Skill.GuildMesoup, Skill.GuildExperienceup];
 
-    public async ValueTask<IReadOnlyList<IRateModifier>> GetModifiersAsync(RateType type, IRateContext context)
+    public async ValueTask<IReadOnlyList<IRateModifier>> GetModifiersAsync(
+        RateType type,
+        IRateContext context
+    )
     {
         var user = context.User;
         if (user == null)
@@ -18,23 +21,30 @@ public sealed class GuildRateModifierSource : IRateModifierSource
 
         foreach (var skillId in GuildSkillIds)
         {
-            var level = guildSkills != null && guildSkills.TryGetValue(skillId, out var skill)
-                ? skill.Level
-                : 0;
-            if (level <= 0) continue;
+            var level =
+                guildSkills != null && guildSkills.TryGetValue(skillId, out var skill)
+                    ? skill.Level
+                    : 0;
+            if (level <= 0)
+                continue;
 
             var template = await user.StageUser.Context.Templates.Skill.Retrieve(skillId);
             var levelTemplate = template?[level];
-            if (levelTemplate == null) continue;
+            if (levelTemplate == null)
+                continue;
 
             var value = type switch
             {
                 RateType.Exp => levelTemplate.EXPr,
                 RateType.Meso => levelTemplate.MESOr,
-                _ => 0
+                _ => 0,
             };
 
-            RateModifierBuilder.TryAddPercent(ref result, $"guild-{type.ToString().ToLowerInvariant()}-{skillId}", value);
+            RateModifierBuilder.TryAddPercent(
+                ref result,
+                $"guild-{type.ToString().ToLowerInvariant()}-{skillId}",
+                value
+            );
         }
 
         return result;

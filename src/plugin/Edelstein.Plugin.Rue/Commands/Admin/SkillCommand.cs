@@ -15,7 +15,8 @@ public sealed class SkillCommand : AbstractTemplateCommand<ISkillTemplate>
     public SkillCommand(
         ITemplateManager<ISkillTemplate> templates,
         ITemplateManager<ISkillStringTemplate> strings
-    ) : base(templates)
+    )
+        : base(templates)
     {
         _strings = strings;
 
@@ -33,23 +34,42 @@ public sealed class SkillCommand : AbstractTemplateCommand<ISkillTemplate>
         {
             result[i++] = TemplateCommandIndex.CreateFromId(s.ID, s.Name);
             result[i++] = TemplateCommandIndex.Create(s.ID, s.Name, s.Name);
-            result[i++] = TemplateCommandIndex.CreateDescription(s.ID, s.Desc ?? string.Empty, s.Name);
+            result[i++] = TemplateCommandIndex.CreateDescription(
+                s.ID,
+                s.Desc ?? string.Empty,
+                s.Name
+            );
         }
 
         return result;
     }
 
-    protected override async Task Execute(IFieldUser user, ISkillTemplate template, TemplateCommandArgs args)
+    protected override async Task Execute(
+        IFieldUser user,
+        ISkillTemplate template,
+        TemplateCommandArgs args
+    )
     {
-        var skillLevel = await user.Prompt(target => target.AskNumber(
-            "What skill level would you like to set?",
-            user.Character.Skills[template.ID]?.Level ?? 0,
-            0,
-            template.MaxLevel
-        ), -1);
-        if (skillLevel == -1) return;
+        var skillLevel = await user.Prompt(
+            target =>
+                target.AskNumber(
+                    "What skill level would you like to set?",
+                    user.Character.Skills[template.ID]?.Level ?? 0,
+                    0,
+                    template.MaxLevel
+                ),
+            -1
+        );
+        if (skillLevel == -1)
+            return;
 
-        await user.ModifySkills(s => s.Set(template, skillLevel, SkillConstants.IsSkillNeedMasterLevel(template.ID) ? skillLevel : null));
+        await user.ModifySkills(s =>
+            s.Set(
+                template,
+                skillLevel,
+                SkillConstants.IsSkillNeedMasterLevel(template.ID) ? skillLevel : null
+            )
+        );
         await user.Message($"Successfully set skill {template.ID} level to {skillLevel}");
     }
 }
@@ -59,6 +79,6 @@ public class SkillResetAllCommand : AbstractCommand
     public override string Name => "ResetAll";
     public override string Description => "Resets all skill records to 0";
 
-    public override Task Execute(IFieldUser user, string[] args)
-        => user.ModifySkills(s => s.ResetAll());
+    public override Task Execute(IFieldUser user, string[] args) =>
+        user.ModifySkills(s => s.ResetAll());
 }

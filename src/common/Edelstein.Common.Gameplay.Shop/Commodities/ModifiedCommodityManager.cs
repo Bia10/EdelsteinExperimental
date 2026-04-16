@@ -3,6 +3,6 @@ using Edelstein.Protocol.Gameplay.Shop.Commodities;
 
 namespace Edelstein.Common.Gameplay.Shop.Commodities;
 
-public class ModifiedCommodityManager : 
-    Repository<int, IModifiedCommodity>, 
-    IModifiedCommodityManager;
+public class ModifiedCommodityManager
+    : Repository<int, IModifiedCommodity>,
+        IModifiedCommodityManager;

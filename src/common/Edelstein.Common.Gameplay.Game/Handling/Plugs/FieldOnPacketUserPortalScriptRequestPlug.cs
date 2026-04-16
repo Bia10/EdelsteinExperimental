@@ -7,24 +7,34 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class FieldOnPacketUserPortalScriptRequestPlug : IPipelinePlug<FieldOnPacketUserPortalScriptRequest>
+public class FieldOnPacketUserPortalScriptRequestPlug
+    : IPipelinePlug<FieldOnPacketUserPortalScriptRequest>
 {
     private readonly INamedConversationManager _scriptManager;
 
-    public FieldOnPacketUserPortalScriptRequestPlug(INamedConversationManager scriptManager) => _scriptManager = scriptManager;
-    
+    public FieldOnPacketUserPortalScriptRequestPlug(INamedConversationManager scriptManager) =>
+        _scriptManager = scriptManager;
+
     public async Task Handle(IPipelineContext ctx, FieldOnPacketUserPortalScriptRequest message)
     {
-        var portal = message.User.Field?.Template.Portals.Objects.FirstOrDefault(p => p.Name == message.Portal);
-        if (portal?.Script == null) return;
-        
-        var conversation = await _scriptManager.Retrieve(portal.Script) as IConversation ?? 
-                           new FallbackConversation(portal.Script, message.User);
+        var portal = message.User.Field?.Template.Portals.Objects.FirstOrDefault(p =>
+            p.Name == message.Portal
+        );
+        if (portal?.Script == null)
+            return;
+
+        var conversation =
+            await _scriptManager.Retrieve(portal.Script) as IConversation
+            ?? new FallbackConversation(portal.Script, message.User);
 
         _ = message.User.Converse(
             conversation,
             c => new ConversationSpeaker(c),
-            c => new ConversationSpeakerUser(message.User, c, flags: ConversationSpeakerFlags.NPCReplacedByUser)
+            c => new ConversationSpeakerUser(
+                message.User,
+                c,
+                flags: ConversationSpeakerFlags.NPCReplacedByUser
+            )
         );
     }
 }

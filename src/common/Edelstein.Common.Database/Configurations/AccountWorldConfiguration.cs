@@ -14,7 +14,8 @@ public class AccountWorldConfiguration : IEntityTypeConfiguration<AccountWorldEn
         builder.ToTable("account_worlds");
 
         builder.HasKey(e => e.ID);
-        builder.HasOne(e => e.Account)
+        builder
+            .HasOne(e => e.Account)
             .WithMany(p => p.AccountWorlds)
             .HasForeignKey(e => e.AccountID)
             .OnDelete(DeleteBehavior.Cascade);

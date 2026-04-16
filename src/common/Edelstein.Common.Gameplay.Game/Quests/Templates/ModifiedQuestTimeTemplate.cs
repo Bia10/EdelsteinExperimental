@@ -18,7 +18,13 @@ public class ModifiedQuestTimeTemplate : ITemplate, IModifiedQuestTime
         var start = node.ResolveString("start");
         var end = node.ResolveString("end");
 
-        if (start != null) DateStart = DateTime.ParseExact(start[..10], "yyyyMMddHH", CultureInfo.InvariantCulture);
-        if (end != null) DateEnd = DateTime.ParseExact(end[..10], "yyyyMMddHH", CultureInfo.InvariantCulture);
+        if (start != null)
+            DateStart = DateTime.ParseExact(
+                start[..10],
+                "yyyyMMddHH",
+                CultureInfo.InvariantCulture
+            );
+        if (end != null)
+            DateEnd = DateTime.ParseExact(end[..10], "yyyyMMddHH", CultureInfo.InvariantCulture);
     }
 }

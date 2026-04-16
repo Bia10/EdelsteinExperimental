@@ -1,4 +1,4 @@
-namespace Edelstein.Protocol.Gameplay.Game.Movements;
+﻿namespace Edelstein.Protocol.Gameplay.Game.Movements;
 
 public enum MoveActionType : byte
 {
@@ -23,5 +23,5 @@ public enum MoveActionType : byte
     Fly2_Move = 0x12,
     Dash2 = 0x13,
     RocketBooster = 0x14,
-    TeslaCoilTriangle = 0x15
+    TeslaCoilTriangle = 0x15,
 }

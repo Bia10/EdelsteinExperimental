@@ -4,5 +4,5 @@ public enum RateType : byte
 {
     Exp,
     Meso,
-    Drop
+    Drop,
 }

@@ -22,7 +22,8 @@ public class GuildService : IGuildService
         IDbContextFactory<SocialDbContext> dbFactory,
         IMessageBus messaging,
         ICharacterRepository characterRepository,
-        ILogger<GuildService> logger)
+        ILogger<GuildService> logger
+    )
     {
         _options = options;
         _dbFactory = dbFactory;
@@ -31,13 +32,13 @@ public class GuildService : IGuildService
         _logger = logger;
     }
 
-
     private static async Task<GuildMembership?> LoadMembershipAsync(
         SocialDbContext db,
-        int characterID)
+        int characterID
+    )
     {
-        var entity = await db.GuildMembers
-            .Include(m => m.Guild)
+        var entity = await db
+            .GuildMembers.Include(m => m.Guild)
                 .ThenInclude(g => g.Members)
             .Include(m => m.Guild)
                 .ThenInclude(g => g.Skills)
@@ -46,7 +47,6 @@ public class GuildService : IGuildService
 
         return entity == null ? null : new GuildMembership(entity);
     }
-
 
     public async Task<GuildLoadResponse> Load(GuildLoadRequest request)
     {
@@ -69,15 +69,17 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            if (string.IsNullOrWhiteSpace(request.GuildName)
+            if (
+                string.IsNullOrWhiteSpace(request.GuildName)
                 || request.GuildName.Length < _options.MinNameLength
-                || request.GuildName.Length > _options.MaxNameLength)
+                || request.GuildName.Length > _options.MaxNameLength
+            )
                 return new GuildNameCheckResponse(GuildResult.FailedNameInvalid);
 
             var taken = await db.Guilds.AnyAsync(g => g.Name == request.GuildName);
-            return new GuildNameCheckResponse(taken
-                ? GuildResult.FailedNameTaken
-                : GuildResult.Success);
+            return new GuildNameCheckResponse(
+                taken ? GuildResult.FailedNameTaken : GuildResult.Success
+            );
         }
         catch (Exception ex)
         {
@@ -85,7 +87,6 @@ public class GuildService : IGuildService
             return new GuildNameCheckResponse(GuildResult.FailedUnknown);
         }
     }
-
 
     public async Task<GuildResponse> Create(GuildCreateRequest request)
     {
@@ -128,13 +129,20 @@ public class GuildService : IGuildService
             // Re-load with all includes for full snapshot.
             var membership = await LoadMembershipAsync(db, request.CharacterID);
             if (membership != null)
-                await _messaging.PublishAsync(new NotifyGuildCreated(request.CharacterID, membership));
+                await _messaging.PublishAsync(
+                    new NotifyGuildCreated(request.CharacterID, membership)
+                );
 
             return new GuildResponse(GuildResult.Success);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Create failed for character {CharacterID} guild '{GuildName}'", request.CharacterID, request.GuildName);
+            _logger.LogError(
+                ex,
+                "Create failed for character {CharacterID} guild '{GuildName}'",
+                request.CharacterID,
+                request.GuildName
+            );
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -146,28 +154,31 @@ public class GuildService : IGuildService
             await using var db = await _dbFactory.CreateDbContextAsync();
 
             var guild = await db.Guilds.FirstOrDefaultAsync(g =>
-                g.ID == request.GuildID && g.MasterCharacterID == request.CharacterID);
+                g.ID == request.GuildID && g.MasterCharacterID == request.CharacterID
+            );
 
             if (guild == null)
                 return new GuildResponse(GuildResult.FailedNotMaster);
 
-            await db.Guilds
-                .Where(g => g.ID == request.GuildID)
-                .ExecuteDeleteAsync();
+            await db.Guilds.Where(g => g.ID == request.GuildID).ExecuteDeleteAsync();
 
-            await _messaging.PublishAsync(new NotifyGuildDisbanded(
-                request.CharacterID,
-                request.GuildID));
+            await _messaging.PublishAsync(
+                new NotifyGuildDisbanded(request.CharacterID, request.GuildID)
+            );
 
             return new GuildResponse(GuildResult.Success);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Disband failed for guild {GuildID} by character {CharacterID}", request.GuildID, request.CharacterID);
+            _logger.LogError(
+                ex,
+                "Disband failed for guild {GuildID} by character {CharacterID}",
+                request.GuildID,
+                request.CharacterID
+            );
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
-
 
     public async Task<GuildResponse> Invite(GuildInviteRequest request)
     {
@@ -177,17 +188,15 @@ public class GuildService : IGuildService
             var now = DateTime.UtcNow;
 
             // Inviter must be in the guild with grade ≤ 2 (master or jr. master).
-            var inviterMember = await db.GuildMembers
-                .FirstOrDefaultAsync(m =>
-                    m.GuildID == request.GuildID &&
-                    m.CharacterID == request.InviterID &&
-                    m.Grade <= 2);
+            var inviterMember = await db.GuildMembers.FirstOrDefaultAsync(m =>
+                m.GuildID == request.GuildID && m.CharacterID == request.InviterID && m.Grade <= 2
+            );
 
             if (inviterMember == null)
                 return new GuildResponse(GuildResult.FailedNotMaster);
 
-            var guild = await db.Guilds
-                .Include(g => g.Members)
+            var guild = await db
+                .Guilds.Include(g => g.Members)
                 .FirstOrDefaultAsync(g => g.ID == request.GuildID);
 
             if (guild == null)
@@ -206,39 +215,53 @@ public class GuildService : IGuildService
             if (await db.GuildMembers.AnyAsync(m => m.CharacterID == target.ID))
                 return new GuildResponse(GuildResult.FailedAlreadyInGuild);
 
-            if (await db.GuildInvitations.AnyAsync(i =>
-                    i.GuildID == request.GuildID &&
-                    i.CharacterID == target.ID &&
-                    i.DateExpire > now))
+            if (
+                await db.GuildInvitations.AnyAsync(i =>
+                    i.GuildID == request.GuildID && i.CharacterID == target.ID && i.DateExpire > now
+                )
+            )
                 return new GuildResponse(GuildResult.FailedAlreadyInvited);
 
             // Remove any stale invitation and create a fresh one.
-            await db.GuildInvitations
-                .Where(i => i.GuildID == request.GuildID && i.CharacterID == target.ID)
+            await db
+                .GuildInvitations.Where(i =>
+                    i.GuildID == request.GuildID && i.CharacterID == target.ID
+                )
                 .ExecuteDeleteAsync();
 
-            await db.GuildInvitations.AddAsync(new GuildInvitationEntity
-            {
-                GuildID = request.GuildID,
-                InviterID = request.InviterID,
-                CharacterID = target.ID,
-                DateExpire = now.AddMinutes(_options.InviteExpiryMinutes),
-            });
+            await db.GuildInvitations.AddAsync(
+                new GuildInvitationEntity
+                {
+                    GuildID = request.GuildID,
+                    InviterID = request.InviterID,
+                    CharacterID = target.ID,
+                    DateExpire = now.AddMinutes(_options.InviteExpiryMinutes),
+                }
+            );
 
             await db.SaveChangesAsync();
 
-            await _messaging.PublishAsync(new NotifyGuildMemberInvited(
-                request.InviterID,
-                request.InviterName,
-                request.GuildID,
-                guild.Name,
-                target.ID));
+            await _messaging.PublishAsync(
+                new NotifyGuildMemberInvited(
+                    request.InviterID,
+                    request.InviterName,
+                    request.GuildID,
+                    guild.Name,
+                    target.ID
+                )
+            );
 
             return new GuildResponse(GuildResult.Success);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Invite failed for guild {GuildID} inviter {InviterID} target '{CharacterName}'", request.GuildID, request.InviterID, request.CharacterName);
+            _logger.LogError(
+                ex,
+                "Invite failed for guild {GuildID} inviter {InviterID} target '{CharacterName}'",
+                request.GuildID,
+                request.InviterID,
+                request.CharacterName
+            );
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -252,10 +275,9 @@ public class GuildService : IGuildService
 
             // Look up the pending invitation by (InviterID, CharacterID) — this is
             // what the V95 client sends in the JoinGuild (0x06) packet (R-004).
-            var invitation = await db.GuildInvitations
-                .FirstOrDefaultAsync(i =>
-                    i.InviterID == request.InviterID &&
-                    i.CharacterID == request.CharacterID);
+            var invitation = await db.GuildInvitations.FirstOrDefaultAsync(i =>
+                i.InviterID == request.InviterID && i.CharacterID == request.CharacterID
+            );
 
             if (invitation == null || invitation.DateExpire < now)
                 return new GuildResponse(GuildResult.FailedNotInvited);
@@ -263,8 +285,8 @@ public class GuildService : IGuildService
             if (await db.GuildMembers.AnyAsync(m => m.CharacterID == request.CharacterID))
                 return new GuildResponse(GuildResult.FailedAlreadyInGuild);
 
-            var guild = await db.Guilds
-                .Include(g => g.Members)
+            var guild = await db
+                .Guilds.Include(g => g.Members)
                 .FirstOrDefaultAsync(g => g.ID == invitation.GuildID);
 
             if (guild == null)
@@ -291,16 +313,24 @@ public class GuildService : IGuildService
             // Reload for complete snapshot.
             var membership = await LoadMembershipAsync(db, request.CharacterID);
             if (membership != null)
-                await _messaging.PublishAsync(new NotifyGuildMemberJoined(
-                    invitation.GuildID,
-                    membership,
-                    new GuildMembershipMember(newMember)));
+                await _messaging.PublishAsync(
+                    new NotifyGuildMemberJoined(
+                        invitation.GuildID,
+                        membership,
+                        new GuildMembershipMember(newMember)
+                    )
+                );
 
             return new GuildResponse(GuildResult.Success);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "InviteAccept failed for character {CharacterID} inviter {InviterID}", request.CharacterID, request.InviterID);
+            _logger.LogError(
+                ex,
+                "InviteAccept failed for character {CharacterID} inviter {InviterID}",
+                request.CharacterID,
+                request.InviterID
+            );
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -311,8 +341,9 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            var invitation = await db.GuildInvitations
-                .FirstOrDefaultAsync(i => i.CharacterID == request.CharacterID);
+            var invitation = await db.GuildInvitations.FirstOrDefaultAsync(i =>
+                i.CharacterID == request.CharacterID
+            );
 
             if (invitation == null)
                 return new GuildResponse(GuildResult.FailedNotInvited);
@@ -323,16 +354,23 @@ public class GuildService : IGuildService
             await db.SaveChangesAsync();
 
             // Notify the inviter that their invite was declined.
-            await _messaging.PublishAsync(new NotifyGuildInviteRejected(
-                inviterID,
-                request.CharacterName,
-                request.IsAlreadyInvited));
+            await _messaging.PublishAsync(
+                new NotifyGuildInviteRejected(
+                    inviterID,
+                    request.CharacterName,
+                    request.IsAlreadyInvited
+                )
+            );
 
             return new GuildResponse(GuildResult.Success);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "InviteReject failed for character {CharacterID}", request.CharacterID);
+            _logger.LogError(
+                ex,
+                "InviteReject failed for character {CharacterID}",
+                request.CharacterID
+            );
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -343,8 +381,7 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            var guild = await db.Guilds
-                .FirstOrDefaultAsync(g => g.ID == request.GuildID);
+            var guild = await db.Guilds.FirstOrDefaultAsync(g => g.ID == request.GuildID);
 
             if (guild == null)
                 return new GuildResponse(GuildResult.FailedGuildNotFound);
@@ -352,10 +389,9 @@ public class GuildService : IGuildService
             if (guild.MasterCharacterID == request.CharacterID)
                 return new GuildResponse(GuildResult.FailedNotMaster);
 
-            var member = await db.GuildMembers
-                .FirstOrDefaultAsync(m =>
-                    m.GuildID == request.GuildID &&
-                    m.CharacterID == request.CharacterID);
+            var member = await db.GuildMembers.FirstOrDefaultAsync(m =>
+                m.GuildID == request.GuildID && m.CharacterID == request.CharacterID
+            );
 
             if (member == null)
                 return new GuildResponse(GuildResult.FailedNotInGuild);
@@ -363,17 +399,25 @@ public class GuildService : IGuildService
             db.GuildMembers.Remove(member);
             await db.SaveChangesAsync();
 
-            await _messaging.PublishAsync(new NotifyGuildMemberWithdrawn(
-                request.GuildID,
-                request.CharacterID,
-                member.CharacterName,
-                false));
+            await _messaging.PublishAsync(
+                new NotifyGuildMemberWithdrawn(
+                    request.GuildID,
+                    request.CharacterID,
+                    member.CharacterName,
+                    false
+                )
+            );
 
             return new GuildResponse(GuildResult.Success);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Leave failed for guild {GuildID} character {CharacterID}", request.GuildID, request.CharacterID);
+            _logger.LogError(
+                ex,
+                "Leave failed for guild {GuildID} character {CharacterID}",
+                request.GuildID,
+                request.CharacterID
+            );
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -387,19 +431,16 @@ public class GuildService : IGuildService
             if (request.MasterID == request.CharacterID)
                 return new GuildResponse(GuildResult.FailedSelf);
 
-            var requester = await db.GuildMembers
-                .FirstOrDefaultAsync(m =>
-                    m.GuildID == request.GuildID &&
-                    m.CharacterID == request.MasterID &&
-                    m.Grade <= 2);
+            var requester = await db.GuildMembers.FirstOrDefaultAsync(m =>
+                m.GuildID == request.GuildID && m.CharacterID == request.MasterID && m.Grade <= 2
+            );
 
             if (requester == null)
                 return new GuildResponse(GuildResult.FailedNotMaster);
 
-            var target = await db.GuildMembers
-                .FirstOrDefaultAsync(m =>
-                    m.GuildID == request.GuildID &&
-                    m.CharacterID == request.CharacterID);
+            var target = await db.GuildMembers.FirstOrDefaultAsync(m =>
+                m.GuildID == request.GuildID && m.CharacterID == request.CharacterID
+            );
 
             if (target == null)
                 return new GuildResponse(GuildResult.FailedNotInGuild);
@@ -411,21 +452,29 @@ public class GuildService : IGuildService
             db.GuildMembers.Remove(target);
             await db.SaveChangesAsync();
 
-            await _messaging.PublishAsync(new NotifyGuildMemberWithdrawn(
-                request.GuildID,
-                request.CharacterID,
-                target.CharacterName,
-                true));
+            await _messaging.PublishAsync(
+                new NotifyGuildMemberWithdrawn(
+                    request.GuildID,
+                    request.CharacterID,
+                    target.CharacterName,
+                    true
+                )
+            );
 
             return new GuildResponse(GuildResult.Success);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Kick failed for guild {GuildID} master {MasterID} target {CharacterID}", request.GuildID, request.MasterID, request.CharacterID);
+            _logger.LogError(
+                ex,
+                "Kick failed for guild {GuildID} master {MasterID} target {CharacterID}",
+                request.GuildID,
+                request.MasterID,
+                request.CharacterID
+            );
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
-
 
     public async Task<GuildResponse> SetNotice(GuildSetNoticeRequest request)
     {
@@ -433,22 +482,25 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            if (!await db.GuildMembers.AnyAsync(m =>
-                    m.GuildID == request.GuildID &&
-                    m.CharacterID == request.CharacterID &&
-                    m.Grade <= 2))
+            if (
+                !await db.GuildMembers.AnyAsync(m =>
+                    m.GuildID == request.GuildID
+                    && m.CharacterID == request.CharacterID
+                    && m.Grade <= 2
+                )
+            )
                 return new GuildResponse(GuildResult.FailedNotMaster);
 
-            var updated = await db.Guilds
-                .Where(g => g.ID == request.GuildID)
+            var updated = await db
+                .Guilds.Where(g => g.ID == request.GuildID)
                 .ExecuteUpdateAsync(g => g.SetProperty(e => e.Notice, request.Notice));
 
             if (updated == 0)
                 return new GuildResponse(GuildResult.FailedGuildNotFound);
 
-            await _messaging.PublishAsync(new NotifyGuildNoticeChanged(
-                request.GuildID,
-                request.Notice));
+            await _messaging.PublishAsync(
+                new NotifyGuildNoticeChanged(request.GuildID, request.Notice)
+            );
 
             return new GuildResponse(GuildResult.Success);
         }
@@ -465,27 +517,40 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            if (!await db.GuildMembers.AnyAsync(m =>
-                    m.GuildID == request.GuildID &&
-                    m.CharacterID == request.CharacterID &&
-                    m.Grade == 1))
+            if (
+                !await db.GuildMembers.AnyAsync(m =>
+                    m.GuildID == request.GuildID
+                    && m.CharacterID == request.CharacterID
+                    && m.Grade == 1
+                )
+            )
                 return new GuildResponse(GuildResult.FailedNotMaster);
 
-            var updated = await db.Guilds
-                .Where(g => g.ID == request.GuildID)
-                .ExecuteUpdateAsync(g => g
-                    .SetProperty(e => e.GradeName1, request.GradeName1)
-                    .SetProperty(e => e.GradeName2, request.GradeName2)
-                    .SetProperty(e => e.GradeName3, request.GradeName3)
-                    .SetProperty(e => e.GradeName4, request.GradeName4)
-                    .SetProperty(e => e.GradeName5, request.GradeName5));
+            var updated = await db
+                .Guilds.Where(g => g.ID == request.GuildID)
+                .ExecuteUpdateAsync(g =>
+                    g.SetProperty(e => e.GradeName1, request.GradeName1)
+                        .SetProperty(e => e.GradeName2, request.GradeName2)
+                        .SetProperty(e => e.GradeName3, request.GradeName3)
+                        .SetProperty(e => e.GradeName4, request.GradeName4)
+                        .SetProperty(e => e.GradeName5, request.GradeName5)
+                );
 
             if (updated == 0)
                 return new GuildResponse(GuildResult.FailedGuildNotFound);
 
-            await _messaging.PublishAsync(new NotifyGuildGradeNamesChanged(
-                request.GuildID,
-                [request.GradeName1, request.GradeName2, request.GradeName3, request.GradeName4, request.GradeName5]));
+            await _messaging.PublishAsync(
+                new NotifyGuildGradeNamesChanged(
+                    request.GuildID,
+                    [
+                        request.GradeName1,
+                        request.GradeName2,
+                        request.GradeName3,
+                        request.GradeName4,
+                        request.GradeName5,
+                    ]
+                )
+            );
 
             return new GuildResponse(GuildResult.Success);
         }
@@ -503,10 +568,13 @@ public class GuildService : IGuildService
             await using var db = await _dbFactory.CreateDbContextAsync();
 
             // Only the master (grade 1) may change grades; master cannot change own grade.
-            if (!await db.GuildMembers.AnyAsync(m =>
-                    m.GuildID == request.GuildID &&
-                    m.CharacterID == request.MasterID &&
-                    m.Grade == 1))
+            if (
+                !await db.GuildMembers.AnyAsync(m =>
+                    m.GuildID == request.GuildID
+                    && m.CharacterID == request.MasterID
+                    && m.Grade == 1
+                )
+            )
                 return new GuildResponse(GuildResult.FailedNotMaster);
 
             if (request.CharacterID == request.MasterID)
@@ -516,25 +584,34 @@ public class GuildService : IGuildService
             if (request.Grade is < 2 or > 5)
                 return new GuildResponse(GuildResult.FailedUnknown);
 
-            var updated = await db.GuildMembers
-                .Where(m =>
-                    m.GuildID == request.GuildID &&
-                    m.CharacterID == request.CharacterID)
+            var updated = await db
+                .GuildMembers.Where(m =>
+                    m.GuildID == request.GuildID && m.CharacterID == request.CharacterID
+                )
                 .ExecuteUpdateAsync(m => m.SetProperty(e => e.Grade, request.Grade));
 
             if (updated == 0)
                 return new GuildResponse(GuildResult.FailedNotInGuild);
 
-            await _messaging.PublishAsync(new NotifyGuildMemberGradeChanged(
-                request.GuildID,
-                request.CharacterID,
-                request.Grade));
+            await _messaging.PublishAsync(
+                new NotifyGuildMemberGradeChanged(
+                    request.GuildID,
+                    request.CharacterID,
+                    request.Grade
+                )
+            );
 
             return new GuildResponse(GuildResult.Success);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "SetMemberGrade failed for guild {GuildID} character {CharacterID} grade {Grade}", request.GuildID, request.CharacterID, request.Grade);
+            _logger.LogError(
+                ex,
+                "SetMemberGrade failed for guild {GuildID} character {CharacterID} grade {Grade}",
+                request.GuildID,
+                request.CharacterID,
+                request.Grade
+            );
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -545,29 +622,36 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            if (!await db.GuildMembers.AnyAsync(m =>
-                    m.GuildID == request.GuildID &&
-                    m.CharacterID == request.CharacterID &&
-                    m.Grade == 1))
+            if (
+                !await db.GuildMembers.AnyAsync(m =>
+                    m.GuildID == request.GuildID
+                    && m.CharacterID == request.CharacterID
+                    && m.Grade == 1
+                )
+            )
                 return new GuildResponse(GuildResult.FailedNotMaster);
 
-            var updated = await db.Guilds
-                .Where(g => g.ID == request.GuildID)
-                .ExecuteUpdateAsync(g => g
-                    .SetProperty(e => e.MarkBg, request.MarkBg)
-                    .SetProperty(e => e.MarkBgColor, request.MarkBgColor)
-                    .SetProperty(e => e.Mark, request.Mark)
-                    .SetProperty(e => e.MarkColor, request.MarkColor));
+            var updated = await db
+                .Guilds.Where(g => g.ID == request.GuildID)
+                .ExecuteUpdateAsync(g =>
+                    g.SetProperty(e => e.MarkBg, request.MarkBg)
+                        .SetProperty(e => e.MarkBgColor, request.MarkBgColor)
+                        .SetProperty(e => e.Mark, request.Mark)
+                        .SetProperty(e => e.MarkColor, request.MarkColor)
+                );
 
             if (updated == 0)
                 return new GuildResponse(GuildResult.FailedGuildNotFound);
 
-            await _messaging.PublishAsync(new NotifyGuildMarkChanged(
-                request.GuildID,
-                request.MarkBg,
-                request.MarkBgColor,
-                request.Mark,
-                request.MarkColor));
+            await _messaging.PublishAsync(
+                new NotifyGuildMarkChanged(
+                    request.GuildID,
+                    request.MarkBg,
+                    request.MarkBgColor,
+                    request.Mark,
+                    request.MarkColor
+                )
+            );
 
             return new GuildResponse(GuildResult.Success);
         }
@@ -584,10 +668,9 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            var guild = await db.Guilds
-                .FirstOrDefaultAsync(g =>
-                    g.ID == request.GuildID &&
-                    g.MasterCharacterID == request.CharacterID);
+            var guild = await db.Guilds.FirstOrDefaultAsync(g =>
+                g.ID == request.GuildID && g.MasterCharacterID == request.CharacterID
+            );
 
             if (guild == null)
                 return new GuildResponse(GuildResult.FailedNotMaster);
@@ -597,8 +680,8 @@ public class GuildService : IGuildService
 
             var newMax = Math.Min(guild.MaxMemberNum + _options.ExpandStep, _options.MaxMemberNum);
 
-            await db.Guilds
-                .Where(g => g.ID == request.GuildID)
+            await db
+                .Guilds.Where(g => g.ID == request.GuildID)
                 .ExecuteUpdateAsync(g => g.SetProperty(e => e.MaxMemberNum, newMax));
 
             await _messaging.PublishAsync(new NotifyGuildMaxMemberChanged(request.GuildID, newMax));
@@ -607,11 +690,15 @@ public class GuildService : IGuildService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "IncMaxMemberNum failed for guild {GuildID} character {CharacterID}", request.GuildID, request.CharacterID);
+            _logger.LogError(
+                ex,
+                "IncMaxMemberNum failed for guild {GuildID} character {CharacterID}",
+                request.GuildID,
+                request.CharacterID
+            );
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
-
 
     public async Task<GuildResponse> UpdateLevelOrJob(GuildUpdateLevelOrJobRequest request)
     {
@@ -619,33 +706,40 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            var member = await db.GuildMembers
-                .FirstOrDefaultAsync(m =>
-                    m.GuildID == request.GuildID &&
-                    m.CharacterID == request.CharacterID);
+            var member = await db.GuildMembers.FirstOrDefaultAsync(m =>
+                m.GuildID == request.GuildID && m.CharacterID == request.CharacterID
+            );
 
             if (member == null)
                 return new GuildResponse(GuildResult.FailedNotInGuild);
 
-            await db.GuildMembers
-                .Where(m =>
-                    m.GuildID == request.GuildID &&
-                    m.CharacterID == request.CharacterID)
-                .ExecuteUpdateAsync(m => m
-                    .SetProperty(e => e.Level, request.Level)
-                    .SetProperty(e => e.Job, request.Job));
+            await db
+                .GuildMembers.Where(m =>
+                    m.GuildID == request.GuildID && m.CharacterID == request.CharacterID
+                )
+                .ExecuteUpdateAsync(m =>
+                    m.SetProperty(e => e.Level, request.Level).SetProperty(e => e.Job, request.Job)
+                );
 
-            await _messaging.PublishAsync(new NotifyGuildMemberLevelOrJobChanged(
-                request.GuildID,
-                request.CharacterID,
-                request.Level,
-                request.Job));
+            await _messaging.PublishAsync(
+                new NotifyGuildMemberLevelOrJobChanged(
+                    request.GuildID,
+                    request.CharacterID,
+                    request.Level,
+                    request.Job
+                )
+            );
 
             return new GuildResponse(GuildResult.Success);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "UpdateLevelOrJob failed for guild {GuildID} character {CharacterID}", request.GuildID, request.CharacterID);
+            _logger.LogError(
+                ex,
+                "UpdateLevelOrJob failed for guild {GuildID} character {CharacterID}",
+                request.GuildID,
+                request.CharacterID
+            );
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -656,22 +750,31 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            await db.GuildMembers
-                .Where(m =>
-                    m.GuildID == request.GuildID &&
-                    m.CharacterID == request.CharacterID)
+            await db
+                .GuildMembers.Where(m =>
+                    m.GuildID == request.GuildID && m.CharacterID == request.CharacterID
+                )
                 .ExecuteUpdateAsync(m => m.SetProperty(e => e.ChannelID, request.ChannelID));
 
-            await _messaging.PublishAsync(new NotifyGuildMemberOnlineChanged(
-                request.GuildID,
-                request.CharacterID,
-                request.ChannelID >= 0));
+            await _messaging.PublishAsync(
+                new NotifyGuildMemberOnlineChanged(
+                    request.GuildID,
+                    request.CharacterID,
+                    request.ChannelID >= 0
+                )
+            );
 
             return new GuildResponse(GuildResult.Success);
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "UpdateChannel failed for guild {GuildID} character {CharacterID} channel {ChannelID}", request.GuildID, request.CharacterID, request.ChannelID);
+            _logger.LogError(
+                ex,
+                "UpdateChannel failed for guild {GuildID} character {CharacterID} channel {ChannelID}",
+                request.GuildID,
+                request.CharacterID,
+                request.ChannelID
+            );
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -685,16 +788,17 @@ public class GuildService : IGuildService
             await using var db = await _dbFactory.CreateDbContextAsync();
 
             // The notice is a single optional pinned post, separate from the paged list.
-            var notice = await db.GuildBBSPosts
-                .Where(p => p.GuildID == request.GuildID && p.IsNotice)
+            var notice = await db
+                .GuildBBSPosts.Where(p => p.GuildID == request.GuildID && p.IsNotice)
                 .FirstOrDefaultAsync();
 
             // Pagination and total count cover only non-notice posts.
-            var totalCount = await db.GuildBBSPosts
-                .CountAsync(p => p.GuildID == request.GuildID && !p.IsNotice);
+            var totalCount = await db.GuildBBSPosts.CountAsync(p =>
+                p.GuildID == request.GuildID && !p.IsNotice
+            );
 
-            var posts = await db.GuildBBSPosts
-                .Where(p => p.GuildID == request.GuildID && !p.IsNotice)
+            var posts = await db
+                .GuildBBSPosts.Where(p => p.GuildID == request.GuildID && !p.IsNotice)
                 .OrderByDescending(p => p.CreatedAt)
                 .Skip(request.EntryListStart)
                 .Take(_options.BBSPostsPerPage)
@@ -704,7 +808,8 @@ public class GuildService : IGuildService
                 GuildResult.Success,
                 notice != null ? new GuildBBSPost(notice) : null,
                 posts.Select(p => (IGuildBBSPost)new GuildBBSPost(p)).ToList().AsReadOnly(),
-                totalCount);
+                totalCount
+            );
         }
         catch (Exception ex)
         {
@@ -719,8 +824,8 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            var post = await db.GuildBBSPosts
-                .Include(p => p.Comments.OrderBy(c => c.CreatedAt))
+            var post = await db
+                .GuildBBSPosts.Include(p => p.Comments.OrderBy(c => c.CreatedAt))
                 .FirstOrDefaultAsync(p => p.ID == request.PostID && p.GuildID == request.GuildID);
 
             if (post == null)
@@ -729,11 +834,19 @@ public class GuildService : IGuildService
             return new GuildBBSViewResponse(
                 GuildResult.Success,
                 new GuildBBSPost(post),
-                post.Comments.Select(c => (IGuildBBSComment)new GuildBBSComment(c)).ToList().AsReadOnly());
+                post.Comments.Select(c => (IGuildBBSComment)new GuildBBSComment(c))
+                    .ToList()
+                    .AsReadOnly()
+            );
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "BBSView failed for guild {GuildID} post {PostID}", request.GuildID, request.PostID);
+            _logger.LogError(
+                ex,
+                "BBSView failed for guild {GuildID} post {PostID}",
+                request.GuildID,
+                request.PostID
+            );
             return new GuildBBSViewResponse(GuildResult.FailedUnknown);
         }
     }
@@ -745,8 +858,9 @@ public class GuildService : IGuildService
             await using var db = await _dbFactory.CreateDbContextAsync();
 
             // Cap applies only to non-notice posts (the notice slot is separate).
-            var totalPosts = await db.GuildBBSPosts
-                .CountAsync(p => p.GuildID == request.GuildID && !p.IsNotice);
+            var totalPosts = await db.GuildBBSPosts.CountAsync(p =>
+                p.GuildID == request.GuildID && !p.IsNotice
+            );
             if (totalPosts >= _options.BBSMaxPosts)
                 return new GuildBBSViewResponse(GuildResult.FailedFull);
 
@@ -754,8 +868,8 @@ public class GuildService : IGuildService
             // Demote the existing notice before inserting a new one.
             if (request.IsNotice)
             {
-                await db.GuildBBSPosts
-                    .Where(p => p.GuildID == request.GuildID && p.IsNotice)
+                await db
+                    .GuildBBSPosts.Where(p => p.GuildID == request.GuildID && p.IsNotice)
                     .ExecuteUpdateAsync(p => p.SetProperty(e => e.IsNotice, false));
             }
 
@@ -766,7 +880,9 @@ public class GuildService : IGuildService
                 AuthorName = request.AuthorName,
                 IsNotice = request.IsNotice,
                 Title = request.Title[..Math.Min(request.Title.Length, _options.BBSMaxTitleLength)],
-                Content = request.Content[..Math.Min(request.Content.Length, _options.BBSMaxContentLength)],
+                Content = request.Content[
+                    ..Math.Min(request.Content.Length, _options.BBSMaxContentLength)
+                ],
                 EmoticonID = request.EmoticonID,
                 CreatedAt = DateTime.UtcNow,
                 CommentCount = 0,
@@ -779,7 +895,12 @@ public class GuildService : IGuildService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "BBSWrite failed for guild {GuildID} author {AuthorID}", request.GuildID, request.AuthorID);
+            _logger.LogError(
+                ex,
+                "BBSWrite failed for guild {GuildID} author {AuthorID}",
+                request.GuildID,
+                request.AuthorID
+            );
             return new GuildBBSViewResponse(GuildResult.FailedUnknown);
         }
     }
@@ -790,8 +911,8 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            var post = await db.GuildBBSPosts
-                .Include(p => p.Comments.OrderBy(c => c.CreatedAt))
+            var post = await db
+                .GuildBBSPosts.Include(p => p.Comments.OrderBy(c => c.CreatedAt))
                 .FirstOrDefaultAsync(p => p.ID == request.PostID && p.GuildID == request.GuildID);
 
             if (post == null)
@@ -799,13 +920,18 @@ public class GuildService : IGuildService
 
             // Only the author or the guild master (grade 1) may edit.
             var isMaster = await db.GuildMembers.AnyAsync(m =>
-                m.GuildID == request.GuildID && m.CharacterID == request.RequesterID && m.Grade == 1);
+                m.GuildID == request.GuildID && m.CharacterID == request.RequesterID && m.Grade == 1
+            );
             if (post.AuthorID != request.RequesterID && !isMaster)
                 return new GuildBBSViewResponse(GuildResult.FailedPermission);
 
             post.IsNotice = request.IsNotice;
-            post.Title = request.Title[..Math.Min(request.Title.Length, _options.BBSMaxTitleLength)];
-            post.Content = request.Content[..Math.Min(request.Content.Length, _options.BBSMaxContentLength)];
+            post.Title = request.Title[
+                ..Math.Min(request.Title.Length, _options.BBSMaxTitleLength)
+            ];
+            post.Content = request.Content[
+                ..Math.Min(request.Content.Length, _options.BBSMaxContentLength)
+            ];
             post.EmoticonID = request.EmoticonID;
 
             await db.SaveChangesAsync();
@@ -813,11 +939,19 @@ public class GuildService : IGuildService
             return new GuildBBSViewResponse(
                 GuildResult.Success,
                 new GuildBBSPost(post),
-                post.Comments.Select(c => (IGuildBBSComment)new GuildBBSComment(c)).ToList().AsReadOnly());
+                post.Comments.Select(c => (IGuildBBSComment)new GuildBBSComment(c))
+                    .ToList()
+                    .AsReadOnly()
+            );
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "BBSEdit failed for guild {GuildID} post {PostID}", request.GuildID, request.PostID);
+            _logger.LogError(
+                ex,
+                "BBSEdit failed for guild {GuildID} post {PostID}",
+                request.GuildID,
+                request.PostID
+            );
             return new GuildBBSViewResponse(GuildResult.FailedUnknown);
         }
     }
@@ -828,14 +962,16 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            var post = await db.GuildBBSPosts
-                .FirstOrDefaultAsync(p => p.ID == request.PostID && p.GuildID == request.GuildID);
+            var post = await db.GuildBBSPosts.FirstOrDefaultAsync(p =>
+                p.ID == request.PostID && p.GuildID == request.GuildID
+            );
 
             if (post == null)
                 return new GuildResponse(GuildResult.FailedPostNotFound);
 
             var isMaster = await db.GuildMembers.AnyAsync(m =>
-                m.GuildID == request.GuildID && m.CharacterID == request.RequesterID && m.Grade == 1);
+                m.GuildID == request.GuildID && m.CharacterID == request.RequesterID && m.Grade == 1
+            );
             if (post.AuthorID != request.RequesterID && !isMaster)
                 return new GuildResponse(GuildResult.FailedPermission);
 
@@ -846,7 +982,12 @@ public class GuildService : IGuildService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "BBSDelete failed for guild {GuildID} post {PostID}", request.GuildID, request.PostID);
+            _logger.LogError(
+                ex,
+                "BBSDelete failed for guild {GuildID} post {PostID}",
+                request.GuildID,
+                request.PostID
+            );
             return new GuildResponse(GuildResult.FailedUnknown);
         }
     }
@@ -857,8 +998,8 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            var post = await db.GuildBBSPosts
-                .Include(p => p.Comments.OrderBy(c => c.CreatedAt))
+            var post = await db
+                .GuildBBSPosts.Include(p => p.Comments.OrderBy(c => c.CreatedAt))
                 .FirstOrDefaultAsync(p => p.ID == request.PostID && p.GuildID == request.GuildID);
 
             if (post == null)
@@ -873,7 +1014,9 @@ public class GuildService : IGuildService
                 GuildID = request.GuildID,
                 AuthorID = request.AuthorID,
                 AuthorName = request.AuthorName,
-                Content = request.Content[..Math.Min(request.Content.Length, _options.BBSMaxCommentLength)],
+                Content = request.Content[
+                    ..Math.Min(request.Content.Length, _options.BBSMaxCommentLength)
+                ],
                 CreatedAt = DateTime.UtcNow,
             };
 
@@ -886,11 +1029,20 @@ public class GuildService : IGuildService
             return new GuildBBSViewResponse(
                 GuildResult.Success,
                 new GuildBBSPost(post),
-                post.Comments.Append(comment).Select(c => (IGuildBBSComment)new GuildBBSComment(c)).ToList().AsReadOnly());
+                post.Comments.Append(comment)
+                    .Select(c => (IGuildBBSComment)new GuildBBSComment(c))
+                    .ToList()
+                    .AsReadOnly()
+            );
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "BBSWriteComment failed for guild {GuildID} post {PostID}", request.GuildID, request.PostID);
+            _logger.LogError(
+                ex,
+                "BBSWriteComment failed for guild {GuildID} post {PostID}",
+                request.GuildID,
+                request.PostID
+            );
             return new GuildBBSViewResponse(GuildResult.FailedUnknown);
         }
     }
@@ -901,8 +1053,8 @@ public class GuildService : IGuildService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            var post = await db.GuildBBSPosts
-                .Include(p => p.Comments.OrderBy(c => c.CreatedAt))
+            var post = await db
+                .GuildBBSPosts.Include(p => p.Comments.OrderBy(c => c.CreatedAt))
                 .FirstOrDefaultAsync(p => p.ID == request.PostID && p.GuildID == request.GuildID);
 
             if (post == null)
@@ -913,7 +1065,8 @@ public class GuildService : IGuildService
                 return new GuildBBSViewResponse(GuildResult.FailedCommentNotFound);
 
             var isMaster = await db.GuildMembers.AnyAsync(m =>
-                m.GuildID == request.GuildID && m.CharacterID == request.RequesterID && m.Grade == 1);
+                m.GuildID == request.GuildID && m.CharacterID == request.RequesterID && m.Grade == 1
+            );
             if (comment.AuthorID != request.RequesterID && !isMaster)
                 return new GuildBBSViewResponse(GuildResult.FailedPermission);
 
@@ -927,11 +1080,21 @@ public class GuildService : IGuildService
             return new GuildBBSViewResponse(
                 GuildResult.Success,
                 new GuildBBSPost(post),
-                remainingComments.Select(c => (IGuildBBSComment)new GuildBBSComment(c)).ToList().AsReadOnly());
+                remainingComments
+                    .Select(c => (IGuildBBSComment)new GuildBBSComment(c))
+                    .ToList()
+                    .AsReadOnly()
+            );
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "BBSDeleteComment failed for guild {GuildID} post {PostID} comment {CommentID}", request.GuildID, request.PostID, request.CommentID);
+            _logger.LogError(
+                ex,
+                "BBSDeleteComment failed for guild {GuildID} post {PostID} comment {CommentID}",
+                request.GuildID,
+                request.PostID,
+                request.CommentID
+            );
             return new GuildBBSViewResponse(GuildResult.FailedUnknown);
         }
     }

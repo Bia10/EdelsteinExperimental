@@ -2,9 +2,7 @@
 
 namespace Edelstein.Common.Gameplay.Game.Objects.User.Messages;
 
-public record GiveBuffMessage(
-    int ItemID
-) : IPacketWritable
+public record GiveBuffMessage(int ItemID) : IPacketWritable
 {
     public void WriteTo(IPacketWriter writer)
     {

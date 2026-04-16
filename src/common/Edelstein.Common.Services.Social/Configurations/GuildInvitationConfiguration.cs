@@ -1,4 +1,4 @@
-using Edelstein.Common.Services.Social.Entities;
+﻿using Edelstein.Common.Services.Social.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

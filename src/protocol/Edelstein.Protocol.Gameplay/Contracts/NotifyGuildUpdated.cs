@@ -1,4 +1,4 @@
-using Edelstein.Protocol.Services.Social;
+﻿using Edelstein.Protocol.Services.Social;
 
 namespace Edelstein.Protocol.Gameplay.Contracts;
 
@@ -6,7 +6,4 @@ namespace Edelstein.Protocol.Gameplay.Contracts;
 /// Broadcast when any guild header data changes: notice, grade names, emblem,
 /// member grade, level/job update, or member channel change.
 /// </summary>
-public record NotifyGuildUpdated(
-    int GuildID,
-    IGuildMembership GuildMembership
-);
+public record NotifyGuildUpdated(int GuildID, IGuildMembership GuildMembership);

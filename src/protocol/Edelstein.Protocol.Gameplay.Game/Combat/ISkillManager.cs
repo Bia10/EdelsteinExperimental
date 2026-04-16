@@ -5,17 +5,23 @@ using Edelstein.Protocol.Utilities.Spatial;
 
 namespace Edelstein.Protocol.Gameplay.Game.Combat;
 
-public interface ISkillManager : 
-    IRepositoryMethodInsert<int, ISkillHandler>,
-    IRepositoryMethodDelete<int, ISkillHandler>,
-    IRepositoryMethodRetrieve<int, ISkillHandler>,
-    IRepositoryMethodRetrieveAll<int, ISkillHandler>
+public interface ISkillManager
+    : IRepositoryMethodInsert<int, ISkillHandler>,
+        IRepositoryMethodDelete<int, ISkillHandler>,
+        IRepositoryMethodRetrieve<int, ISkillHandler>,
+        IRepositoryMethodRetrieveAll<int, ISkillHandler>
 {
     Task<bool> Check(IFieldUser user, int skillID);
-    
+
     Task HandleAttack(IFieldUser user, int skillID, bool IsHitMob);
-    Task HandleAttackMob(IFieldUser user, IFieldMob mob, int skillID, int damage, IPoint2D positionHit);
-    
+    Task HandleAttackMob(
+        IFieldUser user,
+        IFieldMob mob,
+        int skillID,
+        int damage,
+        IPoint2D positionHit
+    );
+
     Task HandleSkillUse(IFieldUser user, int skillID);
     Task HandleSkillCancel(IFieldUser user, int skillID);
 }

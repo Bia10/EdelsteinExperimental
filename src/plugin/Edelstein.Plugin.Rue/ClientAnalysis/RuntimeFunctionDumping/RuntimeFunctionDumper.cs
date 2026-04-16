@@ -9,7 +9,8 @@ public partial class RuntimeFunctionDumper(IntPtr processHandle, ILogger? logger
     private readonly IntPtr _processHandle = processHandle;
     private readonly ILogger? _logger = logger;
 
-    private static readonly Dictionary<int, string> AllKnownOffsets = V95ClientStructs.GetAllFieldOffsets();
+    private static readonly Dictionary<int, string> AllKnownOffsets =
+        V95ClientStructs.GetAllFieldOffsets();
     private readonly Dictionary<uint, string> _knownPointers = [];
 
     public void RegisterKnownPointer(uint address, string name)
@@ -17,7 +18,11 @@ public partial class RuntimeFunctionDumper(IntPtr processHandle, ILogger? logger
         _knownPointers[address] = name;
     }
 
-    public string AnalyzeFunctionChain(string rootName, uint rootAddress, FunctionChainOptions? options = null)
+    public string AnalyzeFunctionChain(
+        string rootName,
+        uint rootAddress,
+        FunctionChainOptions? options = null
+    )
     {
         var opts = options ?? new FunctionChainOptions();
         var sb = new StringBuilder();
@@ -88,9 +93,13 @@ public partial class RuntimeFunctionDumper(IntPtr processHandle, ILogger? logger
         }
 
         var depthGroups = dumpOrder.GroupBy(d => d.Depth).OrderBy(g => g.Key).ToList();
-        sb.AppendLine($"  Results: {dumps.Count} functions dumped across {depthGroups.Count} depth level(s)");
+        sb.AppendLine(
+            $"  Results: {dumps.Count} functions dumped across {depthGroups.Count} depth level(s)"
+        );
         if (skippedTargets.Count > 0)
-            sb.AppendLine($"           {skippedTargets.Count} target(s) not followed (level limit)");
+            sb.AppendLine(
+                $"           {skippedTargets.Count} target(s) not followed (level limit)"
+            );
         if (failedReads.Count > 0)
             sb.AppendLine($"           {failedReads.Count} target(s) failed to read");
         sb.AppendLine();
@@ -100,12 +109,16 @@ public partial class RuntimeFunctionDumper(IntPtr processHandle, ILogger? logger
             var depth = depthGroup.Key;
             var funcsAtDepth = depthGroup.ToList();
 
-            sb.AppendLine("========================================================================");
+            sb.AppendLine(
+                "========================================================================"
+            );
             if (depth == 0)
                 sb.AppendLine("  DEPTH 0 — Root");
             else
                 sb.AppendLine($"  DEPTH {depth} — {funcsAtDepth.Count} function(s)");
-            sb.AppendLine("========================================================================");
+            sb.AppendLine(
+                "========================================================================"
+            );
             sb.AppendLine();
 
             foreach (var (addr, _) in funcsAtDepth)
@@ -128,15 +141,19 @@ public partial class RuntimeFunctionDumper(IntPtr processHandle, ILogger? logger
         uint sendLoginPacketAddr,
         uint? knownInnerFuncAddr = null,
         int innerMaxBytes = 4096,
-        int followDepth = 1)
+        int followDepth = 1
+    )
     {
         if (knownInnerFuncAddr.HasValue && !_knownPointers.ContainsKey(knownInnerFuncAddr.Value))
-            RegisterKnownPointer(knownInnerFuncAddr.Value, $"sub_{knownInnerFuncAddr.Value:X} (configured inner)");
+            RegisterKnownPointer(
+                knownInnerFuncAddr.Value,
+                $"sub_{knownInnerFuncAddr.Value:X} (configured inner)"
+            );
 
-        return AnalyzeFunctionChain("CLogin::SendLoginPacket", sendLoginPacketAddr, new FunctionChainOptions
-        {
-            MaxBytesPerFunction = innerMaxBytes,
-            MaxDepth = followDepth,
-        });
+        return AnalyzeFunctionChain(
+            "CLogin::SendLoginPacket",
+            sendLoginPacketAddr,
+            new FunctionChainOptions { MaxBytesPerFunction = innerMaxBytes, MaxDepth = followDepth }
+        );
     }
 }

@@ -7,9 +7,14 @@ public class PromptConversation : IConversation
 {
     private readonly Action<IConversationSpeaker, IConversationSpeaker> _action;
 
-    public PromptConversation(Action<IConversationSpeaker, IConversationSpeaker> action) => _action = action;
+    public PromptConversation(Action<IConversationSpeaker, IConversationSpeaker> action) =>
+        _action = action;
 
-    public Task Start(IConversationContext ctx, IConversationSpeaker self, IConversationSpeaker target)
+    public Task Start(
+        IConversationContext ctx,
+        IConversationSpeaker self,
+        IConversationSpeaker target
+    )
     {
         _action.Invoke(self, target);
         return Task.CompletedTask;

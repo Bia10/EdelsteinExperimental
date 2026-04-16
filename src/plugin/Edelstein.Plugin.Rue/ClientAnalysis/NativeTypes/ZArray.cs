@@ -35,7 +35,8 @@ public sealed class ZArray<T>
             var elementOffset = ZArrayLayout.PayloadOffset + (i * TypeSizes.Int32);
             BinaryPrimitives.WriteInt32LittleEndian(
                 span.Slice(elementOffset, TypeSizes.Int32),
-                values[i]);
+                values[i]
+            );
         }
 
         if (!allocator.WriteBytes(basePtr, buffer))
@@ -44,7 +45,10 @@ public sealed class ZArray<T>
         return IntPtr.Add(basePtr, ZArrayLayout.PayloadOffset);
     }
 
-    private static IntPtr CreateZXStringArray(NativeAllocator allocator, IReadOnlyList<ZXString> values)
+    private static IntPtr CreateZXStringArray(
+        NativeAllocator allocator,
+        IReadOnlyList<ZXString> values
+    )
     {
         var count = values.Count;
         var layout = new ZArrayLayout(count);
@@ -61,7 +65,8 @@ public sealed class ZArray<T>
             var elementOffset = ZArrayLayout.PayloadOffset + (i * TypeSizes.Int32);
             BinaryPrimitives.WriteInt32LittleEndian(
                 span.Slice(elementOffset, TypeSizes.Int32),
-                values[i].Pointer.ToInt32());
+                values[i].Pointer.ToInt32()
+            );
         }
 
         if (!allocator.WriteBytes(basePtr, buffer))

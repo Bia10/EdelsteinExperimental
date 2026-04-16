@@ -15,22 +15,26 @@ namespace Edelstein.Common.Services.Social.Migrations
                 name: "friend_profiles",
                 columns: table => new
                 {
-                    CharacterID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CharacterID = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     FriendMax = table.Column<byte>(type: "smallint", nullable: false),
-                    IsMaster = table.Column<bool>(type: "boolean", nullable: false)
+                    IsMaster = table.Column<bool>(type: "boolean", nullable: false),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_friend_profiles", x => x.CharacterID);
-                });
+                }
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "friend_profiles");
+            migrationBuilder.DropTable(name: "friend_profiles");
         }
     }
 }

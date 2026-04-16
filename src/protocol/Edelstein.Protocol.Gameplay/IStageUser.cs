@@ -15,7 +15,7 @@ public interface IStageUser<TStageUser> : IIdentifiable<int>, IAdapter
     IAccount? Account { get; set; }
     IAccountWorld? AccountWorld { get; set; }
     ICharacter? Character { get; set; }
-    
+
     IFriendList? Friends { get; set; }
     IPartyMembership? Party { get; set; }
     IGuildMembership? Guild { get; set; }

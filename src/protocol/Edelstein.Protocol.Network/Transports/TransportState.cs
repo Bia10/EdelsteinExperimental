@@ -3,5 +3,5 @@
 public enum TransportState
 {
     Closed,
-    Opened
+    Opened,
 }

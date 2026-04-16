@@ -8,7 +8,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Cygnus;
 public class Soulfighter2SkillHandler : Soulfighter1SkillHandler
 {
     public override int ID => Job.Soulfighter2;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -17,7 +17,7 @@ public class Soulfighter2SkillHandler : Soulfighter1SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.Booster, context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

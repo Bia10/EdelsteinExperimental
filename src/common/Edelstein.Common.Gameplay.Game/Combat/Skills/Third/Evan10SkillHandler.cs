@@ -9,7 +9,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Third;
 public class Evan10SkillHandler : Evan9SkillHandler
 {
     public override int ID => Job.Evan10;
-    
+
     public override Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
     {
         switch (context.Skill?.ID)
@@ -19,7 +19,7 @@ public class Evan10SkillHandler : Evan9SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
 }

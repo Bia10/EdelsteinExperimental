@@ -12,10 +12,10 @@ public sealed class ProcessHandle(ILogger? logger) : IDisposable
     private bool _processExited;
 
     private const Win32Api.ProcessAccess Access =
-        Win32Api.ProcessAccess.VmRead |
-        Win32Api.ProcessAccess.VmWrite |
-        Win32Api.ProcessAccess.VmOperation |
-        Win32Api.ProcessAccess.QueryInformation;
+        Win32Api.ProcessAccess.VmRead
+        | Win32Api.ProcessAccess.VmWrite
+        | Win32Api.ProcessAccess.VmOperation
+        | Win32Api.ProcessAccess.QueryInformation;
 
     public IntPtr Handle => _handle;
     public int ProcessId => _processId;
@@ -43,7 +43,10 @@ public sealed class ProcessHandle(ILogger? logger) : IDisposable
 
         if (processes.Length == 0)
         {
-            _logger?.LogWarning("[Rue-CMemory] No process found matching '{ProcessName}'", targetName);
+            _logger?.LogWarning(
+                "[Rue-CMemory] No process found matching '{ProcessName}'",
+                targetName
+            );
             return false;
         }
 
@@ -59,9 +62,9 @@ public sealed class ProcessHandle(ILogger? logger) : IDisposable
         try
         {
             _processId = match.Id;
-            
+
             // Grab these before opening the handle/disposing the wrapper, just for logging
-            var actualName = match.ProcessName; 
+            var actualName = match.ProcessName;
             var title = match.MainWindowTitle;
 
             _handle = Win32Api.OpenProcess(Access, false, _processId);
@@ -75,8 +78,8 @@ public sealed class ProcessHandle(ILogger? logger) : IDisposable
 
             _logger?.LogDebug(
                 "[Rue-CMemory] Attached to {ProcessName} (PID: {PID}) Title='{Title}'",
-                actualName, 
-                _processId, 
+                actualName,
+                _processId,
                 title
             );
 
@@ -105,8 +108,7 @@ public sealed class ProcessHandle(ILogger? logger) : IDisposable
         _processExited = false;
     }
 
-    public bool TryMarkExitedFromError(int error)
-        => error == 299 && DetectProcessExit();
+    public bool TryMarkExitedFromError(int error) => error == 299 && DetectProcessExit();
 
     private bool DetectProcessExit()
     {
@@ -116,14 +118,20 @@ public sealed class ProcessHandle(ILogger? logger) : IDisposable
             if (proc.HasExited)
             {
                 _processExited = true;
-                _logger?.LogWarning("[Rue-CMemory] Client process (PID {PID}) has exited", _processId);
+                _logger?.LogWarning(
+                    "[Rue-CMemory] Client process (PID {PID}) has exited",
+                    _processId
+                );
                 return true;
             }
         }
         catch
         {
             _processExited = true;
-            _logger?.LogWarning("[Rue-CMemory] Client process (PID {PID}) no longer exists", _processId);
+            _logger?.LogWarning(
+                "[Rue-CMemory] Client process (PID {PID}) no longer exists",
+                _processId
+            );
             return true;
         }
 

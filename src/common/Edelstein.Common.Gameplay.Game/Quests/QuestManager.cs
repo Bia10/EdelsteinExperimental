@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using System.Text;
 using Edelstein.Common.Constants;
 using Edelstein.Common.Gameplay.Game.Conversations;
@@ -27,29 +27,40 @@ public class QuestManager : IQuestManager
     private readonly IMobQuestCacheManager _mobQuestCacheManager;
     private readonly ITemplateManager<IItemTemplate> _itemTemplates;
     private readonly INamedConversationManager _scriptManager;
-    
-    public QuestManager(ITemplateManager<IQuestTemplate> questTemplates, IMobQuestCacheManager mobQuestCacheManager, ITemplateManager<IItemTemplate> itemTemplates, INamedConversationManager scriptManager)
+
+    public QuestManager(
+        ITemplateManager<IQuestTemplate> questTemplates,
+        IMobQuestCacheManager mobQuestCacheManager,
+        ITemplateManager<IItemTemplate> itemTemplates,
+        INamedConversationManager scriptManager
+    )
     {
         _questTemplates = questTemplates;
         _mobQuestCacheManager = mobQuestCacheManager;
         _itemTemplates = itemTemplates;
         _scriptManager = scriptManager;
     }
-    
+
     public async Task UpdateMobKill(IFieldUser user, int mobID, int inc)
     {
         var questRecords = user.Character.QuestRecords;
         var mobQuestCache = await _mobQuestCacheManager.Retrieve(mobID);
-        if (mobQuestCache == null || mobQuestCache.Quests.Count == 0) return;
-        
+        if (mobQuestCache == null || mobQuestCache.Quests.Count == 0)
+            return;
+
         foreach (var questID in mobQuestCache.Quests)
         {
-            if (!questRecords.Records.TryGetValue(questID, out var record)) continue;
-            
+            if (!questRecords.Records.TryGetValue(questID, out var record))
+                continue;
+
             var quest = await _questTemplates.Retrieve(questID);
-            if (quest?.CheckEnd.CheckMob == null) continue;
-            
-            if (record.Value.Length != quest.CheckEnd.CheckMob.Count * 3 || !record.Value.All(char.IsDigit))
+            if (quest?.CheckEnd.CheckMob == null)
+                continue;
+
+            if (
+                record.Value.Length != quest.CheckEnd.CheckMob.Count * 3
+                || !record.Value.All(char.IsDigit)
+            )
             {
                 record.Value = string.Empty;
                 for (var i = 0; i < quest.CheckEnd.CheckMob.Count; i++)
@@ -58,11 +69,13 @@ public class QuestManager : IQuestManager
 
             var builder = new StringBuilder(record.Value, quest.CheckEnd.CheckMob.Count * 3);
             var checkMob = quest.CheckEnd.CheckMob.FirstOrDefault(m => m.MobID == mobID);
-            if (checkMob == null) continue;
-            
+            if (checkMob == null)
+                continue;
+
             var count = Convert.ToInt32(builder.ToString(3 * checkMob.Order, 3));
 
-            if (count >= checkMob.Count) continue;
+            if (count >= checkMob.Count)
+                continue;
 
             count += inc;
             count = Math.Min(count, checkMob.Count);
@@ -70,49 +83,38 @@ public class QuestManager : IQuestManager
 
             builder.Remove(3 * checkMob.Order, 3);
             builder.Insert(3 * checkMob.Order, count.ToString("000"));
-            
+
             record.Value = builder.ToString();
             _ = user.Message(new QuestRecordUpdateMessage(questID, record.Value));
         }
     }
-    
+
     public async Task<QuestResultType> Accept(IFieldUser user, int questID)
     {
         var result = QuestResultType.Success;
         var template = await _questTemplates.Retrieve(questID);
-        
+
         if (template != null)
         {
-            result = await Check(
-                QuestAction.Start, 
-                template,
-                user
-            );
-            
+            result = await Check(QuestAction.Start, template, user);
+
             if (result == QuestResultType.Success)
-                result = await Act(
-                    QuestAction.Start,
-                    template,
-                    user
-                );
+                result = await Act(QuestAction.Start, template, user);
         }
 
         if (result == QuestResultType.Success)
         {
             var record = string.Empty;
-            user.Character.QuestRecords.Records[questID] = new QuestRecord {Value = record};
-            await user.Message(new QuestRecordUpdateMessage(
-                questID,
-                record
-            ));
+            user.Character.QuestRecords.Records[questID] = new QuestRecord { Value = record };
+            await user.Message(new QuestRecordUpdateMessage(questID, record));
         }
 
         if (template?.IsAutoComplete ?? false)
             result = await Complete(user, questID);
-        
+
         return result;
     }
-    
+
     public async Task<QuestResultType> Complete(IFieldUser user, int questID, int? select = null)
     {
         var result = QuestResultType.Success;
@@ -120,21 +122,12 @@ public class QuestManager : IQuestManager
 
         if (template != null)
         {
-            result = await Check(
-                QuestAction.End, 
-                template,
-                user
-            );
-            
+            result = await Check(QuestAction.End, template, user);
+
             if (result == QuestResultType.Success)
-                result = await Act(
-                    QuestAction.End,
-                    template,
-                    user,
-                    select
-                );
+                result = await Act(QuestAction.End, template, user, select);
         }
-        
+
         if (result == QuestResultType.Success)
         {
             var now = DateTime.UtcNow;
@@ -142,142 +135,174 @@ public class QuestManager : IQuestManager
             user.Character.QuestRecords.Records.Remove(questID);
             user.Character.QuestCompletes.Records[questID] = new QuestCompleteRecord
             {
-                DateFinish = now
+                DateFinish = now,
             };
-            await user.Message(new QuestRecordCompleteMessage(
-                questID,
-                now
-            ));
-            
+            await user.Message(new QuestRecordCompleteMessage(questID, now));
+
             if (template != null)
                 await user.Effect(new QuestCompleteEffect());
         }
 
         return result;
     }
-    
-    public Task<QuestResultType> Resign(IFieldUser user, int questID) => throw new NotImplementedException();
-    
-    public async Task<QuestResultType> Script(QuestAction action, IFieldUser user, int questID, int? npcID = null)
+
+    public Task<QuestResultType> Resign(IFieldUser user, int questID) =>
+        throw new NotImplementedException();
+
+    public async Task<QuestResultType> Script(
+        QuestAction action,
+        IFieldUser user,
+        int questID,
+        int? npcID = null
+    )
     {
         var template = await _questTemplates.Retrieve(questID);
-        if (template == null) return QuestResultType.FailedUnknown;
-        var script = action == QuestAction.Start
-            ? template.CheckStart.ScriptStart
-            : template.CheckEnd.ScriptEnd;
-        if (script == null) 
+        if (template == null)
             return QuestResultType.FailedUnknown;
-        if (await Check(action, template, user) != QuestResultType.Success) 
+        var script =
+            action == QuestAction.Start
+                ? template.CheckStart.ScriptStart
+                : template.CheckEnd.ScriptEnd;
+        if (script == null)
             return QuestResultType.FailedUnknown;
-        
-        var conversation = await _scriptManager.Retrieve(script) as IConversation ?? 
-                           new FallbackConversation(script, user);
+        if (await Check(action, template, user) != QuestResultType.Success)
+            return QuestResultType.FailedUnknown;
+
+        var conversation =
+            await _scriptManager.Retrieve(script) as IConversation
+            ?? new FallbackConversation(script, user);
 
         await user.Converse(
             conversation,
             c => new ConversationSpeakerQuest(questID, c, npcID ?? 9010000),
-            c => new ConversationSpeakerUser(user, c, flags: ConversationSpeakerFlags.NPCReplacedByUser)
+            c => new ConversationSpeakerUser(
+                user,
+                c,
+                flags: ConversationSpeakerFlags.NPCReplacedByUser
+            )
         );
         return QuestResultType.Success;
     }
 
-    private async Task<QuestResultType> Act(QuestAction action, IQuestTemplate template, IFieldUser user, int? select = null)
+    private async Task<QuestResultType> Act(
+        QuestAction action,
+        IQuestTemplate template,
+        IFieldUser user,
+        int? select = null
+    )
     {
-        var actTemplate = action == QuestAction.Start
-            ? template.ActStart
-            : template.ActEnd;
-        var rewardsBase = actTemplate.Items?
-            .Where(i => i.Prob == null)
-            .ToImmutableArray() ?? ImmutableArray<IQuestTemplateActItem>.Empty;
-        var rewardsRandom = actTemplate.Items?
-            .Where(i => i.Gender is null or 2 || i.Gender == user.Character.Gender)
-            .Where(i =>
-            {
-                var check = false;
-                
-                if (i.JobFlags > 0)
+        var actTemplate = action == QuestAction.Start ? template.ActStart : template.ActEnd;
+        var rewardsBase =
+            actTemplate.Items?.Where(i => i.Prob == null).ToImmutableArray()
+            ?? ImmutableArray<IQuestTemplateActItem>.Empty;
+        var rewardsRandom =
+            actTemplate
+                .Items?.Where(i => i.Gender is null or 2 || i.Gender == user.Character.Gender)
+                .Where(i =>
                 {
-                    var checks = new List<Tuple<QuestJobFlags, int>>
+                    var check = false;
+
+                    if (i.JobFlags > 0)
                     {
-                        Tuple.Create(QuestJobFlags.Novice, Job.Novice),
-                        Tuple.Create(QuestJobFlags.Swordman, Job.Swordman),
-                        Tuple.Create(QuestJobFlags.Magician, Job.Magician),
-                        Tuple.Create(QuestJobFlags.Archer, Job.Archer),
-                        Tuple.Create(QuestJobFlags.Rogue, Job.Rogue),
-                        Tuple.Create(QuestJobFlags.Pirate, Job.Pirate),
-                        
-                        Tuple.Create(QuestJobFlags.Noblesse, Job.Noblesse),
-                        Tuple.Create(QuestJobFlags.Soulfighter, Job.Soulfighter),
-                        Tuple.Create(QuestJobFlags.Flamewizard, Job.Flamewizard),
-                        Tuple.Create(QuestJobFlags.Windbreaker, Job.Windbreaker),
-                        Tuple.Create(QuestJobFlags.Nightwalker, Job.Nightwalker),
-                        Tuple.Create(QuestJobFlags.Striker, Job.Striker),
-                        
-                        Tuple.Create(QuestJobFlags.Legend, Job.Legend),
-                        Tuple.Create(QuestJobFlags.Aran, Job.Aran),
-                        Tuple.Create(QuestJobFlags.Evan, Job.Evan)
-                    };
+                        var checks = new List<Tuple<QuestJobFlags, int>>
+                        {
+                            Tuple.Create(QuestJobFlags.Novice, Job.Novice),
+                            Tuple.Create(QuestJobFlags.Swordman, Job.Swordman),
+                            Tuple.Create(QuestJobFlags.Magician, Job.Magician),
+                            Tuple.Create(QuestJobFlags.Archer, Job.Archer),
+                            Tuple.Create(QuestJobFlags.Rogue, Job.Rogue),
+                            Tuple.Create(QuestJobFlags.Pirate, Job.Pirate),
+                            Tuple.Create(QuestJobFlags.Noblesse, Job.Noblesse),
+                            Tuple.Create(QuestJobFlags.Soulfighter, Job.Soulfighter),
+                            Tuple.Create(QuestJobFlags.Flamewizard, Job.Flamewizard),
+                            Tuple.Create(QuestJobFlags.Windbreaker, Job.Windbreaker),
+                            Tuple.Create(QuestJobFlags.Nightwalker, Job.Nightwalker),
+                            Tuple.Create(QuestJobFlags.Striker, Job.Striker),
+                            Tuple.Create(QuestJobFlags.Legend, Job.Legend),
+                            Tuple.Create(QuestJobFlags.Aran, Job.Aran),
+                            Tuple.Create(QuestJobFlags.Evan, Job.Evan),
+                        };
 
-                    if (checks.Any(c => 
-                            i.JobFlags.Value.HasFlag(c.Item1) &&
-                            JobConstants.GetJobRace(c.Item2) == JobConstants.GetJobRace(user.Character.Job) &&
-                            JobConstants.GetJobType(c.Item2) == JobConstants.GetJobType(user.Character.Job)))
-                        check = true;
-                }
+                        if (
+                            checks.Any(c =>
+                                i.JobFlags.Value.HasFlag(c.Item1)
+                                && JobConstants.GetJobRace(c.Item2)
+                                    == JobConstants.GetJobRace(user.Character.Job)
+                                && JobConstants.GetJobType(c.Item2)
+                                    == JobConstants.GetJobType(user.Character.Job)
+                            )
+                        )
+                            check = true;
+                    }
 
-                if (check) return check;
-                
-                if (i.JobExFlags > 0)
-                {
-                    var checks = new List<Tuple<QuestJobExFlags, int>>
+                    if (check)
+                        return check;
+
+                    if (i.JobExFlags > 0)
                     {
-                        Tuple.Create(QuestJobExFlags.Bmage, Job.Bmage),
-                        Tuple.Create(QuestJobExFlags.Wildhunter, Job.Wildhunter),
-                        Tuple.Create(QuestJobExFlags.Mechanic, Job.Mechanic),
-                    };
+                        var checks = new List<Tuple<QuestJobExFlags, int>>
+                        {
+                            Tuple.Create(QuestJobExFlags.Bmage, Job.Bmage),
+                            Tuple.Create(QuestJobExFlags.Wildhunter, Job.Wildhunter),
+                            Tuple.Create(QuestJobExFlags.Mechanic, Job.Mechanic),
+                        };
 
-                    if (checks.Any(c =>
-                            i.JobExFlags.Value.HasFlag(c.Item1) &&
-                            JobConstants.GetJobRace(c.Item2) == JobConstants.GetJobRace(user.Character.Job) &&
-                            JobConstants.GetJobType(c.Item2) == JobConstants.GetJobType(user.Character.Job)))
-                        check = true;
-                }
+                        if (
+                            checks.Any(c =>
+                                i.JobExFlags.Value.HasFlag(c.Item1)
+                                && JobConstants.GetJobRace(c.Item2)
+                                    == JobConstants.GetJobRace(user.Character.Job)
+                                && JobConstants.GetJobType(c.Item2)
+                                    == JobConstants.GetJobType(user.Character.Job)
+                            )
+                        )
+                            check = true;
+                    }
 
-                return check;
-            })
-            .Where(i => i.Prob > 0)
-            .ToImmutableArray() ?? ImmutableArray<IQuestTemplateActItem>.Empty;
-        var rewardsSelect = actTemplate.Items?
-            .Where(i => i.Prob == -1)
-            .ToImmutableDictionary(
-                i => i.Order,
-                i => i
-            );
+                    return check;
+                })
+                .Where(i => i.Prob > 0)
+                .ToImmutableArray()
+            ?? ImmutableArray<IQuestTemplateActItem>.Empty;
+        var rewardsSelect = actTemplate
+            .Items?.Where(i => i.Prob == -1)
+            .ToImmutableDictionary(i => i.Order, i => i);
         var rewardSelect = select != null ? rewardsSelect?.GetValueOrDefault(select.Value) : null;
         var rewardsCheck = new List<Tuple<int, short>>();
 
         if (rewardsBase != null)
-            rewardsCheck.AddRange(rewardsBase
-                .Where(r => r.Count > 0)
-                .Select(r => Tuple.Create(r.ItemID, (short)r.Count)));
+            rewardsCheck.AddRange(
+                rewardsBase
+                    .Where(r => r.Count > 0)
+                    .Select(r => Tuple.Create(r.ItemID, (short)r.Count))
+            );
         if (rewardsRandom != null)
-            rewardsCheck.AddRange(rewardsRandom
-                .GroupBy(r => r.ItemID / 1000000)
-                .Select(g => Tuple.Create(g.First().ItemID, (short)g.First().Count)));
+            rewardsCheck.AddRange(
+                rewardsRandom
+                    .GroupBy(r => r.ItemID / 1000000)
+                    .Select(g => Tuple.Create(g.First().ItemID, (short)g.First().Count))
+            );
         if (rewardSelect != null)
             rewardsCheck.Add(Tuple.Create(rewardSelect.ItemID, (short)rewardSelect.Count));
-        
-        if (!user.StageUser.Context.Managers.Inventory.HasSlotFor(user.Character.Inventories, rewardsCheck))
+
+        if (
+            !user.StageUser.Context.Managers.Inventory.HasSlotFor(
+                user.Character.Inventories,
+                rewardsCheck
+            )
+        )
             return QuestResultType.FailedInventory;
-        
+
         var stats = new ModifyStatContext(user.Character);
 
         var rates = user.StageUser.Context.Managers.Rates;
         var rateContext = new RateContext(user, user.StageUser.Context.Options);
         var expRate = await rates.GetFinalRateAsync(RateType.Exp, rateContext);
         var mesoRate = await rates.GetFinalRateAsync(RateType.Meso, rateContext);
-        var incEXP = actTemplate.IncEXP > 0 ? RateModifier.Apply(actTemplate.IncEXP.Value, expRate) : 0;
-        var incMoney = actTemplate.IncMoney > 0 ? RateModifier.Apply(actTemplate.IncMoney.Value, mesoRate) : 0;
+        var incEXP =
+            actTemplate.IncEXP > 0 ? RateModifier.Apply(actTemplate.IncEXP.Value, expRate) : 0;
+        var incMoney =
+            actTemplate.IncMoney > 0 ? RateModifier.Apply(actTemplate.IncMoney.Value, mesoRate) : 0;
 
         if (incMoney > 0 && stats.Money > int.MaxValue - incMoney)
             return QuestResultType.FailedMeso;
@@ -289,7 +314,7 @@ public class QuestManager : IQuestManager
             stats.EXP += incEXP;
             await user.Message(new IncEXPMessage(incEXP, true));
         }
-        
+
         if (incMoney > 0)
         {
             stats.Money += incMoney;
@@ -305,7 +330,7 @@ public class QuestManager : IQuestManager
         await user.ModifyStats(stats);
 
         var rewards = new List<IQuestTemplateActItem>();
-        
+
         if (rewardsBase != null)
             rewards.AddRange(rewardsBase);
 
@@ -313,7 +338,7 @@ public class QuestManager : IQuestManager
         {
             var random = new Random();
             var value = random.Next(0, rewardsRandom.Sum(r => r.Prob) ?? 0);
-            
+
             foreach (var reward in rewardsRandom)
             {
                 value -= reward.Prob ?? 0;
@@ -325,16 +350,16 @@ public class QuestManager : IQuestManager
                 break;
             }
         }
-        
+
         if (rewardSelect != null)
             rewards.Add(rewardSelect);
 
         var inventory = new ModifyInventoryGroupContext(user.Character.Inventories, _itemTemplates);
-        
+
         if (rewards.Count > 0)
         {
             var now = DateTime.UtcNow;
-            
+
             foreach (var reward in rewards)
             {
                 if (reward.Count > 0)
@@ -347,49 +372,60 @@ public class QuestManager : IQuestManager
                         if (reward.Period > 0)
                             slotBase.DateExpire = now.AddDays(reward.Period.Value);
                     }
-                    
+
                     if (slot is ItemSlotBundle bundle)
                         bundle.Number = (short)reward.Count;
 
                     if (slot != null)
                         inventory.Add(slot);
-                } else
+                }
+                else
                     inventory.Remove(reward.ItemID, Math.Abs((short)reward.Count));
             }
 
             await user.ModifyInventory(inventory);
-            await user.Effect(new QuestEffect(rewards
-                .Select(r => Tuple.Create(r.ItemID, r.Count))
-                .ToImmutableArray()));
+            await user.Effect(
+                new QuestEffect(
+                    rewards.Select(r => Tuple.Create(r.ItemID, r.Count)).ToImmutableArray()
+                )
+            );
         }
-        
+
         return QuestResultType.Success;
     }
 
-    private async Task<QuestResultType> Check(QuestAction action, IQuestTemplate template, IFieldUser user)
+    private async Task<QuestResultType> Check(
+        QuestAction action,
+        IQuestTemplate template,
+        IFieldUser user
+    )
     {
-        var checkTemplate = action == QuestAction.Start
-            ? template.CheckStart
-            : template.CheckEnd;
+        var checkTemplate = action == QuestAction.Start ? template.CheckStart : template.CheckEnd;
         var now = DateTime.UtcNow;
         var record = user.Character.QuestRecords[template.ID]?.Value ?? string.Empty;
 
-        if (checkTemplate.WorldMin != null && user.StageUser.Context.Options.WorldID < checkTemplate.WorldMin)
+        if (
+            checkTemplate.WorldMin != null
+            && user.StageUser.Context.Options.WorldID < checkTemplate.WorldMin
+        )
             return QuestResultType.FailedUnknown;
-        if (checkTemplate.WorldMax != null && user.StageUser.Context.Options.WorldID > checkTemplate.WorldMax)
+        if (
+            checkTemplate.WorldMax != null
+            && user.StageUser.Context.Options.WorldID > checkTemplate.WorldMax
+        )
             return QuestResultType.FailedUnknown;
-        
+
         if (checkTemplate.LevelMin != null && user.Character.Level < checkTemplate.LevelMin)
             return QuestResultType.FailedUnknown;
-        
+
         if (checkTemplate.POP != null && user.Character.POP < checkTemplate.POP)
             return QuestResultType.FailedUnknown;
-        
+
         if (checkTemplate.DateStart != null && now < checkTemplate.DateStart)
             return QuestResultType.FailedUnknown;
         if (checkTemplate.DateEnd != null && now > checkTemplate.DateEnd)
             return QuestResultType.FailedUnknown;
-        
+
         if (checkTemplate.Jobs != null && checkTemplate.Jobs.All(j => j != user.Character.Job))
             return QuestResultType.FailedUnknown;
         // TODO: subjob
@@ -397,10 +433,16 @@ public class QuestManager : IQuestManager
         if (checkTemplate.CheckItem != null)
         {
             foreach (var item in checkTemplate.CheckItem)
-                if (!user.StageUser.Context.Managers.Inventory.HasItem(user.Character.Inventories, item.ItemID, (short)item.Count))
+                if (
+                    !user.StageUser.Context.Managers.Inventory.HasItem(
+                        user.Character.Inventories,
+                        item.ItemID,
+                        (short)item.Count
+                    )
+                )
                     return QuestResultType.FailedInventory;
         }
-        
+
         if (action == QuestAction.End && checkTemplate.CheckMob != null)
         {
             if (record.Length != checkTemplate.CheckMob.Count * 3 || !record.All(char.IsDigit))
@@ -413,7 +455,7 @@ public class QuestManager : IQuestManager
                     return QuestResultType.FailedUnknown;
             }
         }
-        
+
         return QuestResultType.Success;
     }
 }

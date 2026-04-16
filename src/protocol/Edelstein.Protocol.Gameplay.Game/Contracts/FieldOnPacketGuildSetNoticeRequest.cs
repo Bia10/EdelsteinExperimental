@@ -1,8 +1,5 @@
-using Edelstein.Protocol.Gameplay.Game.Objects.User;
+﻿using Edelstein.Protocol.Gameplay.Game.Objects.User;
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketGuildSetNoticeRequest(
-    IFieldUser User,
-    string Notice
-);
+public record FieldOnPacketGuildSetNoticeRequest(IFieldUser User, string Notice);

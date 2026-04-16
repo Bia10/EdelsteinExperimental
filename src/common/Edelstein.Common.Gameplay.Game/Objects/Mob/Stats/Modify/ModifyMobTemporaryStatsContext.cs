@@ -14,10 +14,10 @@ public class ModifyMobTemporaryStatsContext : IModifyMobTemporaryStatContext
         HistoryReset = new MobTemporaryStats();
         HistorySet = new MobTemporaryStats();
     }
-    
+
     public IMobTemporaryStats HistoryReset { get; }
     public IMobTemporaryStats HistorySet { get; }
-    
+
     public void Set(MobTemporaryStatType type, IMobTemporaryStatRecord stat)
     {
         ResetByType(type);
@@ -26,22 +26,31 @@ public class ModifyMobTemporaryStatsContext : IModifyMobTemporaryStatContext
         HistorySet.Records[type] = stat;
     }
 
-    public void Set(MobTemporaryStatType type, int value, int reason, DateTime? dateExpire = null)
-        => Set(type, new MobTemporaryStatRecord
-        {
-            Value = value,
-            Reason = reason,
-            DateExpire = dateExpire
-        });
+    public void Set(
+        MobTemporaryStatType type,
+        int value,
+        int reason,
+        DateTime? dateExpire = null
+    ) =>
+        Set(
+            type,
+            new MobTemporaryStatRecord
+            {
+                Value = value,
+                Reason = reason,
+                DateExpire = dateExpire,
+            }
+        );
 
     public void SetBurnedInfo(IMobBurnedInfo info)
     {
-        var burned = _stats.BurnedInfo
-            .FirstOrDefault(b => b.CharacterID == info.CharacterID && b.SkillID == info.SkillID);
+        var burned = _stats.BurnedInfo.FirstOrDefault(b =>
+            b.CharacterID == info.CharacterID && b.SkillID == info.SkillID
+        );
 
         if (burned != null)
             ResetBurnedInfo(burned);
-        
+
         _stats.BurnedInfo.Add(info);
         HistorySet.BurnedInfo.Add(info);
     }
@@ -55,10 +64,12 @@ public class ModifyMobTemporaryStatsContext : IModifyMobTemporaryStatContext
 
     public void ResetByReason(int reason)
     {
-        foreach (var type in _stats.Records
-                     .Where(kv => kv.Value.Reason == reason)
-                     .Select(kv => kv.Key)
-                     .ToImmutableArray())
+        foreach (
+            var type in _stats
+                .Records.Where(kv => kv.Value.Reason == reason)
+                .Select(kv => kv.Key)
+                .ToImmutableArray()
+        )
             ResetByType(type);
     }
 
@@ -67,7 +78,7 @@ public class ModifyMobTemporaryStatsContext : IModifyMobTemporaryStatContext
         foreach (var type in _stats.Records.Keys)
             ResetByType(type);
     }
-    
+
     public void ResetBurnedInfo(IMobBurnedInfo info)
     {
         _stats.BurnedInfo.Remove(info);
@@ -77,19 +88,21 @@ public class ModifyMobTemporaryStatsContext : IModifyMobTemporaryStatContext
     public void ResetBurnedInfoByCharacter(int characterID)
     {
         var burned = _stats.BurnedInfo.FirstOrDefault(i => i.CharacterID == characterID);
-        if (burned == null) return;
+        if (burned == null)
+            return;
         _stats.BurnedInfo.Remove(burned);
         HistoryReset.BurnedInfo.Add(burned);
     }
 
-    public void ResetBurnedInfoBySkill(int skillID) 
+    public void ResetBurnedInfoBySkill(int skillID)
     {
         var burned = _stats.BurnedInfo.FirstOrDefault(i => i.SkillID == skillID);
-        if (burned == null) return;
+        if (burned == null)
+            return;
         _stats.BurnedInfo.Remove(burned);
         HistoryReset.BurnedInfo.Add(burned);
     }
-    
+
     public void ResetBurnedInfoAll()
     {
         foreach (var burned in _stats.BurnedInfo.ToImmutableArray())

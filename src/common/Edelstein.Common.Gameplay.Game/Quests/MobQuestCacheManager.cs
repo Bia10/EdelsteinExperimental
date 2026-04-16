@@ -7,9 +7,9 @@ namespace Edelstein.Common.Gameplay.Game.Quests;
 public class MobQuestCacheManager : IMobQuestCacheManager
 {
     private readonly IRepository<int, IMobQuestCache> _cache;
-    
+
     public MobQuestCacheManager() => _cache = new Repository<int, IMobQuestCache>();
-    
+
     public async Task<IMobQuestCache?> Retrieve(int key)
     {
         var record = await _cache.Retrieve(key);

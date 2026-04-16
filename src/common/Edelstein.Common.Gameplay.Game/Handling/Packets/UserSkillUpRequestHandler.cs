@@ -8,15 +8,13 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
 public class UserSkillUpRequestHandler : AbstractPipedFieldHandler<FieldOnPacketUserSkillUpRequest>
 {
-    public UserSkillUpRequestHandler(IPipeline<FieldOnPacketUserSkillUpRequest> pipeline) : base(pipeline)
-    {
-    }
+    public UserSkillUpRequestHandler(IPipeline<FieldOnPacketUserSkillUpRequest> pipeline)
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.UserSkillUpRequest;
 
-    protected override FieldOnPacketUserSkillUpRequest? Serialize(IFieldUser user, IPacketReader reader)
-        => new(
-            user,
-            reader.Skip(4).ReadInt()
-        );
+    protected override FieldOnPacketUserSkillUpRequest? Serialize(
+        IFieldUser user,
+        IPacketReader reader
+    ) => new(user, reader.Skip(4).ReadInt());
 }

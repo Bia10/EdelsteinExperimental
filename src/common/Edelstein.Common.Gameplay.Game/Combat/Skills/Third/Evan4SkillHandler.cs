@@ -23,7 +23,7 @@ public class Evan4SkillHandler : Evan3SkillHandler
 
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -32,7 +32,7 @@ public class Evan4SkillHandler : Evan3SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.ElementalReset, context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

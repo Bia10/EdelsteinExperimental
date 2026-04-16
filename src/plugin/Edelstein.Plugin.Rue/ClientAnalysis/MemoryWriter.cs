@@ -56,28 +56,34 @@ public sealed class MemoryWriter : IDisposable
 
     public bool? IsConnectionDlgValid() => _fields.IsConnectionDlgValid();
 
-    public bool SetWorldAndChannel(int worldId, int channelId, IntPtr? cwvsContextBase = null)
-        => _fields.SetWorldAndChannel(worldId, channelId, cwvsContextBase);
+    public bool SetWorldAndChannel(int worldId, int channelId, IntPtr? cwvsContextBase = null) =>
+        _fields.SetWorldAndChannel(worldId, channelId, cwvsContextBase);
 
     public bool SetQuestManWorldId(int worldId) => _fields.SetQuestManWorldId(worldId);
 
     public int? ReadWorldId(IntPtr? cwvsContextBase = null) => _fields.ReadWorldId(cwvsContextBase);
 
-    public int? ReadChannelId(IntPtr? cwvsContextBase = null) => _fields.ReadChannelId(cwvsContextBase);
+    public int? ReadChannelId(IntPtr? cwvsContextBase = null) =>
+        _fields.ReadChannelId(cwvsContextBase);
 
-    public uint? ReadAccountId(IntPtr? cwvsContextBase = null) => _fields.ReadAccountId(cwvsContextBase);
+    public uint? ReadAccountId(IntPtr? cwvsContextBase = null) =>
+        _fields.ReadAccountId(cwvsContextBase);
 
     public int? ReadLoginStep(IntPtr? cloginBase = null) => _fields.ReadLoginStep(cloginBase);
 
     public int? ReadStepChanging(IntPtr? cloginBase = null) => _fields.ReadStepChanging(cloginBase);
 
-    public int? ReadCharacterCount(IntPtr? cwvsContextBase = null) => _fields.ReadCharacterCount(cwvsContextBase);
+    public int? ReadCharacterCount(IntPtr? cwvsContextBase = null) =>
+        _fields.ReadCharacterCount(cwvsContextBase);
 
-    public int? ReadSlotCount(IntPtr? cwvsContextBase = null) => _fields.ReadSlotCount(cwvsContextBase);
+    public int? ReadSlotCount(IntPtr? cwvsContextBase = null) =>
+        _fields.ReadSlotCount(cwvsContextBase);
 
-    public int? ReadChannelNameArrayPtr(IntPtr? cwvsContextBase = null) => _fields.ReadChannelNameArrayPtr(cwvsContextBase);
+    public int? ReadChannelNameArrayPtr(IntPtr? cwvsContextBase = null) =>
+        _fields.ReadChannelNameArrayPtr(cwvsContextBase);
 
-    public int? ReadAdultChannelArrayPtr(IntPtr? cwvsContextBase = null) => _fields.ReadAdultChannelArrayPtr(cwvsContextBase);
+    public int? ReadAdultChannelArrayPtr(IntPtr? cwvsContextBase = null) =>
+        _fields.ReadAdultChannelArrayPtr(cwvsContextBase);
 
     public int? ReadCharSelected(IntPtr? cloginBase = null) => _fields.ReadCharSelected(cloginBase);
 
@@ -87,19 +93,23 @@ public sealed class MemoryWriter : IDisposable
 
     public int? ReadChannelSelectWorldItemPtr() => _fields.ReadChannelSelectWorldItemPtr();
 
-    public bool SetChannelSelectSelected(int selected) => _fields.SetChannelSelectSelected(selected);
+    public bool SetChannelSelectSelected(int selected) =>
+        _fields.SetChannelSelectSelected(selected);
 
     public bool SetChannelSelectWorldItemPtr(int ptr) => _fields.SetChannelSelectWorldItemPtr(ptr);
 
-    public bool EnsureChannelSelectState(int worldId, int channelId) => _fields.EnsureChannelSelectState(worldId, channelId);
+    public bool EnsureChannelSelectState(int worldId, int channelId) =>
+        _fields.EnsureChannelSelectState(worldId, channelId);
 
-    public bool EnsureContextChannelArraysFromWorldItem(int worldId) => _fields.EnsureContextChannelArraysFromWorldItem(worldId);
+    public bool EnsureContextChannelArraysFromWorldItem(int worldId) =>
+        _fields.EnsureContextChannelArraysFromWorldItem(worldId);
 
     public int? ReadWorldSelectWorldIdx() => _fields.ReadWorldSelectWorldIdx();
 
     public bool SetWorldSelectWorldIdx(int worldIdx) => _fields.SetWorldSelectWorldIdx(worldIdx);
 
-    public bool SetRequestSent(bool value = true, IntPtr? cloginBase = null) => _fields.SetRequestSent(value, cloginBase);
+    public bool SetRequestSent(bool value = true, IntPtr? cloginBase = null) =>
+        _fields.SetRequestSent(value, cloginBase);
 
     public bool? ReadRequestSent(IntPtr? cloginBase = null) => _fields.ReadRequestSent(cloginBase);
 
@@ -119,7 +129,9 @@ public sealed class MemoryWriter : IDisposable
             return false;
         }
 
-        var funcAddress = new IntPtr(unchecked((int)V95ClientStructs.Addresses.SendLoginPacketFunc));
+        var funcAddress = new IntPtr(
+            unchecked((int)V95ClientStructs.Addresses.SendLoginPacketFunc)
+        );
         if (funcAddress == IntPtr.Zero)
         {
             _logger?.LogError("[Rue-CMemory] SendLoginPacketFuncAddress not configured");

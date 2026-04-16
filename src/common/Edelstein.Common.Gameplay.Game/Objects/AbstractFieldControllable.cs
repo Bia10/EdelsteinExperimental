@@ -6,22 +6,25 @@ using Edelstein.Protocol.Utilities.Spatial;
 
 namespace Edelstein.Common.Gameplay.Game.Objects;
 
-public abstract class AbstractFieldControllable<TMovePath, TMoveAction> :
-    AbstractFieldLife<TMovePath, TMoveAction>, IFieldObjectControllable
+public abstract class AbstractFieldControllable<TMovePath, TMoveAction>
+    : AbstractFieldLife<TMovePath, TMoveAction>,
+        IFieldObjectControllable
     where TMovePath : IMovePath<TMoveAction>
     where TMoveAction : IMoveAction
 {
-
     protected AbstractFieldControllable(
-        TMoveAction action, IPoint2D position, IFieldFoothold? foothold = null
-    ) : base(action, position, foothold)
-    {
-    }
+        TMoveAction action,
+        IPoint2D position,
+        IFieldFoothold? foothold = null
+    )
+        : base(action, position, foothold) { }
+
     public IFieldObjectController? Controller { get; private set; }
 
     public async Task Control(IFieldObjectController? controller = null)
     {
-        if (Controller == controller) return;
+        if (Controller == controller)
+            return;
 
         controller?.Controlled.Remove(this);
 
@@ -30,7 +33,8 @@ public abstract class AbstractFieldControllable<TMovePath, TMoveAction> :
 
         Controller = controller;
 
-        if (controller == null) return;
+        if (controller == null)
+            return;
 
         controller.Controlled.Add(this);
         await controller.Dispatch(GetControlPacket(controller));

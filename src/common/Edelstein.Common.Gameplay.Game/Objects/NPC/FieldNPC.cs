@@ -10,9 +10,11 @@ using Edelstein.Protocol.Utilities.Spatial;
 
 namespace Edelstein.Common.Gameplay.Game.Objects.NPC;
 
-public class FieldNPC : AbstractFieldControllable<IFieldNPCMovePath, IFieldNPCMoveAction>, IFieldNPC, IPacketWritable
+public class FieldNPC
+    : AbstractFieldControllable<IFieldNPCMovePath, IFieldNPCMoveAction>,
+        IFieldNPC,
+        IPacketWritable
 {
-
     public FieldNPC(
         INPCTemplate template,
         IPoint2D position,
@@ -20,12 +22,14 @@ public class FieldNPC : AbstractFieldControllable<IFieldNPCMovePath, IFieldNPCMo
         IRectangle2D? bounds = null,
         bool isFacingLeft = true,
         bool isEnabled = true
-    ) : base(new FieldNPCMoveAction(Convert.ToByte(isFacingLeft)), position, foothold)
+    )
+        : base(new FieldNPCMoveAction(Convert.ToByte(isFacingLeft)), position, foothold)
     {
         Template = template;
         Bounds = bounds ?? new Rectangle2D(Position, Position);
         IsEnabled = isEnabled;
     }
+
     public override FieldObjectType Type => FieldObjectType.NPC;
 
     public INPCTemplate Template { get; }

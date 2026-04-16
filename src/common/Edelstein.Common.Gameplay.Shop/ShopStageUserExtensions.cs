@@ -25,26 +25,26 @@ public static class ShopStageUserExtensions
                 return false;
         }
     }
-    
+
     public static void IncCash(this IShopStageUser user, ShopCashType type, int amount)
     {
         switch (type)
         {
             case ShopCashType.NexonCash:
-                if (user.Account?.NexonCash != null) 
+                if (user.Account?.NexonCash != null)
                     user.Account.NexonCash += amount;
                 break;
             case ShopCashType.MaplePoint:
-                if (user.Account?.MaplePoint != null) 
+                if (user.Account?.MaplePoint != null)
                     user.Account.MaplePoint += amount;
                 break;
             case ShopCashType.PrepaidNXCash:
-                if (user.Account?.PrepaidNXCash != null) 
+                if (user.Account?.PrepaidNXCash != null)
                     user.Account.PrepaidNXCash += amount;
                 break;
         }
     }
-    
+
     public static Task DispatchUpdateCash(this IShopStageUser user)
     {
         using var packet = new PacketWriter(PacketSendOperations.CashShopQueryCashResult);
@@ -61,7 +61,9 @@ public static class ShopStageUserExtensions
 
         packet.WriteByte((byte)ShopResultOperations.LoadLocker_Done);
         packet.WriteShort((short)(user.AccountWorld?.Locker.Items.Count ?? 0));
-        foreach (var slot in user.AccountWorld?.Locker.Items ?? ImmutableList<IItemLockerSlot>.Empty)
+        foreach (
+            var slot in user.AccountWorld?.Locker.Items ?? ImmutableList<IItemLockerSlot>.Empty
+        )
             packet.WriteItemLockerData(slot);
         packet.WriteShort(user.AccountWorld?.Trunk.SlotMax ?? 0);
         packet.WriteShort((short)(user.AccountWorld?.CharacterSlotMax ?? 3));
@@ -69,7 +71,7 @@ public static class ShopStageUserExtensions
         packet.WriteShort(1);
         return user.Dispatch(packet.Build());
     }
-    
+
     public static Task DispatchUpdateWish(this IShopStageUser user)
     {
         using var packet = new PacketWriter(PacketSendOperations.CashShopCashItemResult);

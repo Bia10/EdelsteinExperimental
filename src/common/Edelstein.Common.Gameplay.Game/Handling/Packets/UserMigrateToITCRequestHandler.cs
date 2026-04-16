@@ -6,14 +6,16 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
-public class UserMigrateToITCRequestHandler : AbstractPipedFieldHandler<FieldOnPacketUserMigrateToITCRequest>
+public class UserMigrateToITCRequestHandler
+    : AbstractPipedFieldHandler<FieldOnPacketUserMigrateToITCRequest>
 {
-    public UserMigrateToITCRequestHandler(IPipeline<FieldOnPacketUserMigrateToITCRequest> pipeline) : base(pipeline)
-    {
-    }
+    public UserMigrateToITCRequestHandler(IPipeline<FieldOnPacketUserMigrateToITCRequest> pipeline)
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.UserMigrateToITCRequest;
 
-    protected override FieldOnPacketUserMigrateToITCRequest? Serialize(IFieldUser user, IPacketReader reader)
-        => new(user);
+    protected override FieldOnPacketUserMigrateToITCRequest? Serialize(
+        IFieldUser user,
+        IPacketReader reader
+    ) => new(user);
 }

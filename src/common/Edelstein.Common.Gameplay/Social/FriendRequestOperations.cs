@@ -10,5 +10,5 @@ public enum FriendRequestOperations
 
     NotifyLogin = 0x4,
     NotifyLogout = 0x5,
-    IncMaxCount = 0x6
+    IncMaxCount = 0x6,
 }

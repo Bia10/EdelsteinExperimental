@@ -20,44 +20,51 @@ public class Ticker : ITicker
 
     public int RefreshRate { get; }
 
-    public Task Start()
-        => Task.Run(async () =>
-        {
-            var stopwatch = new Stopwatch();
-
-            stopwatch.Start();
-
-            var limit = 1 / (float)RefreshRate * 1000;
-            var previous = stopwatch.ElapsedMilliseconds;
-
-            while (!_cts.IsCancellationRequested)
+    public Task Start() =>
+        Task.Run(
+            async () =>
             {
-                var start = stopwatch.ElapsedMilliseconds;
-                var delta = start - previous;
+                var stopwatch = new Stopwatch();
 
-                previous = start;
+                stopwatch.Start();
 
-                await _tickable.OnTick(DateTime.UtcNow);
+                var limit = 1 / (float)RefreshRate * 1000;
+                var previous = stopwatch.ElapsedMilliseconds;
 
-                var end = stopwatch.ElapsedMilliseconds;
-                var duration = end - start;
-
-                if (duration > limit)
+                while (!_cts.IsCancellationRequested)
                 {
-                    var over = duration - limit;
-                    var missed = over / limit;
+                    var start = stopwatch.ElapsedMilliseconds;
+                    var delta = start - previous;
 
-                    _logger.LogWarning("Ticker running {Over:F2}ms behind, skipping {Missed:F2} ticks", over, missed);
+                    previous = start;
+
+                    await _tickable.OnTick(DateTime.UtcNow);
+
+                    var end = stopwatch.ElapsedMilliseconds;
+                    var duration = end - start;
+
+                    if (duration > limit)
+                    {
+                        var over = duration - limit;
+                        var missed = over / limit;
+
+                        _logger.LogWarning(
+                            "Ticker running {Over:F2}ms behind, skipping {Missed:F2} ticks",
+                            over,
+                            missed
+                        );
+                    }
+                    else
+                    {
+                        await Task.Delay(
+                            TimeSpan.FromMilliseconds(limit - duration / limit),
+                            _cts.Token
+                        );
+                    }
                 }
-                else
-                {
-                    await Task.Delay(
-                        TimeSpan.FromMilliseconds(limit - duration / limit),
-                        _cts.Token
-                    );
-                }
-            }
-        }, _cts.Token);
+            },
+            _cts.Token
+        );
 
     public Task Stop()
     {

@@ -11,9 +11,7 @@ namespace Edelstein.Common.Services.Social.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             // Drop LastCommenterID — not present in client ENTRYLIST/CURENTRY structs.
-            migrationBuilder.DropColumn(
-                name: "LastCommenterID",
-                table: "guild_bbs_posts");
+            migrationBuilder.DropColumn(name: "LastCommenterID", table: "guild_bbs_posts");
 
             // Add EmoticonID — nEmoticon field in ENTRYLIST and CURENTRY.
             migrationBuilder.AddColumn<int>(
@@ -21,7 +19,8 @@ namespace Edelstein.Common.Services.Social.Migrations
                 table: "guild_bbs_posts",
                 type: "integer",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0
+            );
 
             // Shrink Title from 50 → 25 — client nHorzMax = 25 on CCtrlEdit.
             migrationBuilder.AlterColumn<string>(
@@ -32,22 +31,22 @@ namespace Edelstein.Common.Services.Social.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(50)",
-                oldMaxLength: 50);
+                oldMaxLength: 50
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "EmoticonID",
-                table: "guild_bbs_posts");
+            migrationBuilder.DropColumn(name: "EmoticonID", table: "guild_bbs_posts");
 
             migrationBuilder.AddColumn<int>(
                 name: "LastCommenterID",
                 table: "guild_bbs_posts",
                 type: "integer",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Title",
@@ -57,7 +56,8 @@ namespace Edelstein.Common.Services.Social.Migrations
                 nullable: false,
                 oldClrType: typeof(string),
                 oldType: "character varying(25)",
-                oldMaxLength: 25);
+                oldMaxLength: 25
+            );
         }
     }
 }

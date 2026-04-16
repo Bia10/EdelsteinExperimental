@@ -1,4 +1,4 @@
-namespace Edelstein.Protocol.Services.Social;
+﻿namespace Edelstein.Protocol.Services.Social;
 
 /// <summary>
 /// Represents a single purchased guild skill, corresponding to one entry in

@@ -2,9 +2,7 @@
 
 namespace Edelstein.Common.Gameplay.Game.Objects.User.Messages;
 
-public record IncMoneyMessage(
-    int Money
-) : IPacketWritable
+public record IncMoneyMessage(int Money) : IPacketWritable
 {
     public void WriteTo(IPacketWriter writer)
     {

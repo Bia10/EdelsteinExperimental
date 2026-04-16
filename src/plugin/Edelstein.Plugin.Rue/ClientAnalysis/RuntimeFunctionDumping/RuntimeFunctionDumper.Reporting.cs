@@ -13,7 +13,12 @@ public partial class RuntimeFunctionDumper
         sb.AppendLine("------------------------------------------------------------------------");
     }
 
-    private void AppendDumpSection(StringBuilder sb, FunctionDump dump, bool includeHexDump, int hexDumpMaxBytes = 64)
+    private void AppendDumpSection(
+        StringBuilder sb,
+        FunctionDump dump,
+        bool includeHexDump,
+        int hexDumpMaxBytes = 64
+    )
     {
         var decodedBytes = dump.EndAddress - dump.BaseAddress;
         var extCalls = dump.Targets.Count(t => t.Kind == TargetKind.ExternalCall);
@@ -21,8 +26,12 @@ public partial class RuntimeFunctionDumper
         var intBranches = dump.Targets.Count(t => t.Kind == TargetKind.InternalBranch);
         var tailJumps = dump.Targets.Count(t => t.Kind == TargetKind.TailJump);
 
-        sb.AppendLine($"  Range: 0x{dump.BaseAddress:X8} - 0x{dump.EndAddress:X8}  |  {decodedBytes} bytes decoded  |  {dump.BytesRead} bytes read");
-        sb.AppendLine($"  Targets: {extCallsDistinct} external calls, {intBranches} internal branches, {tailJumps} tail jumps");
+        sb.AppendLine(
+            $"  Range: 0x{dump.BaseAddress:X8} - 0x{dump.EndAddress:X8}  |  {decodedBytes} bytes decoded  |  {dump.BytesRead} bytes read"
+        );
+        sb.AppendLine(
+            $"  Targets: {extCallsDistinct} external calls, {intBranches} internal branches, {tailJumps} tail jumps"
+        );
         sb.AppendLine();
 
         if (includeHexDump)
@@ -57,9 +66,13 @@ public partial class RuntimeFunctionDumper
     }
 
     private void AppendCallGraph(
-        StringBuilder sb, uint rootAddress, string rootName,
-        Dictionary<uint, List<uint>> childrenMap, Dictionary<uint, FunctionDump> dumps,
-        int maxDepth)
+        StringBuilder sb,
+        uint rootAddress,
+        string rootName,
+        Dictionary<uint, List<uint>> childrenMap,
+        Dictionary<uint, FunctionDump> dumps,
+        int maxDepth
+    )
     {
         sb.AppendLine("========================================================================");
         sb.AppendLine("  CALL GRAPH");
@@ -74,8 +87,17 @@ public partial class RuntimeFunctionDumper
             var treeVisited = new HashSet<uint> { rootAddress };
             for (var i = 0; i < rootKids.Count; i++)
             {
-                AppendCallGraphNode(sb, rootKids[i], "  ", i == rootKids.Count - 1,
-                    childrenMap, dumpedSet, treeVisited, 1, maxDepth);
+                AppendCallGraphNode(
+                    sb,
+                    rootKids[i],
+                    "  ",
+                    i == rootKids.Count - 1,
+                    childrenMap,
+                    dumpedSet,
+                    treeVisited,
+                    1,
+                    maxDepth
+                );
             }
         }
 
@@ -83,9 +105,16 @@ public partial class RuntimeFunctionDumper
     }
 
     private void AppendCallGraphNode(
-        StringBuilder sb, uint addr, string indent, bool isLast,
-        Dictionary<uint, List<uint>> childrenMap, HashSet<uint> dumpedSet,
-        HashSet<uint> visited, int depth, int maxDepth)
+        StringBuilder sb,
+        uint addr,
+        string indent,
+        bool isLast,
+        Dictionary<uint, List<uint>> childrenMap,
+        HashSet<uint> dumpedSet,
+        HashSet<uint> visited,
+        int depth,
+        int maxDepth
+    )
     {
         var connector = isLast ? "\\-- " : "|-- ";
         var name = ResolveTargetName(addr);
@@ -104,8 +133,17 @@ public partial class RuntimeFunctionDumper
             var childIndent = indent + (isLast ? "    " : "|   ");
             for (var i = 0; i < kids.Count; i++)
             {
-                AppendCallGraphNode(sb, kids[i], childIndent, i == kids.Count - 1,
-                    childrenMap, dumpedSet, visited, depth + 1, maxDepth);
+                AppendCallGraphNode(
+                    sb,
+                    kids[i],
+                    childIndent,
+                    i == kids.Count - 1,
+                    childrenMap,
+                    dumpedSet,
+                    visited,
+                    depth + 1,
+                    maxDepth
+                );
             }
         }
     }
@@ -113,7 +151,8 @@ public partial class RuntimeFunctionDumper
     private static void AppendSummary(
         StringBuilder sb,
         Dictionary<uint, FunctionDump> dumps,
-        List<(uint Address, int Depth)> dumpOrder)
+        List<(uint Address, int Depth)> dumpOrder
+    )
     {
         sb.AppendLine("========================================================================");
         sb.AppendLine("  SUMMARY");
@@ -157,8 +196,13 @@ public partial class RuntimeFunctionDumper
             sb.AppendLine();
         }
 
-        var vmIndicators = allFindings.Where(f =>
-            f.Finding.Contains("VM-protected") || f.Finding.Contains("INVALID RATIO") || f.Finding.Contains("trampoline")).ToList();
+        var vmIndicators = allFindings
+            .Where(f =>
+                f.Finding.Contains("VM-protected")
+                || f.Finding.Contains("INVALID RATIO")
+                || f.Finding.Contains("trampoline")
+            )
+            .ToList();
         if (vmIndicators.Count > 0)
         {
             sb.AppendLine("  VM PROTECTION INDICATORS:");
@@ -167,9 +211,13 @@ public partial class RuntimeFunctionDumper
             sb.AppendLine();
             sb.AppendLine("  If code is VM-protected, alternative approaches:");
             sb.AppendLine("    1. Hook the function entry/exit to trace register/memory state");
-            sb.AppendLine("    2. Set hardware breakpoints on CWvsContext offsets during manual login");
+            sb.AppendLine(
+                "    2. Set hardware breakpoints on CWvsContext offsets during manual login"
+            );
             sb.AppendLine("    3. Use a Themida devirtualizer tool");
-            sb.AppendLine("    4. Trace memory writes by comparing snapshots before/after DFC call");
+            sb.AppendLine(
+                "    4. Trace memory writes by comparing snapshots before/after DFC call"
+            );
             sb.AppendLine();
         }
     }

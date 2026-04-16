@@ -2,7 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketUserTransferChannelRequest(
-    IFieldUser User,
-    byte ChannelID
-);
+public record FieldOnPacketUserTransferChannelRequest(IFieldUser User, byte ChannelID);

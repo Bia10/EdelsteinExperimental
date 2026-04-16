@@ -11,11 +11,7 @@ public class FriendConfiguration : IEntityTypeConfiguration<FriendEntity>
         builder.ToTable("friends");
 
         builder.HasKey(m => m.ID);
-        builder.HasIndex(m => new
-        {
-            m.CharacterID,
-            m.FriendID
-        }).IsUnique();
+        builder.HasIndex(m => new { m.CharacterID, m.FriendID }).IsUnique();
         builder
             .HasOne(m => m.Profile)
             .WithMany(p => p.Friends)

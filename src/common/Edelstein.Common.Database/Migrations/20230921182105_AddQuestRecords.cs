@@ -15,37 +15,34 @@ namespace Edelstein.Common.Database.Migrations
                 table: "characters",
                 type: "json",
                 nullable: false,
-                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterQuestCompletes, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[System.Int32, System.Private.CoreLib],[Edelstein.Protocol.Gameplay.Models.Characters.Quests.IQuestCompleteRecord, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"}}");
+                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterQuestCompletes, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[System.Int32, System.Private.CoreLib],[Edelstein.Protocol.Gameplay.Models.Characters.Quests.IQuestCompleteRecord, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"}}"
+            );
 
             migrationBuilder.AddColumn<string>(
                 name: "QuestRecords",
                 table: "characters",
                 type: "json",
                 nullable: false,
-                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterQuestRecords, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[System.Int32, System.Private.CoreLib],[Edelstein.Protocol.Gameplay.Models.Characters.Quests.IQuestRecord, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"}}");
+                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterQuestRecords, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[System.Int32, System.Private.CoreLib],[Edelstein.Protocol.Gameplay.Models.Characters.Quests.IQuestRecord, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"}}"
+            );
 
             migrationBuilder.AddColumn<string>(
                 name: "QuestRecordsEx",
                 table: "characters",
                 type: "json",
                 nullable: false,
-                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterQuestRecordsEx, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[System.Int32, System.Private.CoreLib],[Edelstein.Protocol.Gameplay.Models.Characters.Quests.IQuestRecordEx, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"}}");
+                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterQuestRecordsEx, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[System.Int32, System.Private.CoreLib],[Edelstein.Protocol.Gameplay.Models.Characters.Quests.IQuestRecordEx, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"}}"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "QuestCompletes",
-                table: "characters");
+            migrationBuilder.DropColumn(name: "QuestCompletes", table: "characters");
 
-            migrationBuilder.DropColumn(
-                name: "QuestRecords",
-                table: "characters");
+            migrationBuilder.DropColumn(name: "QuestRecords", table: "characters");
 
-            migrationBuilder.DropColumn(
-                name: "QuestRecordsEx",
-                table: "characters");
+            migrationBuilder.DropColumn(name: "QuestRecordsEx", table: "characters");
         }
     }
 }

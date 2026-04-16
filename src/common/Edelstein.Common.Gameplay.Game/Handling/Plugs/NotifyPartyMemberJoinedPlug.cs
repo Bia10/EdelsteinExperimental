@@ -13,27 +13,29 @@ public class NotifyPartyMemberJoinedPlug : IPipelinePlug<NotifyPartyMemberJoined
     private readonly IGameStage _stage;
 
     public NotifyPartyMemberJoinedPlug(IGameStage stage) => _stage = stage;
-    
+
     public async Task Handle(IPipelineContext ctx, NotifyPartyMemberJoined message)
     {
-        
         var users = await _stage.Users.RetrieveAll();
         var partied = users
-            .Where(u => 
-                u.Party?.PartyID == message.PartyID || 
-                u.Character?.ID == message.PartyMember.CharacterID)
+            .Where(u =>
+                u.Party?.PartyID == message.PartyID
+                || u.Character?.ID == message.PartyMember.CharacterID
+            )
             .ToImmutableArray();
-        
+
         foreach (var user in partied)
         {
-            if (user.Character == null) continue;
+            if (user.Character == null)
+                continue;
             if (user.Character.ID == message.PartyMember.CharacterID)
                 user.Party = message.Party;
             else
                 user.Party?.Members.Add(message.PartyMember.CharacterID, message.PartyMember);
 
-            if (user.Party == null) continue;
-            
+            if (user.Party == null)
+                continue;
+
             using var packet = new PacketWriter(PacketSendOperations.PartyResult);
             packet.WriteByte((byte)PartyResultOperations.JoinPartyDone);
             packet.WriteInt(message.PartyID);

@@ -15,37 +15,34 @@ namespace Edelstein.Common.Database.Migrations
                 table: "accounts",
                 type: "integer",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0
+            );
 
             migrationBuilder.AddColumn<int>(
                 name: "NexonCash",
                 table: "accounts",
                 type: "integer",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0
+            );
 
             migrationBuilder.AddColumn<int>(
                 name: "PrepaidNXCash",
                 table: "accounts",
                 type: "integer",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "MaplePoint",
-                table: "accounts");
+            migrationBuilder.DropColumn(name: "MaplePoint", table: "accounts");
 
-            migrationBuilder.DropColumn(
-                name: "NexonCash",
-                table: "accounts");
+            migrationBuilder.DropColumn(name: "NexonCash", table: "accounts");
 
-            migrationBuilder.DropColumn(
-                name: "PrepaidNXCash",
-                table: "accounts");
+            migrationBuilder.DropColumn(name: "PrepaidNXCash", table: "accounts");
         }
     }
 }

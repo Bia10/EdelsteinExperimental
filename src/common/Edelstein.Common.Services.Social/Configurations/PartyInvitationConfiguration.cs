@@ -11,11 +11,7 @@ public class PartyInvitationConfiguration : IEntityTypeConfiguration<PartyInvita
         builder.ToTable("party_invitations");
 
         builder.HasKey(m => m.ID);
-        builder.HasIndex(m => new
-        {
-            m.PartyID,
-            m.CharacterID
-        }).IsUnique();
+        builder.HasIndex(m => new { m.PartyID, m.CharacterID }).IsUnique();
         builder
             .HasOne(m => m.Party)
             .WithMany(p => p.Invitations)

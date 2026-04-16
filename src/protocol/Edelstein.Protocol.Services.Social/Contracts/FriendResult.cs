@@ -11,5 +11,5 @@ public enum FriendResult
     FailedMaxSlotOther = 0x6,
     FailedNotInvited = 0x7,
     FailedMaster = 0x8,
-    FailedSelf = 0x9
+    FailedSelf = 0x9,
 }

@@ -25,9 +25,7 @@ public class NotifyGuildMemberWithdrawnPlug : IPipelinePlug<NotifyGuildMemberWit
     public async Task Handle(IPipelineContext ctx, NotifyGuildMemberWithdrawn message)
     {
         var users = await _stage.Users.RetrieveAll();
-        var affected = users
-            .Where(u => u.Guild?.ID == message.GuildID)
-            .ToImmutableArray();
+        var affected = users.Where(u => u.Guild?.ID == message.GuildID).ToImmutableArray();
 
         var opcode = message.IsKicked
             ? GuildResultOperations.KickGuild_Done

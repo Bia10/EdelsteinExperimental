@@ -11,9 +11,8 @@ public class TeleportPathFragment<TMoveAction> : ActionPathFragment<TMoveAction>
     private short _footholdID;
     private IPoint2D _position;
 
-    public TeleportPathFragment(MovePathFragmentType type) : base(type)
-    {
-    }
+    public TeleportPathFragment(MovePathFragmentType type)
+        : base(type) { }
 
     protected override void ReadBody(IPacketReader reader)
     {

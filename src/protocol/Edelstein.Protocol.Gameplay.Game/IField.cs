@@ -31,5 +31,6 @@ public interface IField : IIdentifiable<int>, IFieldObjectPool
     Task Enter(IFieldObject obj, Func<IPacket>? getEnterPacket = null);
     Task Leave(IFieldObject obj, Func<IPacket>? getLeavePacket = null);
 
-    T? GetObject<T>(int id) where T : IFieldObject;
+    T? GetObject<T>(int id)
+        where T : IFieldObject;
 }

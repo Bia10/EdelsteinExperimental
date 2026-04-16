@@ -10,9 +10,9 @@ public interface IModifyInventoryGroupContext<TSlot, out TContext> : IModifyInve
     TContext? this[ItemInventoryType type] { get; }
 }
 
-public interface IModifyInventoryGroupContext :
-    IModifyInventoryGroupContext<IItemSlot, IModifyInventoryContext>,
-    IModifyInventory
+public interface IModifyInventoryGroupContext
+    : IModifyInventoryGroupContext<IItemSlot, IModifyInventoryContext>,
+        IModifyInventory
 {
     bool HasEquipped(BodyPart part);
     bool HasEquipped(int templateID);

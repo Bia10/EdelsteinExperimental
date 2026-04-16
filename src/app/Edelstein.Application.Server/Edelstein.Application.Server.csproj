@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <Import Project="..\App.targets" />
 
   <PropertyGroup>
@@ -9,7 +8,10 @@
   <ItemGroup>
     <PackageReference Include="Autofac" Version="7.1.0" />
     <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="8.0.0" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
+    <PackageReference
+      Include="AutoMapper.Extensions.Microsoft.DependencyInjection"
+      Version="12.0.1"
+    />
     <PackageReference Include="Duey.Provider.NX" Version="2.0.0" />
     <PackageReference Include="Duey.Provider.WZ" Version="2.0.0" />
     <PackageReference Include="Foundatio.JsonNet" Version="10.6.1" />
@@ -43,5 +45,4 @@
     <ProjectReference Include="..\..\protocol\Edelstein.Protocol.Gameplay.Trade\Edelstein.Protocol.Gameplay.Trade.csproj" />
     <ProjectReference Include="..\..\protocol\Edelstein.Protocol.Plugin\Edelstein.Protocol.Plugin.csproj" />
   </ItemGroup>
-
 </Project>

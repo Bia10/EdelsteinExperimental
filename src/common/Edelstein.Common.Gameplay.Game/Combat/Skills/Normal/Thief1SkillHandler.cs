@@ -20,7 +20,7 @@ public class Thief1SkillHandler : NoviceSkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.PDR, context.SkillLevel!.Y);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
 
@@ -33,7 +33,7 @@ public class Thief1SkillHandler : NoviceSkillHandler
                 context.AddTemporaryStat(TemporaryStatType.Speed, -context.SkillLevel!.Y);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

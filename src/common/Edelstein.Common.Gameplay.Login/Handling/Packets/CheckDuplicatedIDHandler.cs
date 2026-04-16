@@ -7,19 +7,18 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Login.Handling.Packets;
 
-public class CheckDuplicatedIDHandler : AbstractPipedPacketHandler<ILoginStageUser, UserOnPacketCheckDuplicatedID>
+public class CheckDuplicatedIDHandler
+    : AbstractPipedPacketHandler<ILoginStageUser, UserOnPacketCheckDuplicatedID>
 {
-    public CheckDuplicatedIDHandler(IPipeline<UserOnPacketCheckDuplicatedID> pipeline) : base(pipeline)
-    {
-    }
-    
+    public CheckDuplicatedIDHandler(IPipeline<UserOnPacketCheckDuplicatedID> pipeline)
+        : base(pipeline) { }
+
     public override short Operation => (short)PacketRecvOperations.CheckDuplicatedID;
 
     public override bool Check(ILoginStageUser user) => user.State == LoginState.SelectCharacter;
 
-    public override UserOnPacketCheckDuplicatedID Serialize(ILoginStageUser user, IPacketReader reader) 
-        => new(
-            user,
-            reader.ReadString()
-        );
+    public override UserOnPacketCheckDuplicatedID Serialize(
+        ILoginStageUser user,
+        IPacketReader reader
+    ) => new(user, reader.ReadString());
 }

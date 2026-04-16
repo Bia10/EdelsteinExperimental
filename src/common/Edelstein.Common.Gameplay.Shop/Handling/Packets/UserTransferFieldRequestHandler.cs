@@ -7,16 +7,18 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Shop.Handling.Packets;
 
-public class UserTransferFieldRequestHandler : AbstractPipedPacketHandler<IShopStageUser, ShopOnPacketUserTransferFieldRequest>
-{    
-    public UserTransferFieldRequestHandler(IPipeline<ShopOnPacketUserTransferFieldRequest> pipeline) : base(pipeline)
-    {
-    }
-    
+public class UserTransferFieldRequestHandler
+    : AbstractPipedPacketHandler<IShopStageUser, ShopOnPacketUserTransferFieldRequest>
+{
+    public UserTransferFieldRequestHandler(IPipeline<ShopOnPacketUserTransferFieldRequest> pipeline)
+        : base(pipeline) { }
+
     public override short Operation => (short)PacketRecvOperations.UserTransferFieldRequest;
-    
+
     public override bool Check(IShopStageUser user) => true;
 
-    public override ShopOnPacketUserTransferFieldRequest? Serialize(IShopStageUser user, IPacketReader reader)
-        => new(user);
+    public override ShopOnPacketUserTransferFieldRequest? Serialize(
+        IShopStageUser user,
+        IPacketReader reader
+    ) => new(user);
 }

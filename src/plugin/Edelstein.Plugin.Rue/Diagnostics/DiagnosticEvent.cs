@@ -8,4 +8,5 @@ public record DiagnosticEvent(
     string Source,
     string EventType,
     string Description,
-    Dictionary<string, object?>? Details = null);
+    Dictionary<string, object?>? Details = null
+);

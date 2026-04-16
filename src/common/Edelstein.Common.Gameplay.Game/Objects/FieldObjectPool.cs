@@ -20,8 +20,10 @@ public class FieldObjectPool : AbstractFieldObjectPool, IFieldObjectPool
 
     public override Task Enter(IFieldObject obj)
     {
-        if (obj is IFieldUser user) user.ObjectID = user.Character.ID;
-        else obj.ObjectID = _runningObjectID.Dequeue();
+        if (obj is IFieldUser user)
+            user.ObjectID = user.Character.ID;
+        else
+            obj.ObjectID = _runningObjectID.Dequeue();
 
         _objects[obj.ObjectID!.Value] = obj;
         return Task.CompletedTask;
@@ -31,7 +33,8 @@ public class FieldObjectPool : AbstractFieldObjectPool, IFieldObjectPool
     {
         var objectID = obj.ObjectID;
 
-        if (objectID == null) return Task.CompletedTask;
+        if (objectID == null)
+            return Task.CompletedTask;
 
         _objects.Remove(objectID.Value);
 
@@ -43,7 +46,6 @@ public class FieldObjectPool : AbstractFieldObjectPool, IFieldObjectPool
         return Task.CompletedTask;
     }
 
-    public override IFieldObject? GetObject(int id) => _objects.TryGetValue(id, out var obj)
-        ? obj
-        : null;
+    public override IFieldObject? GetObject(int id) =>
+        _objects.TryGetValue(id, out var obj) ? obj : null;
 }

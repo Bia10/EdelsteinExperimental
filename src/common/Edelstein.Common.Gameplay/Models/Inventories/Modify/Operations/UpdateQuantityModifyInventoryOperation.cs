@@ -11,9 +11,9 @@ public class UpdateQuantityModifyInventoryOperation : AbstractModifyInventoryOpe
         ItemInventoryType inventory,
         short slot,
         short quantity
-    ) : base(ModifyInventoryOperationType.UpdateQuantity, inventory, slot) =>
+    )
+        : base(ModifyInventoryOperationType.UpdateQuantity, inventory, slot) =>
         _quantity = quantity;
 
-    protected override void WriteData(IPacketWriter writer) =>
-        writer.WriteShort(_quantity);
+    protected override void WriteData(IPacketWriter writer) => writer.WriteShort(_quantity);
 }

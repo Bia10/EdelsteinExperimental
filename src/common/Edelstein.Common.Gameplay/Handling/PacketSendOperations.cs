@@ -509,5 +509,5 @@ public enum PacketSendOperations : short
     Vega_e = 0x1AF,
     END_VEGA = 0x1AF,
     LogoutGift = 0x1B0,
-    NO = 0x1B1
+    NO = 0x1B1,
 }

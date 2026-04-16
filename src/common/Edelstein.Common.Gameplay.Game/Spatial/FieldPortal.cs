@@ -8,7 +8,6 @@ namespace Edelstein.Common.Gameplay.Game.Spatial;
 
 public record FieldPortal : IFieldPortal
 {
-
     public FieldPortal(int id, IDataNode node)
     {
         ID = id;
@@ -23,6 +22,7 @@ public record FieldPortal : IFieldPortal
             node.ResolveInt("y") ?? int.MinValue
         );
     }
+
     public int ID { get; }
 
     public int MinX => Position.MinX;

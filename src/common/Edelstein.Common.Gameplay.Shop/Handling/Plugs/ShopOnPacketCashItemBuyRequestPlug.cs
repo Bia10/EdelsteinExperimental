@@ -16,8 +16,12 @@ public class ShopOnPacketCashItemBuyRequestPlug : IPipelinePlug<ShopOnPacketCash
     private readonly ICommodityManager _commodityManager;
     private readonly ICashPackageManager _cashPackageManager;
     private readonly ITemplateManager<IItemTemplate> _itemTemplates;
-    
-    public ShopOnPacketCashItemBuyRequestPlug(ICommodityManager commodityManager, ICashPackageManager cashPackageManager, ITemplateManager<IItemTemplate> itemTemplates)
+
+    public ShopOnPacketCashItemBuyRequestPlug(
+        ICommodityManager commodityManager,
+        ICashPackageManager cashPackageManager,
+        ITemplateManager<IItemTemplate> itemTemplates
+    )
     {
         _commodityManager = commodityManager;
         _cashPackageManager = cashPackageManager;
@@ -29,14 +33,24 @@ public class ShopOnPacketCashItemBuyRequestPlug : IPipelinePlug<ShopOnPacketCash
         var commodity = await _commodityManager.Retrieve(message.CommoditySN);
         var template = await _itemTemplates.Retrieve(commodity?.ItemID ?? 0);
 
-        if (commodity == null) return;
-        if (template == null) return;
-        if (commodity.OnSale == false) return;
-        if (commodity.Meso > 0) return;
-        if (await _cashPackageManager.Retrieve(message.CommoditySN) != null) return;
-        if (message.User.AccountWorld?.Locker == null) return;
-        if (message.User.AccountWorld.Locker.Items.Count >= message.User.AccountWorld.Locker.SlotMax) return;
-        if (!message.User.CheckCash(message.Cash, commodity.Price)) return;
+        if (commodity == null)
+            return;
+        if (template == null)
+            return;
+        if (commodity.OnSale == false)
+            return;
+        if (commodity.Meso > 0)
+            return;
+        if (await _cashPackageManager.Retrieve(message.CommoditySN) != null)
+            return;
+        if (message.User.AccountWorld?.Locker == null)
+            return;
+        if (
+            message.User.AccountWorld.Locker.Items.Count >= message.User.AccountWorld.Locker.SlotMax
+        )
+            return;
+        if (!message.User.CheckCash(message.Cash, commodity.Price))
+            return;
 
         var item = commodity.ToItemLockerSlot(template);
 
@@ -47,7 +61,7 @@ public class ShopOnPacketCashItemBuyRequestPlug : IPipelinePlug<ShopOnPacketCash
         message.User.IncCash(message.Cash, -commodity.Price);
 
         using var packet = new PacketWriter(PacketSendOperations.CashShopCashItemResult);
-    
+
         packet.WriteByte((byte)ShopResultOperations.Buy_Done);
         packet.WriteItemLockerData(item);
         await message.User.Dispatch(packet.Build());

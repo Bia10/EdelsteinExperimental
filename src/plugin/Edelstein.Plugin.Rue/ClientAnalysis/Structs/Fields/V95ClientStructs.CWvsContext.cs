@@ -32,7 +32,8 @@ public static partial class V95ClientStructs
         [Offsets.CWvsContext.ChatUnblockDate] = "CWvsContext.m_dtChatUnblockDate",
         [Offsets.CWvsContext.RegisterDate] = "CWvsContext.m_dtRegisterDate",
         [Offsets.CWvsContext.NumOfCharacter] = "CWvsContext.m_nNumOfCharacter",
-        [Offsets.CWvsContext.ThisAccountJustCreatedCharacter] = "CWvsContext.m_bThisAccountJustCreatedCharacter",
+        [Offsets.CWvsContext.ThisAccountJustCreatedCharacter] =
+            "CWvsContext.m_bThisAccountJustCreatedCharacter",
         [Offsets.CWvsContext.IsGuestAccount] = "CWvsContext.m_bIsGuestAccount",
         [Offsets.CWvsContext.ManagerAccount] = "CWvsContext.m_bManagerAccount",
         [Offsets.CWvsContext.CharacterCount] = "CWvsContext.m_nCharacterCount",

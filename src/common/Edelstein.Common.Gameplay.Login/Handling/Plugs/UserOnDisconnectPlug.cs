@@ -10,14 +10,21 @@ namespace Edelstein.Common.Gameplay.Login.Handling.Plugs;
 public class UserOnDisconnectPlug : AbstractUserOnDisconnectPlug<ILoginStageUser>
 {
     public UserOnDisconnectPlug(
-        ISessionService session, 
-        IAccountRepository accountRepository, 
+        ISessionService session,
+        IAccountRepository accountRepository,
         IAccountWorldRepository accountWorldRepository,
-        ICharacterRepository characterRepository, 
-        IFriendService friendService, 
+        ICharacterRepository characterRepository,
+        IFriendService friendService,
         IPartyService partyService,
         IGuildService guildService
-    ) : base(session, accountRepository, accountWorldRepository, characterRepository, friendService, partyService, guildService)
-    {
-    }
+    )
+        : base(
+            session,
+            accountRepository,
+            accountWorldRepository,
+            characterRepository,
+            friendService,
+            partyService,
+            guildService
+        ) { }
 }

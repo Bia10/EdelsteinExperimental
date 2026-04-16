@@ -2,6 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketPartyCreateRequest(
-    IFieldUser User
-);
+public record FieldOnPacketPartyCreateRequest(IFieldUser User);

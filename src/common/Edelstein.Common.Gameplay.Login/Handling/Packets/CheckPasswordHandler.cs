@@ -7,20 +7,18 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Login.Handling.Packets;
 
-public class CheckPasswordHandler : AbstractPipedPacketHandler<ILoginStageUser, UserOnPacketCheckPassword>
-{    
-    public CheckPasswordHandler(IPipeline<UserOnPacketCheckPassword> pipeline) : base(pipeline)
-    {
-    }
-    
+public class CheckPasswordHandler
+    : AbstractPipedPacketHandler<ILoginStageUser, UserOnPacketCheckPassword>
+{
+    public CheckPasswordHandler(IPipeline<UserOnPacketCheckPassword> pipeline)
+        : base(pipeline) { }
+
     public override short Operation => (short)PacketRecvOperations.CheckPassword;
 
     public override bool Check(ILoginStageUser user) => user.State == LoginState.CheckPassword;
 
-    public override UserOnPacketCheckPassword Serialize(ILoginStageUser user, IPacketReader reader)
-        => new(
-            user,
-            reader.ReadString(),
-            reader.ReadString()
-        );
+    public override UserOnPacketCheckPassword Serialize(
+        ILoginStageUser user,
+        IPacketReader reader
+    ) => new(user, reader.ReadString(), reader.ReadString());
 }

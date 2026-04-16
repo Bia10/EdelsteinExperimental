@@ -62,30 +62,35 @@ public class CharacterRepository : ICharacterRepository
         await using var db = await _dbFactory.CreateDbContextAsync();
         return await db.Characters.AnyAsync(c => c.Name.ToLower() == name.ToLower());
     }
-    
+
     public async Task<ICharacter?> RetrieveByName(string name)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
-        var entity = await db.Characters.FirstOrDefaultAsync(c => c.Name.ToLower() == name.ToLower());
+        var entity = await db.Characters.FirstOrDefaultAsync(c =>
+            c.Name.ToLower() == name.ToLower()
+        );
         return entity != null ? _mapper.Map<Character>(entity) : null;
     }
 
-    public async Task<ICharacter?> RetrieveByAccountWorldAndCharacter(int accountWorld, int character)
+    public async Task<ICharacter?> RetrieveByAccountWorldAndCharacter(
+        int accountWorld,
+        int character
+    )
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
-        var entity = await db.Characters.FirstOrDefaultAsync(c => c.AccountWorldID == accountWorld && c.ID == character);
+        var entity = await db.Characters.FirstOrDefaultAsync(c =>
+            c.AccountWorldID == accountWorld && c.ID == character
+        );
         return entity != null ? _mapper.Map<Character>(entity) : null;
     }
 
     public async Task<IEnumerable<ICharacter>> RetrieveAllByAccountWorld(int accountWorld)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
-        var results = await db.Characters
-            .Where(c => c.AccountWorldID == accountWorld)
+        var results = await db
+            .Characters.Where(c => c.AccountWorldID == accountWorld)
             .OrderBy(c => c.ID)
             .ToListAsync();
-        return results
-            .Select(m => _mapper.Map<Character>(m))
-            .ToImmutableArray();
+        return results.Select(m => _mapper.Map<Character>(m)).ToImmutableArray();
     }
 }

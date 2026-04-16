@@ -6,8 +6,8 @@ namespace Edelstein.Common.Gameplay.Game.Objects.NPC;
 
 public class FieldNPCMovePath : AbstractMovePath<IFieldNPCMoveAction>, IFieldNPCMovePath
 {
-
     public FieldNPCMovePath(bool isMove) => IsMove = isMove;
+
     public byte Act { get; private set; }
     public byte Chat { get; private set; }
 
@@ -31,5 +31,6 @@ public class FieldNPCMovePath : AbstractMovePath<IFieldNPCMoveAction>, IFieldNPC
             base.WriteTo(writer);
     }
 
-    protected override IFieldNPCMoveAction GetActionFromRaw(byte raw) => new FieldNPCMoveAction(raw);
+    protected override IFieldNPCMoveAction GetActionFromRaw(byte raw) =>
+        new FieldNPCMoveAction(raw);
 }

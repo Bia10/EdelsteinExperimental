@@ -15,15 +15,14 @@ namespace Edelstein.Common.Database.Migrations
                 table: "characters",
                 type: "json",
                 nullable: false,
-                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterTemporaryStats, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[Edelstein.Protocol.Gameplay.Models.Characters.Stats.TemporaryStatType, Edelstein.Protocol.Gameplay],[Edelstein.Protocol.Gameplay.Models.Characters.Stats.ITemporaryStatRecord, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"}}");
+                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterTemporaryStats, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[Edelstein.Protocol.Gameplay.Models.Characters.Stats.TemporaryStatType, Edelstein.Protocol.Gameplay],[Edelstein.Protocol.Gameplay.Models.Characters.Stats.ITemporaryStatRecord, Edelstein.Protocol.Gameplay]], System.Private.CoreLib\"}}"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "TemporaryStats",
-                table: "characters");
+            migrationBuilder.DropColumn(name: "TemporaryStats", table: "characters");
         }
     }
 }

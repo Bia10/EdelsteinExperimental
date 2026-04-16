@@ -6,17 +6,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class FieldOnPacketUserAbilityMassUpRequestPlug : IPipelinePlug<FieldOnPacketUserAbilityMassUpRequest>
+public class FieldOnPacketUserAbilityMassUpRequestPlug
+    : IPipelinePlug<FieldOnPacketUserAbilityMassUpRequest>
 {
     private readonly ILogger _logger;
-    
-    public FieldOnPacketUserAbilityMassUpRequestPlug(ILogger<FieldOnPacketUserAbilityMassUpRequestPlug> logger)
-        => _logger = logger;
+
+    public FieldOnPacketUserAbilityMassUpRequestPlug(
+        ILogger<FieldOnPacketUserAbilityMassUpRequestPlug> logger
+    ) => _logger = logger;
 
     public async Task Handle(IPipelineContext ctx, FieldOnPacketUserAbilityMassUpRequest message)
     {
         var stats = new ModifyStatContext(message.User.Character);
-        
+
         foreach (var pair in message.StatUp)
         {
             try
@@ -31,12 +33,12 @@ public class FieldOnPacketUserAbilityMassUpRequestPlug : IPipelinePlug<FieldOnPa
 
         await message.User.ModifyStats(stats, exclRequest: true);
     }
-    
+
     public static void HandleStatUp(ModifyStatContext stats, ModifyStatType type, int value = 1)
     {
         if (stats.AP < value)
             return;
-        
+
         switch (type)
         {
             case ModifyStatType.STR:

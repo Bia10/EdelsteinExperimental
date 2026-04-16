@@ -6,5 +6,5 @@ public enum LoginState
     SelectGender = 0x1,
     SelectWorld = 0x2,
     SelectCharacter = 0x3,
-    Connecting = 0x4
+    Connecting = 0x4,
 }

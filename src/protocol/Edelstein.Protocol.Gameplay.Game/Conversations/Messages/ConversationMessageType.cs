@@ -18,5 +18,5 @@ public enum ConversationMessageType : byte
     AskAccept = 0xD,
     AskBoxText = 0xE,
     AskSlideMenu = 0xF,
-    AskCenter = 0x10
+    AskCenter = 0x10,
 }

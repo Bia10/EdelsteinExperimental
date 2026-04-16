@@ -47,20 +47,21 @@ public class UserOnPacketCheckPasswordPlug : IPipelinePlug<UserOnPacketCheckPass
                 AuthResult.Success => LoginResult.Success,
                 AuthResult.FailedInvalidUsername => LoginResult.NotRegistered,
                 AuthResult.FailedInvalidPassword => LoginResult.IncorrectPassword,
-                _ => LoginResult.Unknown
+                _ => LoginResult.Unknown,
             };
 
-            var account = await _repository.RetrieveByUsername(message.Username) ??
-                          await _repository.Insert(new Account { Username = message.Username });
+            var account =
+                await _repository.RetrieveByUsername(message.Username)
+                ?? await _repository.Insert(new Account { Username = message.Username });
 
             if (result == LoginResult.Success)
             {
-                var session = new Session(
-                    message.User.Context.Options.ID,
-                    account.ID
-                );
+                var session = new Session(message.User.Context.Options.ID, account.ID);
 
-                if ((await _session.Start(new SessionStartRequest(session))).Result != SessionResult.Success)
+                if (
+                    (await _session.Start(new SessionStartRequest(session))).Result
+                    != SessionResult.Success
+                )
                     result = LoginResult.AlreadyConnected;
             }
 
@@ -69,7 +70,6 @@ public class UserOnPacketCheckPasswordPlug : IPipelinePlug<UserOnPacketCheckPass
             packet.WriteByte((byte)result);
             packet.WriteByte(0);
             packet.WriteInt(0);
-
 
             if (result == LoginResult.Success)
             {

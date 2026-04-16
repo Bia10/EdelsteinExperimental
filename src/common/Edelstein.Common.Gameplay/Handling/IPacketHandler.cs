@@ -3,7 +3,8 @@ using Edelstein.Protocol.Utilities.Packets;
 
 namespace Edelstein.Common.Gameplay.Handling;
 
-public interface IPacketHandler<in TStageUser> where TStageUser : IStageUser<TStageUser>
+public interface IPacketHandler<in TStageUser>
+    where TStageUser : IStageUser<TStageUser>
 {
     short Operation { get; }
 

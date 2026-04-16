@@ -15,32 +15,37 @@ namespace Edelstein.Common.Services.Social.Migrations
                 name: "friends",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ID = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     CharacterID = table.Column<int>(type: "integer", nullable: false),
                     FriendID = table.Column<int>(type: "integer", nullable: false),
                     FriendName = table.Column<string>(type: "text", nullable: false),
                     FriendGroup = table.Column<string>(type: "text", nullable: false),
                     Flag = table.Column<short>(type: "smallint", nullable: false),
-                    ChannelID = table.Column<int>(type: "integer", nullable: false)
+                    ChannelID = table.Column<int>(type: "integer", nullable: false),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_friends", x => x.ID);
-                });
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_friends_CharacterID_FriendID",
                 table: "friends",
                 columns: new[] { "CharacterID", "FriendID" },
-                unique: true);
+                unique: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "friends");
+            migrationBuilder.DropTable(name: "friends");
         }
     }
 }

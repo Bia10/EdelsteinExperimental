@@ -38,7 +38,8 @@ public class InitDatabaseBootstrap : IBootstrap
 
     public async Task Start()
     {
-        if (!_config.MigrateDatabaseOnInit) return;
+        if (!_config.MigrateDatabaseOnInit)
+            return;
 
         await using var db0 = await _authContext.CreateDbContextAsync();
         await using var db1 = await _serverContext.CreateDbContextAsync();

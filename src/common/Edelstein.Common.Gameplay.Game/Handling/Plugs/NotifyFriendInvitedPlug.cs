@@ -12,11 +12,12 @@ public class NotifyFriendInvitedPlug : IPipelinePlug<NotifyFriendInvited>
     private readonly IGameStage _stage;
 
     public NotifyFriendInvitedPlug(IGameStage stage) => _stage = stage;
-    
+
     public async Task Handle(IPipelineContext ctx, NotifyFriendInvited message)
     {
         var user = await _stage.Users.Retrieve(message.FriendID);
-        if (user == null) return;
+        if (user == null)
+            return;
         using var packet = new PacketWriter(PacketSendOperations.FriendResult);
         packet.WriteByte((byte)FriendResultOperations.Invite);
         packet.WriteInt(message.InviterID);

@@ -15,33 +15,40 @@ public partial class CommandManager : Repository<string, ICommand>, ICommandMana
         var results = (await RetrieveAll())
             .Where(c => c.Check(user))
             .Where(c =>
-                c.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase) ||
-                c.Aliases.Any(s => s.StartsWith(name, StringComparison.OrdinalIgnoreCase)))
+                c.Name.StartsWith(name, StringComparison.OrdinalIgnoreCase)
+                || c.Aliases.Any(s => s.StartsWith(name, StringComparison.OrdinalIgnoreCase))
+            )
             .ToImmutableArray();
 
-        if (results.Length <= 1) return results.FirstOrDefault();
+        if (results.Length <= 1)
+            return results.FirstOrDefault();
 
         var i = 0;
-        var select = await user.Prompt(s => s.AskMenu($"Multiple command found with name '{name}', did you mean..", results.ToImmutableDictionary(
-            c => i++,
-            c => c.Name
-        )), -1);
+        var select = await user.Prompt(
+            s =>
+                s.AskMenu(
+                    $"Multiple command found with name '{name}', did you mean..",
+                    results.ToImmutableDictionary(c => i++, c => c.Name)
+                ),
+            -1
+        );
 
-        return select == -1
-            ? null
-            : results[select];
+        return select == -1 ? null : results[select];
     }
 
     public virtual Task<bool> Process(IFieldUser user, string text)
     {
         var regex = CommandRegex();
-        var args = regex.Matches(text)
+        var args = regex
+            .Matches(text)
             .Select(m =>
             {
                 var res = m.Value;
 
-                if ((!res.StartsWith("'") || !res.EndsWith("'")) &&
-                    (!res.StartsWith("\"") || !res.EndsWith("\"")))
+                if (
+                    (!res.StartsWith("'") || !res.EndsWith("'"))
+                    && (!res.StartsWith("\"") || !res.EndsWith("\""))
+                )
                     return res;
 
                 res = res[1..];

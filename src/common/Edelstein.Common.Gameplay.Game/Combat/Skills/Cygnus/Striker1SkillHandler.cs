@@ -22,7 +22,7 @@ public class Striker1SkillHandler : NoblesseSkillHandler
                 context.AddSummoned(MoveAbilityType.Walk, SummonedAssistType.Attack);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

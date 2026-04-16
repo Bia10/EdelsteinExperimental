@@ -16,9 +16,9 @@ public class ContiMoveManagerInit : IPipelinePlug<StageStart>
     private readonly ITemplateManager<IContiMoveTemplate> _templates;
 
     public ContiMoveManagerInit(
-        ILogger<ContiMove> logger, 
-        IContiMoveManager contiMoveManager, 
-        IFieldManager fieldManager, 
+        ILogger<ContiMove> logger,
+        IContiMoveManager contiMoveManager,
+        IFieldManager fieldManager,
         ITemplateManager<IContiMoveTemplate> templates
     )
     {
@@ -27,12 +27,13 @@ public class ContiMoveManagerInit : IPipelinePlug<StageStart>
         _fieldManager = fieldManager;
         _templates = templates;
     }
-    
+
     public async Task Handle(IPipelineContext ctx, StageStart message)
     {
-        await Task.WhenAll((await _templates.RetrieveAll())
-            .Select(t => new ContiMove(_logger, _fieldManager, t))
-            .Select(_contiMoveManager.Insert)
+        await Task.WhenAll(
+            (await _templates.RetrieveAll())
+                .Select(t => new ContiMove(_logger, _fieldManager, t))
+                .Select(_contiMoveManager.Insert)
         );
     }
 }

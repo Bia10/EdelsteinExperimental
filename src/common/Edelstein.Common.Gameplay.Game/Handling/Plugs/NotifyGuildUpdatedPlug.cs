@@ -26,9 +26,7 @@ public class NotifyGuildUpdatedPlug : IPipelinePlug<NotifyGuildUpdated>
     public async Task Handle(IPipelineContext ctx, NotifyGuildUpdated message)
     {
         var users = await _stage.Users.RetrieveAll();
-        var affected = users
-            .Where(u => u.Guild?.ID == message.GuildID)
-            .ToImmutableArray();
+        var affected = users.Where(u => u.Guild?.ID == message.GuildID).ToImmutableArray();
 
         foreach (var user in affected)
         {
@@ -36,24 +34,24 @@ public class NotifyGuildUpdatedPlug : IPipelinePlug<NotifyGuildUpdated>
             // preserving each member's personal fields (CharacterID, Grade, etc.).
             if (user.Guild is GuildMembership ms)
             {
-                ms.Name              = message.GuildMembership.Name;
-                ms.GradeName1        = message.GuildMembership.GradeName1;
-                ms.GradeName2        = message.GuildMembership.GradeName2;
-                ms.GradeName3        = message.GuildMembership.GradeName3;
-                ms.GradeName4        = message.GuildMembership.GradeName4;
-                ms.GradeName5        = message.GuildMembership.GradeName5;
-                ms.MaxMemberNum      = message.GuildMembership.MaxMemberNum;
+                ms.Name = message.GuildMembership.Name;
+                ms.GradeName1 = message.GuildMembership.GradeName1;
+                ms.GradeName2 = message.GuildMembership.GradeName2;
+                ms.GradeName3 = message.GuildMembership.GradeName3;
+                ms.GradeName4 = message.GuildMembership.GradeName4;
+                ms.GradeName5 = message.GuildMembership.GradeName5;
+                ms.MaxMemberNum = message.GuildMembership.MaxMemberNum;
                 ms.MasterCharacterID = message.GuildMembership.MasterCharacterID;
-                ms.MarkBg            = message.GuildMembership.MarkBg;
-                ms.MarkBgColor       = message.GuildMembership.MarkBgColor;
-                ms.Mark              = message.GuildMembership.Mark;
-                ms.MarkColor         = message.GuildMembership.MarkColor;
-                ms.Notice            = message.GuildMembership.Notice;
-                ms.Point             = message.GuildMembership.Point;
-                ms.GuildLevel        = message.GuildMembership.GuildLevel;
-                ms.AllianceID        = message.GuildMembership.AllianceID;
-                ms.Members           = message.GuildMembership.Members;
-                ms.Skills            = message.GuildMembership.Skills;
+                ms.MarkBg = message.GuildMembership.MarkBg;
+                ms.MarkBgColor = message.GuildMembership.MarkBgColor;
+                ms.Mark = message.GuildMembership.Mark;
+                ms.MarkColor = message.GuildMembership.MarkColor;
+                ms.Notice = message.GuildMembership.Notice;
+                ms.Point = message.GuildMembership.Point;
+                ms.GuildLevel = message.GuildMembership.GuildLevel;
+                ms.AllianceID = message.GuildMembership.AllianceID;
+                ms.Members = message.GuildMembership.Members;
+                ms.Skills = message.GuildMembership.Skills;
             }
 
             using var packet = new PacketWriter(PacketSendOperations.GuildResult);

@@ -15,6 +15,9 @@ public class FallbackConversation : IConversation
         _user = user;
     }
 
-    public Task Start(IConversationContext ctx, IConversationSpeaker self, IConversationSpeaker target) 
-        => _user.Message($"The scripted conversation '{_name}' is not available");
+    public Task Start(
+        IConversationContext ctx,
+        IConversationSpeaker self,
+        IConversationSpeaker target
+    ) => _user.Message($"The scripted conversation '{_name}' is not available");
 }

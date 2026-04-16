@@ -1,5 +1,3 @@
 ﻿namespace Edelstein.Protocol.Gameplay.Trade.Contracts;
 
-public record TradeOnPacketUserTransferFieldRequest(
-    ITradeStageUser User
-);
+public record TradeOnPacketUserTransferFieldRequest(ITradeStageUser User);

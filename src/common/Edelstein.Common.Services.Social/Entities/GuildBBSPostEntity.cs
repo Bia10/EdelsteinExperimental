@@ -27,5 +27,6 @@ public class GuildBBSPostEntity : IGuildBBSPost, IIdentifiable<int>
 
     public GuildEntity Guild { get; set; } = null!;
 
-    public ICollection<GuildBBSCommentEntity> Comments { get; set; } = new List<GuildBBSCommentEntity>();
+    public ICollection<GuildBBSCommentEntity> Comments { get; set; } =
+        new List<GuildBBSCommentEntity>();
 }

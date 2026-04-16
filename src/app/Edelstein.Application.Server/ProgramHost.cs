@@ -8,10 +8,10 @@ using Edelstein.Common.Gameplay.Game;
 using Edelstein.Common.Gameplay.Game.Combat;
 using Edelstein.Common.Gameplay.Game.Continents;
 using Edelstein.Common.Gameplay.Game.Conversations;
-using Edelstein.Common.Gameplay.Game.Rates;
 using Edelstein.Common.Gameplay.Game.Objects.Mob.Rewards;
 using Edelstein.Common.Gameplay.Game.Objects.NPC;
 using Edelstein.Common.Gameplay.Game.Quests;
+using Edelstein.Common.Gameplay.Game.Rates;
 using Edelstein.Common.Gameplay.Handling;
 using Edelstein.Common.Gameplay.Login;
 using Edelstein.Common.Gameplay.Models.Inventories;
@@ -82,8 +82,7 @@ public class ProgramHost : IHostedService
             if (_config.TradeStages.Count > 0)
                 assemblies.Add(Assembly.GetAssembly(typeof(TradeStage))!);
 
-            b
-                .RegisterAssemblyTypes(assemblies.ToArray())
+            b.RegisterAssemblyTypes(assemblies.ToArray())
                 .Where(t => t.IsClass && t.IsAssignableTo(typeof(ITemplateLoader)))
                 .AsImplementedInterfaces()
                 .SingleInstance();
@@ -94,50 +93,51 @@ public class ProgramHost : IHostedService
         stages.AddRange(_config.GameStages);
         stages.AddRange(_config.ShopStages);
         stages.AddRange(_config.TradeStages);
-        
+
         foreach (var stage in stages)
         {
             await using var stageScope = programScope.BeginLifetimeScope(b =>
             {
-                b.RegisterGeneric(typeof(PluginManager<>)).As(typeof(IPluginManager<>)).SingleInstance();
-                b.RegisterGeneric(typeof(PacketHandlerManager<>)).As(typeof(IPacketHandlerManager<>)).SingleInstance();
+                b.RegisterGeneric(typeof(PluginManager<>))
+                    .As(typeof(IPluginManager<>))
+                    .SingleInstance();
+                b.RegisterGeneric(typeof(PacketHandlerManager<>))
+                    .As(typeof(IPacketHandlerManager<>))
+                    .SingleInstance();
                 b.RegisterGeneric(typeof(Pipeline<>)).As(typeof(IPipeline<>)).SingleInstance();
 
-                b
-                    .Register(c => new NettyTransportAcceptor(
+                b.Register(c => new NettyTransportAcceptor(
                         c.Resolve<IAdapterInitializer>(),
-                        new TransportVersion(stage.Version, stage.Patch, stage.Locale))
-                    )
+                        new TransportVersion(stage.Version, stage.Patch, stage.Locale)
+                    ))
                     .As<ITransportAcceptor>()
                     .SingleInstance();
 
                 b.RegisterType<StartStageBootstrap>().As<IBootstrap>().SingleInstance();
                 b.Register(c => new StartServerBootstrap(
-                    c.Resolve<ILogger<StartServerBootstrap>>(),
-                    c.Resolve<ITickerManager>(),
-                    c.Resolve<ITransportAcceptor>(),
-                    stage
-                )).As<IBootstrap>().SingleInstance();
-                
-                
+                        c.Resolve<ILogger<StartServerBootstrap>>(),
+                        c.Resolve<ITickerManager>(),
+                        c.Resolve<ITransportAcceptor>(),
+                        stage
+                    ))
+                    .As<IBootstrap>()
+                    .SingleInstance();
+
                 b.RegisterType<InventoryManager>().As<IInventoryManager>().SingleInstance();
 
                 switch (stage)
                 {
                     case ILoginStageOptions options:
-                        b
-                            .RegisterAssemblyTypes(Assembly.GetAssembly(typeof(LoginStage))!)
+                        b.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(LoginStage))!)
                             .Where(t => t.IsClass)
                             .AsClosedTypesOf(typeof(IPacketHandler<>))
                             .SingleInstance();
-                        b
-                            .RegisterAssemblyTypes(Assembly.GetAssembly(typeof(LoginStage))!)
+                        b.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(LoginStage))!)
                             .Where(t => t.IsClass)
                             .AsClosedTypesOf(typeof(IPipelinePlug<>))
                             .SingleInstance();
 
-                        b
-                            .RegisterInstance(options)
+                        b.RegisterInstance(options)
                             .As<ILoginStageOptions>()
                             .As<ProgramConfigStage>()
                             .As<ProgramConfigStageLogin>()
@@ -149,12 +149,14 @@ public class ProgramHost : IHostedService
                         b.RegisterType<LoginContextTemplates>().SingleInstance();
                         b.RegisterType<LoginContextPipelines>().SingleInstance();
 
-                        b.RegisterType<LoginStageUserInitializer>().As<IAdapterInitializer>().SingleInstance();
+                        b.RegisterType<LoginStageUserInitializer>()
+                            .As<IAdapterInitializer>()
+                            .SingleInstance();
                         b.RegisterInstance(new LoginStage(stage.ID))
                             .As<IStage<ILoginStageUser>>()
                             .As<ILoginStage>()
                             .SingleInstance();
-                        
+
                         b.RegisterType<InitPluginBootstrap<LoginContext>>()
                             .As<IBootstrap>()
                             .SingleInstance();
@@ -167,39 +169,51 @@ public class ProgramHost : IHostedService
                             .SingleInstance();
                         break;
                     case IGameStageOptions options:
-                        b
-                            .RegisterAssemblyTypes(Assembly.GetAssembly(typeof(GameStage))!)
+                        b.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(GameStage))!)
                             .Where(t => t.IsClass)
                             .AsClosedTypesOf(typeof(IPacketHandler<>))
                             .SingleInstance();
-                        b
-                            .RegisterAssemblyTypes(Assembly.GetAssembly(typeof(GameStage))!)
+                        b.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(GameStage))!)
                             .Where(t => t.IsClass)
                             .AsClosedTypesOf(typeof(IPipelinePlug<>))
                             .SingleInstance();
 
                         b.RegisterType<FieldManager>().As<IFieldManager>().SingleInstance();
                         b.RegisterType<ContiMoveManager>().As<IContiMoveManager>().SingleInstance();
-                        b.RegisterType<ScriptedConversationManager>().As<INamedConversationManager>().SingleInstance();
+                        b.RegisterType<ScriptedConversationManager>()
+                            .As<INamedConversationManager>()
+                            .SingleInstance();
                         b.RegisterType<NPCShopManager>().As<INPCShopManager>().SingleInstance();
-                        b.RegisterType<MobRewardPoolManager>().As<IMobRewardPoolManager>().SingleInstance();
+                        b.RegisterType<MobRewardPoolManager>()
+                            .As<IMobRewardPoolManager>()
+                            .SingleInstance();
                         b.RegisterType<SkillManager>().As<ISkillManager>().SingleInstance();
-                        b.RegisterType<ModifiedQuestTimeManager>().As<IModifiedQuestTimeManager>().SingleInstance();
+                        b.RegisterType<ModifiedQuestTimeManager>()
+                            .As<IModifiedQuestTimeManager>()
+                            .SingleInstance();
                         b.RegisterType<QuestManager>().As<IQuestManager>().SingleInstance();
-                        b.RegisterType<MobQuestCacheManager>().As<IMobQuestCacheManager>().SingleInstance();
-                        b.RegisterType<RateModifierManager>().As<IRateModifierManager>().SingleInstance();
-                        b.RegisterType<TemporaryStatRateModifierSource>().As<IRateModifierSource>().SingleInstance();
-                        b.RegisterType<GuildRateModifierSource>().As<IRateModifierSource>().SingleInstance();
-                        b.RegisterType<StageOptionsRateModifierSource>().As<IRateModifierSource>().SingleInstance();
-                        
-                        b
-                            .RegisterAssemblyTypes(Assembly.GetAssembly(typeof(GameStage))!)
+                        b.RegisterType<MobQuestCacheManager>()
+                            .As<IMobQuestCacheManager>()
+                            .SingleInstance();
+                        b.RegisterType<RateModifierManager>()
+                            .As<IRateModifierManager>()
+                            .SingleInstance();
+                        b.RegisterType<TemporaryStatRateModifierSource>()
+                            .As<IRateModifierSource>()
+                            .SingleInstance();
+                        b.RegisterType<GuildRateModifierSource>()
+                            .As<IRateModifierSource>()
+                            .SingleInstance();
+                        b.RegisterType<StageOptionsRateModifierSource>()
+                            .As<IRateModifierSource>()
+                            .SingleInstance();
+
+                        b.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(GameStage))!)
                             .Where(t => t.IsClass && t.IsAssignableTo<ISkillHandler>())
                             .As<ISkillHandler>()
                             .SingleInstance();
-                        
-                        b
-                            .RegisterInstance(options)
+
+                        b.RegisterInstance(options)
                             .As<IGameStageOptions>()
                             .As<ProgramConfigStage>()
                             .As<ProgramConfigStageGame>()
@@ -211,12 +225,14 @@ public class ProgramHost : IHostedService
                         b.RegisterType<GameContextTemplates>().SingleInstance();
                         b.RegisterType<GameContextPipelines>().SingleInstance();
 
-                        b.RegisterType<GameStageUserInitializer>().As<IAdapterInitializer>().SingleInstance();
+                        b.RegisterType<GameStageUserInitializer>()
+                            .As<IAdapterInitializer>()
+                            .SingleInstance();
                         b.Register(c => new GameStage(stage.ID, c.Resolve<IFieldManager>()))
                             .As<IStage<IGameStageUser>>()
                             .As<IGameStage>()
                             .SingleInstance();
-                        
+
                         b.RegisterType<InitPluginBootstrap<GameContext>>()
                             .As<IBootstrap>()
                             .SingleInstance();
@@ -229,24 +245,25 @@ public class ProgramHost : IHostedService
                             .SingleInstance();
                         break;
                     case IShopStageOptions options:
-                        b
-                            .RegisterAssemblyTypes(Assembly.GetAssembly(typeof(ShopStage))!)
+                        b.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(ShopStage))!)
                             .Where(t => t.IsClass)
                             .AsClosedTypesOf(typeof(IPacketHandler<>))
                             .SingleInstance();
-                        b
-                            .RegisterAssemblyTypes(Assembly.GetAssembly(typeof(ShopStage))!)
+                        b.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(ShopStage))!)
                             .Where(t => t.IsClass)
                             .AsClosedTypesOf(typeof(IPipelinePlug<>))
                             .SingleInstance();
-                        
+
                         b.RegisterType<NotSaleManager>().As<INotSaleManager>().SingleInstance();
                         b.RegisterType<CommodityManager>().As<ICommodityManager>().SingleInstance();
-                        b.RegisterType<ModifiedCommodityManager>().As<IModifiedCommodityManager>().SingleInstance();
-                        b.RegisterType<CashPackageManager>().As<ICashPackageManager>().SingleInstance();
-                        
-                        b
-                            .RegisterInstance(options)
+                        b.RegisterType<ModifiedCommodityManager>()
+                            .As<IModifiedCommodityManager>()
+                            .SingleInstance();
+                        b.RegisterType<CashPackageManager>()
+                            .As<ICashPackageManager>()
+                            .SingleInstance();
+
+                        b.RegisterInstance(options)
                             .As<IShopStageOptions>()
                             .As<ProgramConfigStage>()
                             .As<ProgramConfigStageShop>()
@@ -258,12 +275,14 @@ public class ProgramHost : IHostedService
                         b.RegisterType<ShopContextTemplates>().SingleInstance();
                         b.RegisterType<ShopContextPipelines>().SingleInstance();
 
-                        b.RegisterType<ShopStageUserInitializer>().As<IAdapterInitializer>().SingleInstance();
+                        b.RegisterType<ShopStageUserInitializer>()
+                            .As<IAdapterInitializer>()
+                            .SingleInstance();
                         b.Register(c => new ShopStage(stage.ID))
                             .As<IStage<IShopStageUser>>()
                             .As<IShopStage>()
                             .SingleInstance();
-                        
+
                         b.RegisterType<InitPluginBootstrap<ShopContext>>()
                             .As<IBootstrap>()
                             .SingleInstance();
@@ -276,19 +295,16 @@ public class ProgramHost : IHostedService
                             .SingleInstance();
                         break;
                     case ITradeStageOptions options:
-                        b
-                            .RegisterAssemblyTypes(Assembly.GetAssembly(typeof(TradeStage))!)
+                        b.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(TradeStage))!)
                             .Where(t => t.IsClass)
                             .AsClosedTypesOf(typeof(IPacketHandler<>))
                             .SingleInstance();
-                        b
-                            .RegisterAssemblyTypes(Assembly.GetAssembly(typeof(TradeStage))!)
+                        b.RegisterAssemblyTypes(Assembly.GetAssembly(typeof(TradeStage))!)
                             .Where(t => t.IsClass)
                             .AsClosedTypesOf(typeof(IPipelinePlug<>))
                             .SingleInstance();
-                        
-                        b
-                            .RegisterInstance(options)
+
+                        b.RegisterInstance(options)
                             .As<ITradeStageOptions>()
                             .As<ProgramConfigStage>()
                             .As<ProgramConfigStageTrade>()
@@ -300,12 +316,14 @@ public class ProgramHost : IHostedService
                         b.RegisterType<TradeContextTemplates>().SingleInstance();
                         b.RegisterType<TradeContextPipelines>().SingleInstance();
 
-                        b.RegisterType<TradeStageUserInitializer>().As<IAdapterInitializer>().SingleInstance();
+                        b.RegisterType<TradeStageUserInitializer>()
+                            .As<IAdapterInitializer>()
+                            .SingleInstance();
                         b.Register(c => new TradeStage(stage.ID))
                             .As<IStage<ITradeStageUser>>()
                             .As<ITradeStage>()
                             .SingleInstance();
-                        
+
                         b.RegisterType<InitPluginBootstrap<TradeContext>>()
                             .As<IBootstrap>()
                             .SingleInstance();
@@ -324,36 +342,38 @@ public class ProgramHost : IHostedService
                 _bootstraps.Add(bootstrap);
         }
 
-        _bootstraps.Add(new CleanupRegistryBootstrap(
-            programScope.Resolve<ILogger<CleanupRegistryBootstrap>>(),
-            programScope.Resolve<IDbContextFactory<ServerDbContext>>(),
-            _config
-        ));
-        _bootstraps.Add(new InitDatabaseBootstrap(
-            programScope.Resolve<ILogger<InitDatabaseBootstrap>>(),
-            programScope.Resolve<IDbContextFactory<AuthDbContext>>(),
-            programScope.Resolve<IDbContextFactory<ServerDbContext>>(),
-            programScope.Resolve<IDbContextFactory<GameplayDbContext>>(),
-            programScope.Resolve<IDbContextFactory<SocialDbContext>>(),
-            _config
-        ));
+        _bootstraps.Add(
+            new CleanupRegistryBootstrap(
+                programScope.Resolve<ILogger<CleanupRegistryBootstrap>>(),
+                programScope.Resolve<IDbContextFactory<ServerDbContext>>(),
+                _config
+            )
+        );
+        _bootstraps.Add(
+            new InitDatabaseBootstrap(
+                programScope.Resolve<ILogger<InitDatabaseBootstrap>>(),
+                programScope.Resolve<IDbContextFactory<AuthDbContext>>(),
+                programScope.Resolve<IDbContextFactory<ServerDbContext>>(),
+                programScope.Resolve<IDbContextFactory<GameplayDbContext>>(),
+                programScope.Resolve<IDbContextFactory<SocialDbContext>>(),
+                _config
+            )
+        );
         _bootstraps.Add(new InitTickerBootstrap(programScope.Resolve<ITickerManager>()));
-        _bootstraps.Add(new LoadTemplateBootstrap(
-            programScope.Resolve<ILogger<LoadTemplateBootstrap>>(),
-            programScope.Resolve<IEnumerable<ITemplateLoader>>())
+        _bootstraps.Add(
+            new LoadTemplateBootstrap(
+                programScope.Resolve<ILogger<LoadTemplateBootstrap>>(),
+                programScope.Resolve<IEnumerable<ITemplateLoader>>()
+            )
         );
 
-        foreach (var group in _bootstraps
-                     .GroupBy(b => b.Priority)
-                     .OrderBy(g => g.Key))
+        foreach (var group in _bootstraps.GroupBy(b => b.Priority).OrderBy(g => g.Key))
             await Task.WhenAll(group.AsParallel().Select(b => b.Start()));
     }
 
     public async Task StopAsync(CancellationToken cancellationToken)
     {
-        foreach (var group in _bootstraps
-                     .GroupBy(b => b.Priority)
-                     .OrderByDescending(g => g.Key))
+        foreach (var group in _bootstraps.GroupBy(b => b.Priority).OrderByDescending(g => g.Key))
             await Task.WhenAll(group.AsParallel().Select(b => b.Stop()));
     }
 }

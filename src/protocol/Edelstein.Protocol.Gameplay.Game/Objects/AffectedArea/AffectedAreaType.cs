@@ -6,5 +6,5 @@ public enum AffectedAreaType
     UserSkill = 0x1,
     Smoke = 0x2,
     Buff = 0x3,
-    BlessedMist = 0x4
+    BlessedMist = 0x4,
 }

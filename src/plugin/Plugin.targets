@@ -1,6 +1,5 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
-  <Import Project="..\Source.targets"/>
+  <Import Project="..\Source.targets" />
 
   <PropertyGroup>
     <IsPackable>false</IsPackable>
@@ -19,5 +18,4 @@
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </None>
   </ItemGroup>
-
 </Project>

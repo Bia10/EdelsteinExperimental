@@ -11,7 +11,8 @@ public class UserOnPacketDeleteCharacterPlug : IPipelinePlug<UserOnPacketDeleteC
 {
     private readonly ICharacterRepository _characterRepository;
 
-    public UserOnPacketDeleteCharacterPlug(ICharacterRepository characterRepository) => _characterRepository = characterRepository;
+    public UserOnPacketDeleteCharacterPlug(ICharacterRepository characterRepository) =>
+        _characterRepository = characterRepository;
 
     public async Task Handle(IPipelineContext ctx, UserOnPacketDeleteCharacter message)
     {
@@ -25,8 +26,10 @@ public class UserOnPacketDeleteCharacterPlug : IPipelinePlug<UserOnPacketDeleteC
                 message.CharacterID
             );
 
-            if (character == null) result = LoginResult.NotAuthorized;
-            if (!BCrypt.Net.BCrypt.Verify(message.SPW, message.User.Account!.SPW)) result = LoginResult.IncorrectSPW;
+            if (character == null)
+                result = LoginResult.NotAuthorized;
+            if (!BCrypt.Net.BCrypt.Verify(message.SPW, message.User.Account!.SPW))
+                result = LoginResult.IncorrectSPW;
 
             if (result == LoginResult.Success)
                 await _characterRepository.Delete(character!);

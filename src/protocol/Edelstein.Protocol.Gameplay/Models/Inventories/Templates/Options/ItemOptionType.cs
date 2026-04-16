@@ -12,5 +12,5 @@ public enum ItemOptionType
     AnyPants = 53,
     AnyGloves = 54,
     AnyShoe = 55,
-    AnyAccessoryNotBelt = 90
+    AnyAccessoryNotBelt = 90,
 }

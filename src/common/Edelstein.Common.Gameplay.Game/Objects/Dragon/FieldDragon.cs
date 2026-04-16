@@ -9,30 +9,30 @@ using Edelstein.Protocol.Utilities.Spatial;
 
 namespace Edelstein.Common.Gameplay.Game.Objects.Dragon;
 
-public class FieldDragon : 
-    AbstractFieldLife<IFieldDragonMovePath, IFieldDragonMoveAction>, 
-    IFieldDragon
+public class FieldDragon
+    : AbstractFieldLife<IFieldDragonMovePath, IFieldDragonMoveAction>,
+        IFieldDragon
 {
     public FieldDragon(
         IFieldUser owner,
         short jobCode,
-        IFieldDragonMoveAction action, 
-        IPoint2D position, 
+        IFieldDragonMoveAction action,
+        IPoint2D position,
         IFieldFoothold? foothold = null
-    ) : base(action, position, foothold)
+    )
+        : base(action, position, foothold)
     {
         Owner = owner;
         JobCode = jobCode;
     }
 
     public override FieldObjectType Type => FieldObjectType.Etc;
-    
+
     public IFieldUser Owner { get; }
     public short JobCode { get; }
-    
-    public Task Move(IPoint2D position, IFieldFoothold? foothold)
-        => Move(position, foothold, true);
-    
+
+    public Task Move(IPoint2D position, IFieldFoothold? foothold) => Move(position, foothold, true);
+
     public override IPacket GetEnterFieldPacket()
     {
         using var packet = new PacketWriter(PacketSendOperations.DragonEnterField);
@@ -49,7 +49,7 @@ public class FieldDragon :
     public override IPacket GetLeaveFieldPacket()
     {
         using var packet = new PacketWriter(PacketSendOperations.DragonLeaveField);
-        
+
         packet.WriteInt(Owner.Character.ID);
         return packet.Build();
     }
@@ -57,7 +57,7 @@ public class FieldDragon :
     protected override IPacket GetMovePacket(IFieldDragonMovePath ctx)
     {
         using var packet = new PacketWriter(PacketSendOperations.DragonMove);
-        
+
         packet.WriteInt(Owner.Character.ID);
         packet.Write(ctx);
         return packet.Build();

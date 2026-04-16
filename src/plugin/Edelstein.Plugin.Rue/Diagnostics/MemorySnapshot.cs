@@ -22,7 +22,8 @@ public record MemorySnapshot(
     int? WorldItemPtr,
     bool ConnectionDlgExists,
     bool WorldSelectExists,
-    int? WorldIdx)
+    int? WorldIdx
+)
 {
     public string Describe()
     {
@@ -41,7 +42,9 @@ public record MemorySnapshot(
         sb.AppendLine();
         sb.AppendLine("[CLogin]");
         sb.AppendLine($"  m_bRequestSent: {RequestSent?.ToString() ?? "null"}");
-        sb.AppendLine($"  m_nLoginStep: {LoginStep?.ToString() ?? "null"} ({DescribeLoginStep(LoginStep)})");
+        sb.AppendLine(
+            $"  m_nLoginStep: {LoginStep?.ToString() ?? "null"} ({DescribeLoginStep(LoginStep)})"
+        );
         sb.AppendLine($"  m_tStepChanging: {StepChanging?.ToString() ?? "null"}");
         sb.AppendLine($"  m_nCharSelected: {CharSelected?.ToString() ?? "null"}");
         sb.AppendLine($"  m_bLoginOpt: {LoginOpt?.ToString() ?? "null"}");
@@ -58,8 +61,7 @@ public record MemorySnapshot(
         return sb.ToString();
     }
 
-    private static string FormatPtr(int? ptr)
-        => ptr.HasValue ? $"0x{ptr.Value:X8}" : "null";
+    private static string FormatPtr(int? ptr) => ptr.HasValue ? $"0x{ptr.Value:X8}" : "null";
 
     private static string DescribeLoginStep(int? step) =>
         step.HasValue && Enum.IsDefined(typeof(LoginStep), step.Value)

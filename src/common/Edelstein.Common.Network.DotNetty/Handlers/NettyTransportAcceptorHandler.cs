@@ -13,7 +13,11 @@ public class NettyTransportAcceptorHandler : ChannelHandlerAdapter
     private readonly IRepository<string, ISocket> _sockets;
     private readonly TransportVersion _version;
 
-    public NettyTransportAcceptorHandler(TransportVersion version, IAdapterInitializer initializer, IRepository<string, ISocket> sockets)
+    public NettyTransportAcceptorHandler(
+        TransportVersion version,
+        IAdapterInitializer initializer,
+        IRepository<string, ISocket> sockets
+    )
     {
         _version = version;
         _initializer = initializer;
@@ -23,11 +27,7 @@ public class NettyTransportAcceptorHandler : ChannelHandlerAdapter
     public override void ChannelActive(IChannelHandlerContext context)
     {
         var random = new Random();
-        var newSocket = new NettySocket(
-            context.Channel,
-            (uint)random.Next(),
-            (uint)random.Next()
-        );
+        var newSocket = new NettySocket(context.Channel, (uint)random.Next(), (uint)random.Next());
         var newAdapter = _initializer.Initialize(newSocket);
         using var handshake = new PacketWriter();
 
@@ -59,7 +59,8 @@ public class NettyTransportAcceptorHandler : ChannelHandlerAdapter
         adapter?.OnDisconnect();
         base.ChannelInactive(context);
 
-        if (adapter == null) return;
+        if (adapter == null)
+            return;
 
         _ = _sockets.Delete(adapter.Socket);
     }
@@ -68,7 +69,7 @@ public class NettyTransportAcceptorHandler : ChannelHandlerAdapter
     {
         var adapter = context.Channel.GetAttribute(NettyAttributes.AdapterKey).Get();
         using var packet = (IPacket)message;
-        
+
         adapter?.OnPacket(packet);
     }
 

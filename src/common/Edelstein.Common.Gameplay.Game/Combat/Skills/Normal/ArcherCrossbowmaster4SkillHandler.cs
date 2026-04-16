@@ -10,7 +10,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class ArcherCrossbowmaster4SkillHandler : ArcherCrossbowmaster3SkillHandler
 {
     public override int ID => Job.Crossbowmaster;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -18,7 +18,7 @@ public class ArcherCrossbowmaster4SkillHandler : ArcherCrossbowmaster3SkillHandl
             case Skill.CrossbowmasterSharpEyes:
                 var cr = context.SkillLevel!.X;
                 var cd = context.SkillLevel!.CDMax;
-                
+
                 context.AddTemporaryStat(TemporaryStatType.SharpEyes, (cr << 8) + cd);
                 break;
             case Skill.CrossbowmasterBlind:
@@ -29,7 +29,7 @@ public class ArcherCrossbowmaster4SkillHandler : ArcherCrossbowmaster3SkillHandl
                 context.AddSummoned(MoveAbilityType.Fly, SummonedAssistType.Attack);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

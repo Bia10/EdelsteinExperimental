@@ -8,5 +8,5 @@ public enum MoveAbilityType
     Jump = 0x3,
     Fly = 0x4,
     FlyRandom = 0x5,
-    Escort = 0x6
+    Escort = 0x6,
 }

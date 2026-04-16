@@ -12,9 +12,12 @@ public partial class RuntimeFunctionDumper
         if (candidates.Count <= maxCount)
             return candidates;
 
-        return [.. candidates
-            .OrderByDescending(_knownPointers.ContainsKey)
-            .ThenBy(addr => addr)
-            .Take(maxCount)];
+        return
+        [
+            .. candidates
+                .OrderByDescending(_knownPointers.ContainsKey)
+                .ThenBy(addr => addr)
+                .Take(maxCount),
+        ];
     }
 }

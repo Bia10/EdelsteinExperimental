@@ -18,15 +18,12 @@ public class NotifyGuildNoticeChangedPlug : IPipelinePlug<NotifyGuildNoticeChang
 {
     private readonly IGameStage _stage;
 
-    public NotifyGuildNoticeChangedPlug(IGameStage stage) =>
-        _stage = stage;
+    public NotifyGuildNoticeChangedPlug(IGameStage stage) => _stage = stage;
 
     public async Task Handle(IPipelineContext ctx, NotifyGuildNoticeChanged message)
     {
         var users = await _stage.Users.RetrieveAll();
-        var affected = users
-            .Where(u => u.Guild?.ID == message.GuildID)
-            .ToImmutableArray();
+        var affected = users.Where(u => u.Guild?.ID == message.GuildID).ToImmutableArray();
 
         foreach (var user in affected)
         {

@@ -2,7 +2,4 @@
 
 namespace Edelstein.Common.Gameplay.Game.Combat.Contexts;
 
-public record SkillContextTemporaryStatExisting(
-    TemporaryStatType Type,
-    int Value
-);
+public record SkillContextTemporaryStatExisting(TemporaryStatType Type, int Value);

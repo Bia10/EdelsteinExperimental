@@ -8,9 +8,9 @@ namespace Edelstein.Common.Gameplay.Models.Characters.Skills.Templates;
 public class SkillTemplateLevel : ISkillTemplateLevel
 {
     public int ID => Level;
-    
+
     public int Level { get; }
-    
+
     public short HP { get; }
     public short MP { get; }
 
@@ -131,7 +131,7 @@ public class SkillTemplateLevel : ISkillTemplateLevel
     public SkillTemplateLevel(int level, IDataNode node)
     {
         Level = level;
-        
+
         HP = node.ResolveShort("hp") ?? 0;
         MP = node.ResolveShort("mp") ?? 0;
 

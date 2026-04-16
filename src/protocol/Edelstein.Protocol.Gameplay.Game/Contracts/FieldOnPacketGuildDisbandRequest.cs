@@ -1,7 +1,5 @@
-using Edelstein.Protocol.Gameplay.Game.Objects.User;
+﻿using Edelstein.Protocol.Gameplay.Game.Objects.User;
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketGuildDisbandRequest(
-    IFieldUser User
-);
+public record FieldOnPacketGuildDisbandRequest(IFieldUser User);

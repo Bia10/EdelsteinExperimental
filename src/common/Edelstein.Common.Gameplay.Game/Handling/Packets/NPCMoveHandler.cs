@@ -11,12 +11,14 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
 public class NPCMoveHandler : AbstractPipedFieldNPCHandler<FieldOnPacketNPCMove>
 {
-    public NPCMoveHandler(IPipeline<FieldOnPacketNPCMove> pipeline) : base(pipeline)
-    {
-    }
-    
+    public NPCMoveHandler(IPipeline<FieldOnPacketNPCMove> pipeline)
+        : base(pipeline) { }
+
     public override short Operation => (short)PacketRecvOperations.NpcMove;
 
-    protected override FieldOnPacketNPCMove? Serialize(IFieldUser user, IFieldNPC npc, IPacketReader reader)
-        => new(user, npc, reader.Read(new FieldNPCMovePath(npc.Template.Move)));
+    protected override FieldOnPacketNPCMove? Serialize(
+        IFieldUser user,
+        IFieldNPC npc,
+        IPacketReader reader
+    ) => new(user, npc, reader.Read(new FieldNPCMovePath(npc.Template.Move)));
 }

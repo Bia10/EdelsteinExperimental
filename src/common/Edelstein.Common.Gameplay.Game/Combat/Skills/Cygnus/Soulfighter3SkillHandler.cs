@@ -7,7 +7,7 @@ using Edelstein.Protocol.Gameplay.Models.Characters.Stats;
 
 namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Cygnus;
 
-public class Soulfighter3SkillHandler: Soulfighter2SkillHandler
+public class Soulfighter3SkillHandler : Soulfighter2SkillHandler
 {
     public override int ID => Job.Soulfighter3;
 
@@ -16,7 +16,7 @@ public class Soulfighter3SkillHandler: Soulfighter2SkillHandler
         await this.HandleAttackComboCounter(context, user);
         await base.HandleAttack(context, user);
     }
-    
+
     public override Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
     {
         switch (context.Skill?.ID)
@@ -30,7 +30,7 @@ public class Soulfighter3SkillHandler: Soulfighter2SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
 
@@ -53,7 +53,7 @@ public class Soulfighter3SkillHandler: Soulfighter2SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.WeaponCharge, context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

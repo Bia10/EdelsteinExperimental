@@ -7,21 +7,25 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
-public class UserCharacterInfoRequest : AbstractPipedFieldHandler<FieldOnPacketUserCharacterInfoRequest>
+public class UserCharacterInfoRequest
+    : AbstractPipedFieldHandler<FieldOnPacketUserCharacterInfoRequest>
 {
-    public UserCharacterInfoRequest(IPipeline<FieldOnPacketUserCharacterInfoRequest> pipeline) : base(pipeline)
-    {
-    }
+    public UserCharacterInfoRequest(IPipeline<FieldOnPacketUserCharacterInfoRequest> pipeline)
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.UserCharacterInfoRequest;
-    
-    protected override FieldOnPacketUserCharacterInfoRequest? Serialize(IFieldUser user, IPacketReader reader)
+
+    protected override FieldOnPacketUserCharacterInfoRequest? Serialize(
+        IFieldUser user,
+        IPacketReader reader
+    )
     {
         _ = reader.ReadInt();
         var objID = reader.ReadInt();
         var obj = user.Field?.GetPool(FieldObjectType.User)?.GetObject(objID);
 
-        if (obj is not IFieldUser target) return default;
+        if (obj is not IFieldUser target)
+            return default;
 
         return new(user, target);
     }

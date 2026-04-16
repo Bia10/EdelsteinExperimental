@@ -11,21 +11,28 @@ using Edelstein.Protocol.Utilities.Tickers;
 
 namespace Edelstein.Common.Gameplay.Game.Objects.Summoned;
 
-public class FieldSummoned : 
-    AbstractFieldLife<IFieldSummonedMovePath, IFieldSummonedMoveAction>, 
-    IFieldSummoned,
-    ITickable
+public class FieldSummoned
+    : AbstractFieldLife<IFieldSummonedMovePath, IFieldSummonedMoveAction>,
+        IFieldSummoned,
+        ITickable
 {
     public FieldSummoned(
-        IFieldUser owner, 
-        int skillID, 
-        byte skillLevel, 
-        MoveAbilityType moveAbility, 
-        SummonedAssistType assistType, 
+        IFieldUser owner,
+        int skillID,
+        byte skillLevel,
+        MoveAbilityType moveAbility,
+        SummonedAssistType assistType,
         IPoint2D position,
         IFieldFoothold? foothold = null,
         DateTime? dateExpire = null
-    ) : base(new FieldSummonedMoveAction(Convert.ToByte(owner.Action.Direction == MoveActionDirection.Left)), position, foothold)
+    )
+        : base(
+            new FieldSummonedMoveAction(
+                Convert.ToByte(owner.Action.Direction == MoveActionDirection.Left)
+            ),
+            position,
+            foothold
+        )
     {
         Owner = owner;
         SkillID = skillID;
@@ -34,27 +41,24 @@ public class FieldSummoned :
         AssistType = assistType;
         DateExpire = dateExpire;
     }
-    
+
     public IFieldUser Owner { get; }
 
     public int SkillID { get; }
     public byte SkillLevel { get; }
-    
+
     public MoveAbilityType MoveAbility { get; }
     public SummonedAssistType AssistType { get; }
-    
+
     public DateTime? DateExpire { get; }
 
     public override FieldObjectType Type => FieldObjectType.Summoned;
-    
-    public Task Move(IPoint2D position, IFieldFoothold? foothold)
-        => Move(position, foothold, true);
-    
-    public override IPacket GetEnterFieldPacket()
-        => GetEnterFieldPacket(0);
-    
-    public override IPacket GetLeaveFieldPacket()
-        => GetLeaveFieldPacket(3);
+
+    public Task Move(IPoint2D position, IFieldFoothold? foothold) => Move(position, foothold, true);
+
+    public override IPacket GetEnterFieldPacket() => GetEnterFieldPacket(0);
+
+    public override IPacket GetLeaveFieldPacket() => GetLeaveFieldPacket(3);
 
     public IPacket GetEnterFieldPacket(byte enterType)
     {
@@ -73,14 +77,14 @@ public class FieldSummoned :
 
         packet.WriteByte((byte)MoveAbility);
         packet.WriteByte((byte)AssistType);
-        
+
         packet.WriteByte(enterType);
 
         packet.WriteBool(false); // AvatarLook
 
         return packet.Build();
     }
-    
+
     public IPacket GetLeaveFieldPacket(byte leaveType)
     {
         using var packet = new PacketWriter(PacketSendOperations.SummonedLeaveField);
@@ -102,11 +106,12 @@ public class FieldSummoned :
 
         return packet.Build();
     }
-    
+
     public async Task OnTick(DateTime now)
     {
-        if (Field == null) return;
-        if (now > DateExpire) 
+        if (Field == null)
+            return;
+        if (now > DateExpire)
             await Field.Leave(this, () => GetLeaveFieldPacket(0));
     }
 }

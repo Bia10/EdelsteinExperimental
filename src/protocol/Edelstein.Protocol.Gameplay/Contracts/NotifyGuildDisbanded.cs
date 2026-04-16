@@ -1,6 +1,3 @@
-namespace Edelstein.Protocol.Gameplay.Contracts;
+﻿namespace Edelstein.Protocol.Gameplay.Contracts;
 
-public record NotifyGuildDisbanded(
-    int CharacterID,
-    int GuildID
-);
+public record NotifyGuildDisbanded(int CharacterID, int GuildID);

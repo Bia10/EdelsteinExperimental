@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <Import Project="..\Plugin.targets" />
 
   <ItemGroup>
@@ -28,8 +27,11 @@
       <RueOutputFiles Include="$(OutputPath)**\*.*" />
     </ItemGroup>
     <MakeDir Directories="$(ServerPluginDir)" />
-    <Copy SourceFiles="@(RueOutputFiles)" DestinationFiles="@(RueOutputFiles->'$(ServerPluginDir)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy
+      SourceFiles="@(RueOutputFiles)"
+      DestinationFiles="@(RueOutputFiles->'$(ServerPluginDir)%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true"
+    />
     <Message Importance="high" Text="[Rue] Copied changed files to $(ServerPluginDir)" />
   </Target>
-
 </Project>

@@ -40,7 +40,7 @@ public class AdminSuperGMSkillHandler : AdminSkillHandler
                 context.AddTemporaryStat(TemporaryStatType.MaxMP, context.SkillLevel!.Y);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

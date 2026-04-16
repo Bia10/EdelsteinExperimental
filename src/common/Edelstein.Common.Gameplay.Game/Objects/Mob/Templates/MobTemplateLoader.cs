@@ -20,22 +20,23 @@ public class MobTemplateLoader : ITemplateLoader
     {
         var directory = _data.ResolvePath("Mob")?.Cache();
 
-        if (directory == null) return 0;
+        if (directory == null)
+            return 0;
 
-        await Task.WhenAll(directory.Children
-            .Where(n => n.Name.Split(".")[0].All(char.IsDigit))
-            .Select(async n =>
-            {
-                var id = Convert.ToInt32(n.Name.Split(".")[0]);
-                await _manager.Insert(new TemplateProviderLazy<IMobTemplate>(
-                    id,
-                    () => new MobTemplate(
-                        id,
-                        n.Cache(),
-                        n.ResolvePath("info")!.Cache()
-                    )
-                ));
-            }));
+        await Task.WhenAll(
+            directory
+                .Children.Where(n => n.Name.Split(".")[0].All(char.IsDigit))
+                .Select(async n =>
+                {
+                    var id = Convert.ToInt32(n.Name.Split(".")[0]);
+                    await _manager.Insert(
+                        new TemplateProviderLazy<IMobTemplate>(
+                            id,
+                            () => new MobTemplate(id, n.Cache(), n.ResolvePath("info")!.Cache())
+                        )
+                    );
+                })
+        );
 
         _manager.Freeze();
         return _manager.Count;

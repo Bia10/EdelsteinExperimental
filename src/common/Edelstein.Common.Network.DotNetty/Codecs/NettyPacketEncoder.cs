@@ -14,11 +14,7 @@ public class NettyPacketEncoder : MessageToByteEncoder<IPacket>
     private readonly IGCipher _igCipher;
     private readonly TransportVersion _version;
 
-    public NettyPacketEncoder(
-        TransportVersion version,
-        AESCipher aesCipher,
-        IGCipher igCipher
-    )
+    public NettyPacketEncoder(TransportVersion version, AESCipher aesCipher, IGCipher igCipher)
     {
         _version = version;
         _aesCipher = aesCipher;
@@ -34,9 +30,9 @@ public class NettyPacketEncoder : MessageToByteEncoder<IPacket>
         var socket = context.Channel.GetAttribute(NettyAttributes.SocketKey).Get();
         var dataLen = message.Length;
         var buffer = ArrayPool<byte>.Shared.Rent(dataLen);
-        
+
         Array.Copy(message.Buffer, buffer, dataLen);
-        
+
         if (socket != null)
         {
             var seqSend = socket.SeqSend;
@@ -59,7 +55,7 @@ public class NettyPacketEncoder : MessageToByteEncoder<IPacket>
             output.WriteShortLE(dataLen);
             output.WriteBytes(buffer, 0, dataLen);
         }
-        
+
         ArrayPool<byte>.Shared.Return(buffer);
     }
 }

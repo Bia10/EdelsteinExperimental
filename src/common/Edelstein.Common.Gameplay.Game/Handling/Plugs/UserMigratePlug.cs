@@ -11,7 +11,6 @@ public class UserMigratePlug : AbstractUserMigratePlug<IGameStage, IGameStageUse
         ILogger<AbstractUserMigratePlug<IGameStage, IGameStageUser>> logger,
         IGameStage stage,
         IMigrationService migrationService
-    ) : base(logger, stage, migrationService)
-    {
-    }
+    )
+        : base(logger, stage, migrationService) { }
 }

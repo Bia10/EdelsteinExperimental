@@ -1,6 +1,3 @@
 ﻿namespace Edelstein.Protocol.Services.Social.Contracts;
 
-public record FriendUpdateChannelRequest(
-    int CharacterID,
-    int ChannelID
-);
+public record FriendUpdateChannelRequest(int CharacterID, int ChannelID);

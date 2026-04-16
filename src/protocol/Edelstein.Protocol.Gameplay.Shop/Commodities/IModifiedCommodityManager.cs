@@ -2,8 +2,8 @@
 
 namespace Edelstein.Protocol.Gameplay.Shop.Commodities;
 
-public interface IModifiedCommodityManager :
-    IRepositoryMethodInsert<int, IModifiedCommodity>,
-    IRepositoryMethodRetrieve<int, IModifiedCommodity>,
-    IRepositoryMethodRetrieveAll<int, IModifiedCommodity>,
-    IRepositoryMethodDelete<int, IModifiedCommodity>;
+public interface IModifiedCommodityManager
+    : IRepositoryMethodInsert<int, IModifiedCommodity>,
+        IRepositoryMethodRetrieve<int, IModifiedCommodity>,
+        IRepositoryMethodRetrieveAll<int, IModifiedCommodity>,
+        IRepositoryMethodDelete<int, IModifiedCommodity>;

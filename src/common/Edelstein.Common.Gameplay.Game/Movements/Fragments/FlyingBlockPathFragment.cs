@@ -11,9 +11,8 @@ public class FlyingBlockPathFragment<TMoveAction> : ActionPathFragment<TMoveActi
     private IPoint2D _position;
     private IPoint2D _vPosition;
 
-    public FlyingBlockPathFragment(MovePathFragmentType type) : base(type)
-    {
-    }
+    public FlyingBlockPathFragment(MovePathFragmentType type)
+        : base(type) { }
 
     protected override void ReadBody(IPacketReader reader)
     {

@@ -23,7 +23,7 @@ public class WarriorPaladin3SkillHandler : WarriorPaladin2SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
 

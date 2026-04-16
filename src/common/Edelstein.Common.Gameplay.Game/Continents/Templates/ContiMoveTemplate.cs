@@ -1,4 +1,4 @@
-using Duey.Abstractions;
+﻿using Duey.Abstractions;
 using Edelstein.Protocol.Gameplay.Game.Continents.Templates;
 
 namespace Edelstein.Common.Gameplay.Game.Continents.Templates;
@@ -28,7 +28,8 @@ public record ContiMoveTemplate : IContiMoveTemplate
         Term = scheduler.ResolveInt("tTerm") ?? 1;
         Delay = scheduler.ResolveInt("tDelay") ?? 0;
 
-        if (genMob != null) GenMob = new ContiMoveTemplateGenMob(genMob);
+        if (genMob != null)
+            GenMob = new ContiMoveTemplateGenMob(genMob);
 
         Wait = time.ResolveInt("tWait") ?? 1;
         EventEnd = time.ResolveInt("tEventEnd") ?? 0;

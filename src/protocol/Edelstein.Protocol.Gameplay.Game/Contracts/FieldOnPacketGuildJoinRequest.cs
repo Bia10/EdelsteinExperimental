@@ -8,7 +8,4 @@ namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 /// Wire payload: inviterID(4) + myCharacterID(4) — client sends the inviterID,
 /// not the guildID; the service looks up the pending invitation by inviterID.
 /// </summary>
-public record FieldOnPacketGuildJoinRequest(
-    IFieldUser User,
-    int InviterID
-);
+public record FieldOnPacketGuildJoinRequest(IFieldUser User, int InviterID);

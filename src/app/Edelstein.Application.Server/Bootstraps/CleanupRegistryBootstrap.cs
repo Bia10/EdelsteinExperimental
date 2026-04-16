@@ -15,7 +15,8 @@ public class CleanupRegistryBootstrap : IBootstrap
     public CleanupRegistryBootstrap(
         ILogger<CleanupRegistryBootstrap> logger,
         IDbContextFactory<ServerDbContext> dbFactory,
-        ProgramConfig config)
+        ProgramConfig config
+    )
     {
         _logger = logger;
         _dbFactory = dbFactory;
@@ -26,37 +27,39 @@ public class CleanupRegistryBootstrap : IBootstrap
 
     public async Task Start()
     {
-        if (!_config.CleanupRegistryOnInit) return;
+        if (!_config.CleanupRegistryOnInit)
+            return;
 
         await using var db = await _dbFactory.CreateDbContextAsync();
         var now = DateTime.UtcNow;
-        var stageIDs = _config.LoginStages.Select(static s => s.ID)
+        var stageIDs = _config
+            .LoginStages.Select(static s => s.ID)
             .Concat(_config.GameStages.Select(static s => s.ID))
             .Concat(_config.ShopStages.Select(static s => s.ID))
             .Concat(_config.TradeStages.Select(static s => s.ID))
             .ToHashSet(StringComparer.Ordinal);
-        var gameStages = _config.GameStages
-            .Select(static s => (s.WorldID, s.ChannelID))
+        var gameStages = _config
+            .GameStages.Select(static s => (s.WorldID, s.ChannelID))
             .ToHashSet();
-        var shopStages = _config.ShopStages
-            .Select(static s => s.WorldID)
-            .ToHashSet();
-        var tradeStages = _config.TradeStages
-            .Select(static s => s.WorldID)
-            .ToHashSet();
-        var entries = await db.Servers
-            .ToListAsync();
+        var shopStages = _config.ShopStages.Select(static s => s.WorldID).ToHashSet();
+        var tradeStages = _config.TradeStages.Select(static s => s.WorldID).ToHashSet();
+        var entries = await db.Servers.ToListAsync();
 
-        // Remove entries that are expired OR match current stages (to allow fresh registration)  
+        // Remove entries that are expired OR match current stages (to allow fresh registration)
         var removable = entries
             .Where(s => s.DateExpire < now || stageIDs.Contains(s.ID))
-            .Where(s => s switch
-            {
-                ServerGameEntity game => !gameStages.Contains((game.WorldID, game.ChannelID)) || stageIDs.Contains(s.ID),
-                ServerShopEntity shop => !shopStages.Contains(shop.WorldID) || stageIDs.Contains(s.ID),
-                ServerTradeEntity trade => !tradeStages.Contains(trade.WorldID) || stageIDs.Contains(s.ID),
-                _ => stageIDs.Contains(s.ID)
-            })
+            .Where(s =>
+                s switch
+                {
+                    ServerGameEntity game => !gameStages.Contains((game.WorldID, game.ChannelID))
+                        || stageIDs.Contains(s.ID),
+                    ServerShopEntity shop => !shopStages.Contains(shop.WorldID)
+                        || stageIDs.Contains(s.ID),
+                    ServerTradeEntity trade => !tradeStages.Contains(trade.WorldID)
+                        || stageIDs.Contains(s.ID),
+                    _ => stageIDs.Contains(s.ID),
+                }
+            )
             .DistinctBy(static s => s.ID)
             .ToList();
 

@@ -37,7 +37,7 @@ public class MagicianFirePoison3SkillHandler : MagicianFirePoison2SkillHandler
 
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -50,7 +50,11 @@ public class MagicianFirePoison3SkillHandler : MagicianFirePoison2SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.Booster, context.SkillLevel!.X);
                 break;
             case Skill.Mage1TeleportMastery:
-                context.AddTemporaryStat(TemporaryStatType.TeleportMasteryOn, context.SkillLevel!.X, expire: DateTime.MaxValue);
+                context.AddTemporaryStat(
+                    TemporaryStatType.TeleportMasteryOn,
+                    context.SkillLevel!.X,
+                    expire: DateTime.MaxValue
+                );
                 break;
             case Skill.Mage1ElementalReset:
                 context.AddTemporaryStat(TemporaryStatType.ElementalReset, context.SkillLevel!.X);

@@ -1,7 +1,7 @@
 ﻿using System.Buffers.Binary;
 using System.Text;
-using Edelstein.Common.Gameplay.Login.Types;
 using Edelstein.Common.Gameplay.Handling;
+using Edelstein.Common.Gameplay.Login.Types;
 using Edelstein.Plugin.Rue.ClientAnalysis;
 
 namespace Edelstein.Plugin.Rue.Diagnostics;
@@ -31,10 +31,14 @@ public static class CrashAnalyzer
     private const int CharacterNamesMaxCount = 10;
     private const int CharacterNamesEntryStride = 150;
 
-
-    public static void ParseCrashBuffer(short type, ReadOnlySpan<byte> buffer, Dictionary<string, object?> details)
+    public static void ParseCrashBuffer(
+        short type,
+        ReadOnlySpan<byte> buffer,
+        Dictionary<string, object?> details
+    )
     {
-        if (buffer.Length < MinimumCrashBufferLength) return;
+        if (buffer.Length < MinimumCrashBufferLength)
+            return;
 
         try
         {
@@ -44,7 +48,8 @@ public static class CrashAnalyzer
                     if (buffer.Length >= 1)
                     {
                         details["parsedResult"] = buffer[0];
-                        details["parsedResultName"] = buffer[0] == ResultSuccess ? "SUCCESS" : $"FAIL({buffer[0]})";
+                        details["parsedResultName"] =
+                            buffer[0] == ResultSuccess ? "SUCCESS" : $"FAIL({buffer[0]})";
                         if (buffer[0] == ResultSuccess && buffer.Length >= 2)
                         {
                             details["parsedCharCount"] = buffer[1];
@@ -81,9 +86,7 @@ public static class CrashAnalyzer
                     break;
             }
         }
-        catch
-        {
-        }
+        catch { }
     }
 
     public static string AnalyzeCrash(short type, int errorCode)
@@ -98,20 +101,34 @@ public static class CrashAnalyzer
                 sb.AppendLine("    1. CWvsContext->m_nWorldID not set before SelectWorldResult");
                 sb.AppendLine("    2. CWvsContext->m_nChannelID not set before SelectWorldResult");
                 sb.AppendLine("    3. CLogin->m_bRequestSent not set to 1");
-                sb.AppendLine("    4. CLogin->m_tStepChanging was non-zero (client was transitioning)");
+                sb.AppendLine(
+                    "    4. CLogin->m_tStepChanging was non-zero (client was transitioning)"
+                );
                 sb.AppendLine("    5. Character parsing failed (malformed packet data)");
-                sb.AppendLine("    6. CUIChannelSelect->m_pWorldItem is NULL or has garbage worldID");
-                sb.AppendLine("    7. CUIWorldSelect->m_nWorldIdx was garbage when CUIChannelSelect was created");
+                sb.AppendLine(
+                    "    6. CUIChannelSelect->m_pWorldItem is NULL or has garbage worldID"
+                );
+                sb.AppendLine(
+                    "    7. CUIWorldSelect->m_nWorldIdx was garbage when CUIChannelSelect was created"
+                );
                 break;
 
             case (short)PacketSendOperations.CheckUserLimitResult:
-                sb.AppendLine("  CRASH IN: CLogin::OnCheckUserLimitResult → CUIWorldSelect::UserLimitResult");
+                sb.AppendLine(
+                    "  CRASH IN: CLogin::OnCheckUserLimitResult → CUIWorldSelect::UserLimitResult"
+                );
                 sb.AppendLine("  POSSIBLE CAUSES:");
-                sb.AppendLine("    1. CUIWorldSelect does not exist (WorldInformation not processed yet)");
+                sb.AppendLine(
+                    "    1. CUIWorldSelect does not exist (WorldInformation not processed yet)"
+                );
                 sb.AppendLine("    2. CheckUserLimitResult sent before WorldInformation");
                 sb.AppendLine("    3. CUIWorldSelect->m_nWorldIdx not set (garbage value)");
-                sb.AppendLine("  FIX: Wait for CUIWorldSelect to exist before sending CheckUserLimitResult");
-                sb.AppendLine("       AND set CUIWorldSelect->m_nWorldIdx before CheckUserLimitResult");
+                sb.AppendLine(
+                    "  FIX: Wait for CUIWorldSelect to exist before sending CheckUserLimitResult"
+                );
+                sb.AppendLine(
+                    "       AND set CUIWorldSelect->m_nWorldIdx before CheckUserLimitResult"
+                );
                 break;
 
             case (short)PacketSendOperations.WorldInformation:
@@ -163,21 +180,34 @@ public static class CrashAnalyzer
     private static List<string> ExtractCharacterNames(ReadOnlySpan<byte> buffer)
     {
         var names = new List<string>();
-        if (buffer.Length < MinimumCharacterNamesBufferLength) return names;
+        if (buffer.Length < MinimumCharacterNamesBufferLength)
+            return names;
 
         var offset = CharacterNamesInitialOffset;
         Span<char> charBuffer = stackalloc char[CharacterNameMaxLength];
-        while (offset + MinimumCharacterNamesBufferLength < buffer.Length && names.Count < CharacterNamesMaxCount)
+        while (
+            offset + MinimumCharacterNamesBufferLength < buffer.Length
+            && names.Count < CharacterNamesMaxCount
+        )
         {
             offset += CharacterNamesEntryPrefixBytes;
 
-            if (offset + CharacterNamesLengthBytes > buffer.Length) break;
+            if (offset + CharacterNamesLengthBytes > buffer.Length)
+                break;
             var lengthSlice = buffer[offset..(offset + CharacterNamesLengthBytes)];
             var strLen = (int)BinaryPrimitives.ReadUInt16LittleEndian(lengthSlice);
 
-            if (strLen > 0 && strLen <= CharacterNameMaxLength && offset + CharacterNamesLengthBytes + strLen <= buffer.Length)
+            if (
+                strLen > 0
+                && strLen <= CharacterNameMaxLength
+                && offset + CharacterNamesLengthBytes + strLen <= buffer.Length
+            )
             {
-                var nameSlice = buffer[(offset + CharacterNamesLengthBytes)..(offset + CharacterNamesLengthBytes + strLen)];
+                var nameSlice = buffer[
+                    (offset + CharacterNamesLengthBytes)..(
+                        offset + CharacterNamesLengthBytes + strLen
+                    )
+                ];
                 var charsWritten = Encoding.ASCII.GetChars(nameSlice, charBuffer);
                 var name = new string(charBuffer[..charsWritten]);
 
@@ -200,7 +230,9 @@ public static class CrashAnalyzer
     private static string GetLoginResultName(byte resultCode)
     {
         var result = (LoginResult)resultCode;
-        return Enum.IsDefined(typeof(LoginResult), result) ? result.ToString() : $"UNKNOWN({resultCode})";
+        return Enum.IsDefined(typeof(LoginResult), result)
+            ? result.ToString()
+            : $"UNKNOWN({resultCode})";
     }
 
     public static string GetNTStatusName(int errorCode)
@@ -229,7 +261,7 @@ public static class CrashAnalyzer
             Win32Api.NtStatus.Breakpoint => "STATUS_BREAKPOINT",
             Win32Api.NtStatus.SingleStep => "STATUS_SINGLE_STEP",
             Win32Api.NtStatus.CppException => "C++ EXCEPTION (throw)",
-            _ => $"UNKNOWN (0x{(uint)errorCode:X8})"
+            _ => $"UNKNOWN (0x{(uint)errorCode:X8})",
         };
     }
 
@@ -238,19 +270,22 @@ public static class CrashAnalyzer
         var status = (Win32Api.NtStatus)(uint)errorCode;
         return status switch
         {
-            Win32Api.NtStatus.AccessViolation => "    The code tried to read or write to an invalid memory address.\n" +
-                          "    Common causes: NULL pointer, freed memory, stack corruption, bad cast.",
-            Win32Api.NtStatus.StackOverflow => "    The call stack exceeded its size limit.\n" +
-                          "    Common causes: Infinite recursion, excessive local variables.",
+            Win32Api.NtStatus.AccessViolation =>
+                "    The code tried to read or write to an invalid memory address.\n"
+                    + "    Common causes: NULL pointer, freed memory, stack corruption, bad cast.",
+            Win32Api.NtStatus.StackOverflow => "    The call stack exceeded its size limit.\n"
+                + "    Common causes: Infinite recursion, excessive local variables.",
             Win32Api.NtStatus.IntegerDivideByZero => "    Integer division by zero.",
-            Win32Api.NtStatus.IllegalInstruction => "    CPU encountered an invalid instruction.\n" +
-                          "    Common causes: Jump to bad address, corrupted function pointer.",
-            Win32Api.NtStatus.NonContinuableException => "    A non-continuable exception was raised.",
-            Win32Api.NtStatus.Breakpoint => "    A software breakpoint was hit (INT3 instruction).\n" +
-                          "    This might be a debug assertion or intentional crash.",
-            Win32Api.NtStatus.CppException => "    A C++ exception was thrown and not caught.\n" +
-                          "    The code threw an exception that propagated to the top level.",
-            _ => "    No additional description available for this error code."
+            Win32Api.NtStatus.IllegalInstruction => "    CPU encountered an invalid instruction.\n"
+                + "    Common causes: Jump to bad address, corrupted function pointer.",
+            Win32Api.NtStatus.NonContinuableException =>
+                "    A non-continuable exception was raised.",
+            Win32Api.NtStatus.Breakpoint =>
+                "    A software breakpoint was hit (INT3 instruction).\n"
+                    + "    This might be a debug assertion or intentional crash.",
+            Win32Api.NtStatus.CppException => "    A C++ exception was thrown and not caught.\n"
+                + "    The code threw an exception that propagated to the top level.",
+            _ => "    No additional description available for this error code.",
         };
     }
 }

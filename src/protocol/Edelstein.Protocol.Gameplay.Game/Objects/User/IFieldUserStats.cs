@@ -3,15 +3,15 @@
 public interface IFieldUserStats
 {
     int Level { get; }
-    
+
     int STR { get; }
     int DEX { get; }
     int INT { get; }
     int LUK { get; }
-    
+
     int MaxHP { get; }
     int MaxMP { get; }
-    
+
     int PAD { get; }
     int PDD { get; }
     int MAD { get; }
@@ -23,7 +23,7 @@ public interface IFieldUserStats
     int Craft { get; }
     int Speed { get; }
     int Jump { get; }
-    
+
     int STRr { get; }
     int DEXr { get; }
     int INTr { get; }
@@ -36,7 +36,7 @@ public interface IFieldUserStats
     int MDDr { get; }
     int ACCr { get; }
     int EVAr { get; }
-    
+
     int PACC { get; }
     int MACC { get; }
     int PEVA { get; }
@@ -44,7 +44,7 @@ public interface IFieldUserStats
 
     int Ar { get; }
     int Er { get; }
-    
+
     int Cr { get; }
     int CDMin { get; }
     int CDMax { get; }
@@ -56,15 +56,15 @@ public interface IFieldUserStats
     int BossDamR { get; }
 
     int Mastery { get; }
-    
+
     int AttackSpeedBase { get; }
     int AttackSpeed { get; }
 
     int DamageMin { get; }
     int DamageMax { get; }
-    
+
     int CompletedSetItemID { get; }
-    
+
     IFieldUserStatsSkillLevels SkillLevels { get; }
 
     Task Apply(IFieldUser user);

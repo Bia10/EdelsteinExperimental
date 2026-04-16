@@ -12,25 +12,28 @@ public record ItemOptionTemplate : IItemOptionTemplate
 
         var info = node.ResolvePath("info");
         var level = node.ResolvePath("level");
-        
+
         Grade = (ItemOptionGrade)(id / 10000);
         Type = (ItemOptionType)(info?.ResolveShort("optionType") ?? 0);
-        
+
         ReqLevel = info?.ResolveShort("reqLevel") ?? 0;
 
-        Levels = level?.Children
-            .ToFrozenDictionary(
+        Levels =
+            level?.Children.ToFrozenDictionary(
                 l => Convert.ToInt32(l.Name),
-                l => (IItemOptionTemplateLevel)new ItemOptionTemplateLevel(Convert.ToInt32(l.Name), l.Cache())
-            ) ?? FrozenDictionary<int, IItemOptionTemplateLevel>.Empty;
+                l =>
+                    (IItemOptionTemplateLevel)
+                        new ItemOptionTemplateLevel(Convert.ToInt32(l.Name), l.Cache())
+            )
+            ?? FrozenDictionary<int, IItemOptionTemplateLevel>.Empty;
     }
-    
+
     public int ID { get; }
-    
+
     public ItemOptionGrade Grade { get; }
     public ItemOptionType Type { get; }
-    
+
     public short ReqLevel { get; }
-    
+
     public IDictionary<int, IItemOptionTemplateLevel> Levels { get; }
 }

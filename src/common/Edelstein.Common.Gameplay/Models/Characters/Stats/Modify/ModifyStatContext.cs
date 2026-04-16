@@ -9,9 +9,8 @@ public class ModifyStatContext : IModifyStatContext
 {
     private readonly ICharacter _character;
 
-    public ModifyStatContext(ICharacter character)
-        => _character = character;
-    
+    public ModifyStatContext(ICharacter character) => _character = character;
+
     public ModifyStatType Flag { get; set; }
 
     public byte Skin
@@ -171,20 +170,25 @@ public class ModifyStatContext : IModifyStatContext
         {
             if (Level >= 200 || JobConstants.GetJobRace(Job) == 1 && Level >= 120)
             {
-                if (_character.EXP > 0) 
+                if (_character.EXP > 0)
                     value = 0;
-                else return;
+                else
+                    return;
             }
 
             Flag |= ModifyStatType.EXP;
             _character.EXP = value;
 
-            if (EXP < EXPTable.CharacterEXP[_character.Level]) return;
+            if (EXP < EXPTable.CharacterEXP[_character.Level])
+                return;
 
-            _character.EXP = Math.Max(0, Math.Min(
-                EXPTable.CharacterEXP[_character.Level] - 1,
-                _character.EXP - EXPTable.CharacterEXP[_character.Level - 1]
-            ));
+            _character.EXP = Math.Max(
+                0,
+                Math.Min(
+                    EXPTable.CharacterEXP[_character.Level] - 1,
+                    _character.EXP - EXPTable.CharacterEXP[_character.Level - 1]
+                )
+            );
 
             LevelUp();
         }
@@ -220,18 +224,19 @@ public class ModifyStatContext : IModifyStatContext
         }
     }
 
-    public void IncExtendSP(byte jobLevel, byte amount)
-        => SetExtendSP(jobLevel, (byte)((_character.ExtendSP[jobLevel] ?? 0) + amount));
-    
+    public void IncExtendSP(byte jobLevel, byte amount) =>
+        SetExtendSP(jobLevel, (byte)((_character.ExtendSP[jobLevel] ?? 0) + amount));
+
     public void SetExtendSP(byte jobLevel, byte amount)
     {
         Flag |= ModifyStatType.SP;
         _character.ExtendSP.Records[jobLevel] = amount;
     }
-    
+
     public void LevelUp()
     {
-        if (Level >= 200 || JobConstants.GetJobRace(Job) == 1 && Level >= 120) return;
+        if (Level >= 200 || JobConstants.GetJobRace(Job) == 1 && Level >= 120)
+            return;
 
         Level++;
 
@@ -243,38 +248,57 @@ public class ModifyStatContext : IModifyStatContext
         MaxHP = Math.Min(999999, MaxHP + hpBonus);
         MaxMP = Math.Min(999999, MaxMP + mpBonus);
 
-        if (HP < MaxHP) HP = MaxHP;
-        if (MP < MaxMP) MP = MaxMP;
+        if (HP < MaxHP)
+            HP = MaxHP;
+        if (MP < MaxMP)
+            MP = MaxMP;
 
-        if (Level <= 10) return;
+        if (Level <= 10)
+            return;
         if (JobConstants.IsExtendSPJob(Job))
         {
             byte jobLevel = 0;
 
             if (JobConstants.GetJobRace(Job) == 2 && JobConstants.GetJobType(Job) == 2)
             {
-                if (Level <= 200) jobLevel = 10;
-                if (Level <= 160) jobLevel = 9;
-                if (Level <= 120) jobLevel = 8;
-                if (Level <= 100) jobLevel = 7;
-                if (Level <= 80) jobLevel = 6;
-                if (Level <= 60) jobLevel = 5;
-                if (Level <= 50) jobLevel = 4;
-                if (Level <= 40) jobLevel = 3;
-                if (Level <= 30) jobLevel = 2;
-                if (Level <= 20) jobLevel = 1;
+                if (Level <= 200)
+                    jobLevel = 10;
+                if (Level <= 160)
+                    jobLevel = 9;
+                if (Level <= 120)
+                    jobLevel = 8;
+                if (Level <= 100)
+                    jobLevel = 7;
+                if (Level <= 80)
+                    jobLevel = 6;
+                if (Level <= 60)
+                    jobLevel = 5;
+                if (Level <= 50)
+                    jobLevel = 4;
+                if (Level <= 40)
+                    jobLevel = 3;
+                if (Level <= 30)
+                    jobLevel = 2;
+                if (Level <= 20)
+                    jobLevel = 1;
             }
             else
             {
-                if (Level <= 200) jobLevel = 4;
-                if (Level <= 120) jobLevel = 3;
-                if (Level <= 70) jobLevel = 2;
-                if (Level <= 30) jobLevel = 1;
+                if (Level <= 200)
+                    jobLevel = 4;
+                if (Level <= 120)
+                    jobLevel = 3;
+                if (Level <= 70)
+                    jobLevel = 2;
+                if (Level <= 30)
+                    jobLevel = 1;
             }
 
-            if (jobLevel > 0) IncExtendSP(jobLevel, 3);
+            if (jobLevel > 0)
+                IncExtendSP(jobLevel, 3);
         }
-        else SP += 3;
+        else
+            SP += 3;
         AP += 5;
 
         if (Level >= 200 || JobConstants.GetJobRace(Job) == 1 && Level >= 120)
@@ -285,39 +309,57 @@ public class ModifyStatContext : IModifyStatContext
     {
         writer.WriteInt((int)Flag);
 
-        if ((Flag & ModifyStatType.Skin) != 0) writer.WriteByte(Skin);
-        if ((Flag & ModifyStatType.Face) != 0) writer.WriteInt(Face);
-        if ((Flag & ModifyStatType.Hair) != 0) writer.WriteInt(Hair);
+        if ((Flag & ModifyStatType.Skin) != 0)
+            writer.WriteByte(Skin);
+        if ((Flag & ModifyStatType.Face) != 0)
+            writer.WriteInt(Face);
+        if ((Flag & ModifyStatType.Hair) != 0)
+            writer.WriteInt(Hair);
 
         // if ((Flag & ModifyStatType.Pet) != 0) writer.WriteLong(Pet1);
         // if ((Flag & ModifyStatType.Pet2) != 0) writer.WriteLong(Pet2);
         // if ((Flag & ModifyStatType.Pet3) != 0) writer.WriteLong(Pet3);
 
-        if ((Flag & ModifyStatType.Level) != 0) writer.WriteByte(Level);
-        if ((Flag & ModifyStatType.Job) != 0) writer.WriteShort(Job);
-        if ((Flag & ModifyStatType.STR) != 0) writer.WriteShort(STR);
-        if ((Flag & ModifyStatType.DEX) != 0) writer.WriteShort(DEX);
-        if ((Flag & ModifyStatType.INT) != 0) writer.WriteShort(INT);
-        if ((Flag & ModifyStatType.LUK) != 0) writer.WriteShort(LUK);
+        if ((Flag & ModifyStatType.Level) != 0)
+            writer.WriteByte(Level);
+        if ((Flag & ModifyStatType.Job) != 0)
+            writer.WriteShort(Job);
+        if ((Flag & ModifyStatType.STR) != 0)
+            writer.WriteShort(STR);
+        if ((Flag & ModifyStatType.DEX) != 0)
+            writer.WriteShort(DEX);
+        if ((Flag & ModifyStatType.INT) != 0)
+            writer.WriteShort(INT);
+        if ((Flag & ModifyStatType.LUK) != 0)
+            writer.WriteShort(LUK);
 
-        if ((Flag & ModifyStatType.HP) != 0) writer.WriteInt(HP);
-        if ((Flag & ModifyStatType.MaxHP) != 0) writer.WriteInt(MaxHP);
-        if ((Flag & ModifyStatType.MP) != 0) writer.WriteInt(MP);
-        if ((Flag & ModifyStatType.MaxMP) != 0) writer.WriteInt(MaxMP);
+        if ((Flag & ModifyStatType.HP) != 0)
+            writer.WriteInt(HP);
+        if ((Flag & ModifyStatType.MaxHP) != 0)
+            writer.WriteInt(MaxHP);
+        if ((Flag & ModifyStatType.MP) != 0)
+            writer.WriteInt(MP);
+        if ((Flag & ModifyStatType.MaxMP) != 0)
+            writer.WriteInt(MaxMP);
 
-        if ((Flag & ModifyStatType.AP) != 0) writer.WriteShort(AP);
+        if ((Flag & ModifyStatType.AP) != 0)
+            writer.WriteShort(AP);
         if ((Flag & ModifyStatType.SP) != 0)
         {
             if (JobConstants.IsExtendSPJob(_character.Job))
                 writer.WriteCharacterExtendSP(_character.ExtendSP);
-            else 
+            else
                 writer.WriteShort(SP);
         }
 
-        if ((Flag & ModifyStatType.EXP) != 0) writer.WriteInt(EXP);
-        if ((Flag & ModifyStatType.POP) != 0) writer.WriteShort(POP);
+        if ((Flag & ModifyStatType.EXP) != 0)
+            writer.WriteInt(EXP);
+        if ((Flag & ModifyStatType.POP) != 0)
+            writer.WriteShort(POP);
 
-        if ((Flag & ModifyStatType.Money) != 0) writer.WriteInt(Money);
-        if ((Flag & ModifyStatType.TempEXP) != 0) writer.WriteInt(TempEXP);
+        if ((Flag & ModifyStatType.Money) != 0)
+            writer.WriteInt(Money);
+        if ((Flag & ModifyStatType.TempEXP) != 0)
+            writer.WriteInt(TempEXP);
     }
 }

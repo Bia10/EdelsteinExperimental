@@ -1,4 +1,4 @@
-using System.Collections.Frozen;
+﻿using System.Collections.Frozen;
 using Duey.Abstractions;
 using Edelstein.Protocol.Gameplay.Game.Objects.NPC.Templates;
 
@@ -6,7 +6,6 @@ namespace Edelstein.Common.Gameplay.Game.Objects.NPC.Templates;
 
 public record NPCTemplate : INPCTemplate
 {
-
     public NPCTemplate(int id, IDataNode node, IDataNode info)
     {
         ID = id;
@@ -19,12 +18,14 @@ public record NPCTemplate : INPCTemplate
         TrunkPut = info.ResolveInt("trunkPut") ?? 0;
         TrunkGet = info.ResolveInt("trunkGet") ?? 0;
 
-        Scripts = info.ResolvePath("script")?.Children
-                      .Where(p => p.Name.All(char.IsDigit)) // 1057006 causes errors
-                      .Select(p => new NPCTemplateScript(Convert.ToInt32(p.Name), p))
-                      .ToFrozenSet()
-                  ?? FrozenSet<NPCTemplateScript>.Empty;
+        Scripts =
+            info.ResolvePath("script")
+                ?.Children.Where(p => p.Name.All(char.IsDigit)) // 1057006 causes errors
+                .Select(p => new NPCTemplateScript(Convert.ToInt32(p.Name), p))
+                .ToFrozenSet()
+            ?? FrozenSet<NPCTemplateScript>.Empty;
     }
+
     public int ID { get; }
 
     public bool Move { get; }

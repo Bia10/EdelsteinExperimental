@@ -10,7 +10,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class ArcherBowmaster2SkillHandler : Archer1SkillHandler
 {
     public override int ID => Job.Hunter;
-    
+
     public override Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
     {
         switch (context.Skill?.ID)
@@ -20,10 +20,10 @@ public class ArcherBowmaster2SkillHandler : Archer1SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -35,7 +35,7 @@ public class ArcherBowmaster2SkillHandler : Archer1SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.SoulArrow, context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

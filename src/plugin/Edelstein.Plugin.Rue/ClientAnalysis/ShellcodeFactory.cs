@@ -5,11 +5,20 @@ namespace Edelstein.Plugin.Rue.ClientAnalysis;
 
 public sealed class ShellcodeFactory
 {
-    public byte[] BuildSendLoginPacketShellcode(IntPtr shellcodeAddr, IntPtr cLoginThis, IntPtr funcAddr, int worldId, int channelId)
+    public byte[] BuildSendLoginPacketShellcode(
+        IntPtr shellcodeAddr,
+        IntPtr cLoginThis,
+        IntPtr funcAddr,
+        int worldId,
+        int channelId
+    )
     {
-        if (shellcodeAddr == IntPtr.Zero) throw new ArgumentException("Shellcode address is required.", nameof(shellcodeAddr));
-        if (cLoginThis == IntPtr.Zero) throw new ArgumentException("CLogin instance address is required.", nameof(cLoginThis));
-        if (funcAddr == IntPtr.Zero) throw new ArgumentException("Function address is required.", nameof(funcAddr));
+        if (shellcodeAddr == IntPtr.Zero)
+            throw new ArgumentException("Shellcode address is required.", nameof(shellcodeAddr));
+        if (cLoginThis == IntPtr.Zero)
+            throw new ArgumentException("CLogin instance address is required.", nameof(cLoginThis));
+        if (funcAddr == IntPtr.Zero)
+            throw new ArgumentException("Function address is required.", nameof(funcAddr));
 
         var asm = new Assembler(32);
 

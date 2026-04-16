@@ -11,24 +11,31 @@ public class FieldOnPacketPartyLeaveRequestPlug : IPipelinePlug<FieldOnPacketPar
 {
     public async Task Handle(IPipelineContext ctx, FieldOnPacketPartyLeaveRequest message)
     {
-        if (message.User.StageUser.Party == null) return;
-        
-        var response = message.User.Character.ID == message.User.StageUser.Party.BossCharacterID
-            ? await message.User.StageUser.Context.Services.Party.Disband(new PartyDisbandRequest(
-                message.User.Character.ID,
-                message.User.StageUser.Party.ID
-            ))
-            : await message.User.StageUser.Context.Services.Party.Leave(new PartyLeaveRequest(
-                message.User.Character.ID,
-                message.User.Character.Name,
-                message.User.StageUser.Party.ID
-            ));
-        
-        if (response.Result == PartyResult.Success) return;
-        
+        if (message.User.StageUser.Party == null)
+            return;
+
+        var response =
+            message.User.Character.ID == message.User.StageUser.Party.BossCharacterID
+                ? await message.User.StageUser.Context.Services.Party.Disband(
+                    new PartyDisbandRequest(
+                        message.User.Character.ID,
+                        message.User.StageUser.Party.ID
+                    )
+                )
+                : await message.User.StageUser.Context.Services.Party.Leave(
+                    new PartyLeaveRequest(
+                        message.User.Character.ID,
+                        message.User.Character.Name,
+                        message.User.StageUser.Party.ID
+                    )
+                );
+
+        if (response.Result == PartyResult.Success)
+            return;
+
         var result = response.Result switch
         {
-            _ => PartyResultOperations.WithdrawPartyUnknown
+            _ => PartyResultOperations.WithdrawPartyUnknown,
         };
         using var packet = new PacketWriter(PacketSendOperations.PartyResult);
         packet.WriteByte((byte)result);

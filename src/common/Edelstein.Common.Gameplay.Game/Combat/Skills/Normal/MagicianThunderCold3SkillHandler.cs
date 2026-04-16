@@ -10,7 +10,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class MagicianThunderCold3SkillHandler : MagicianThunderCold2SkillHandler
 {
     public override int ID => Job.MageThunderCold;
-    
+
     public override Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
     {
         switch (context.Skill?.ID)
@@ -23,10 +23,10 @@ public class MagicianThunderCold3SkillHandler : MagicianThunderCold2SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -39,7 +39,11 @@ public class MagicianThunderCold3SkillHandler : MagicianThunderCold2SkillHandler
                 context.AddTemporaryStat(TemporaryStatType.Booster, context.SkillLevel!.X);
                 break;
             case Skill.Mage2TeleportMastery:
-                context.AddTemporaryStat(TemporaryStatType.TeleportMasteryOn, context.SkillLevel!.X, expire: DateTime.MaxValue);
+                context.AddTemporaryStat(
+                    TemporaryStatType.TeleportMasteryOn,
+                    context.SkillLevel!.X,
+                    expire: DateTime.MaxValue
+                );
                 break;
             case Skill.Mage2ElementalReset:
                 context.AddTemporaryStat(TemporaryStatType.ElementalReset, context.SkillLevel!.X);

@@ -15,18 +15,18 @@ public class ModifyInventoryGroupContext : AbstractModifyInventory, IModifyInven
     public ModifyInventoryGroupContext(
         ICharacterInventories inventories,
         ITemplateManager<IItemTemplate> manager
-    ) : this(
-        new Dictionary<ItemInventoryType, IItemInventory>
-        {
-            { ItemInventoryType.Equip, inventories.Equip },
-            { ItemInventoryType.Consume, inventories.Consume },
-            { ItemInventoryType.Install, inventories.Install },
-            { ItemInventoryType.Etc, inventories.Etc },
-            { ItemInventoryType.Cash, inventories.Cash }
-        },
-        manager)
-    {
-    }
+    )
+        : this(
+            new Dictionary<ItemInventoryType, IItemInventory>
+            {
+                { ItemInventoryType.Equip, inventories.Equip },
+                { ItemInventoryType.Consume, inventories.Consume },
+                { ItemInventoryType.Install, inventories.Install },
+                { ItemInventoryType.Etc, inventories.Etc },
+                { ItemInventoryType.Cash, inventories.Cash },
+            },
+            manager
+        ) { }
 
     private ModifyInventoryGroupContext(
         IDictionary<ItemInventoryType, IItemInventory> inventories,
@@ -41,12 +41,9 @@ public class ModifyInventoryGroupContext : AbstractModifyInventory, IModifyInven
         _contexts.Values.SelectMany(c => c.Operations);
 
     public IModifyInventoryContext? this[ItemInventoryType type] =>
-        _contexts.TryGetValue(type, out var context)
-            ? context 
-            : null;
+        _contexts.TryGetValue(type, out var context) ? context : null;
 
-    public override short Add(IItemSlot item) =>
-        this[GetTypeByID(item.ID)]?.Add(item) ?? -1;
+    public override short Add(IItemSlot item) => this[GetTypeByID(item.ID)]?.Add(item) ?? -1;
 
     public override void Remove(int templateID) =>
         this[GetTypeByID(templateID)]?.Remove(templateID);
@@ -77,7 +74,7 @@ public class ModifyInventoryGroupContext : AbstractModifyInventory, IModifyInven
         foreach (var context in _contexts.Values)
             context.Sort();
     }
-    
+
     public override void Clear()
     {
         foreach (var context in _contexts.Values)
@@ -100,12 +97,11 @@ public class ModifyInventoryGroupContext : AbstractModifyInventory, IModifyInven
         this[ItemInventoryType.Equip]?[(short)-(short)part] != null;
 
     public bool HasEquipped(int templateID) =>
-        this[ItemInventoryType.Equip]?.Items
-            .Where(kv => kv.Key < 0)
+        this[ItemInventoryType.Equip]
+            ?.Items.Where(kv => kv.Key < 0)
             .Count(kv => kv.Value.ID == templateID) > 0;
 
-    public bool HasEquipped(IItemTemplate template) =>
-        HasEquipped(template.ID);
+    public bool HasEquipped(IItemTemplate template) => HasEquipped(template.ID);
 
     public void SetEquipped(BodyPart part, int templateID) =>
         this[ItemInventoryType.Equip]?.SetSlot((short)-(short)part, templateID);
@@ -119,6 +115,5 @@ public class ModifyInventoryGroupContext : AbstractModifyInventory, IModifyInven
     public void SetEquipped(BodyPart part, IItemTemplate template, short count) =>
         this[ItemInventoryType.Equip]?.SetSlot((short)-(short)part, template.ID, count);
 
-    private ItemInventoryType GetTypeByID(int id)
-        => (ItemInventoryType)(id / 1_000_000);
+    private ItemInventoryType GetTypeByID(int id) => (ItemInventoryType)(id / 1_000_000);
 }

@@ -2,7 +2,9 @@
 
 public static class StructFieldRegistry
 {
-    private static readonly Dictionary<string, Dictionary<int, string>> Fields = new(StringComparer.Ordinal)
+    private static readonly Dictionary<string, Dictionary<int, string>> Fields = new(
+        StringComparer.Ordinal
+    )
     {
         ["CLogin"] = V95ClientStructs.CLogin,
         ["CWvsContext"] = V95ClientStructs.CWvsContext,
@@ -11,7 +13,7 @@ public static class StructFieldRegistry
         ["CQuestMan"] = V95ClientStructs.CQuestMan,
         ["CWvsApp"] = V95ClientStructs.CWvsApp,
         ["WorldItem"] = V95ClientStructs.WorldItem,
-        ["ChannelItem"] = V95ClientStructs.ChannelItem
+        ["ChannelItem"] = V95ClientStructs.ChannelItem,
     };
 
     private static readonly Dictionary<string, string> PointerFields = new(StringComparer.Ordinal)
@@ -19,7 +21,7 @@ public static class StructFieldRegistry
         [$"CUIWorldSelect:{V95ClientStructs.Offsets.CUIWorldSelect.Login}"] = "CLogin",
         [$"CUIChannelSelect:{V95ClientStructs.Offsets.CUIChannelSelect.Login}"] = "CLogin",
         [$"CUIChannelSelect:{V95ClientStructs.Offsets.CUIChannelSelect.WorldItem}"] = "WorldItem",
-        [$"WorldItem:{V95ClientStructs.Offsets.WorldItem.ChannelItemsPtr}"] = "ChannelItem"
+        [$"WorldItem:{V95ClientStructs.Offsets.WorldItem.ChannelItemsPtr}"] = "ChannelItem",
     };
 
     public static bool TryGetField(string typeName, int offset, out string fieldName)

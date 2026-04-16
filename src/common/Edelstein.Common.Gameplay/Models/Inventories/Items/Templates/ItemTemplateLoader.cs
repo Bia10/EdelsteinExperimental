@@ -1,4 +1,4 @@
-using System.Collections.Frozen;
+﻿using System.Collections.Frozen;
 using Duey.Abstractions;
 using Edelstein.Common.Utilities.Templates;
 using Edelstein.Protocol.Gameplay.Models.Inventories.Templates;
@@ -10,7 +10,7 @@ public class ItemTemplateLoader : ITemplateLoader
 {
     private readonly IDataNamespace _data;
     private readonly ITemplateManager<IItemTemplate> _manager;
-    
+
     public ItemTemplateLoader(IDataNamespace data, ITemplateManager<IItemTemplate> manager)
     {
         _data = data;
@@ -38,14 +38,14 @@ public class ItemTemplateLoader : ITemplateLoader
             dirCharacter?.ResolvePath("Shield"),
             dirCharacter?.ResolvePath("Shoes"),
             dirCharacter?.ResolvePath("TamingMob"),
-            dirCharacter?.ResolvePath("Weapon")
+            dirCharacter?.ResolvePath("Weapon"),
         };
         var nodesBundle = new List<IDataNode?>
         {
             dirItem?.ResolvePath("Cash"),
             dirItem?.ResolvePath("Consume"),
             dirItem?.ResolvePath("Etc"),
-            dirItem?.ResolvePath("Install")
+            dirItem?.ResolvePath("Install"),
         };
         var nodesPet = dirItem?.ResolvePath("Pet");
 
@@ -56,11 +56,14 @@ public class ItemTemplateLoader : ITemplateLoader
             {
                 var id = Convert.ToInt32(n.Name.Split(".")[0]);
                 var node = n.ResolvePath("info")?.Cache();
-                if (node == null) return;
-                await _manager.Insert(new TemplateProviderLazy<IItemTemplate>(
-                    id,
-                    () => new ItemEquipTemplate(id, node)
-                ));
+                if (node == null)
+                    return;
+                await _manager.Insert(
+                    new TemplateProviderLazy<IItemTemplate>(
+                        id,
+                        () => new ItemEquipTemplate(id, node)
+                    )
+                );
             })
             .ToFrozenSet();
         var loadBundle = nodesBundle
@@ -71,29 +74,33 @@ public class ItemTemplateLoader : ITemplateLoader
             {
                 var id = Convert.ToInt32(n.Name);
                 var node = n.ResolvePath("info")?.Cache();
-                if (node == null) return;
-                await _manager.Insert(new TemplateProviderLazy<IItemTemplate>(
-                    id,
-                    () => new ItemBundleTemplate(id, node)
-                ));
+                if (node == null)
+                    return;
+                await _manager.Insert(
+                    new TemplateProviderLazy<IItemTemplate>(
+                        id,
+                        () => new ItemBundleTemplate(id, node)
+                    )
+                );
             })
             .ToFrozenSet();
-        var loadPet = nodesPet?
-            .Select(async n =>
+        var loadPet = nodesPet
+            ?.Select(async n =>
             {
                 var id = Convert.ToInt32(n.Name.Split(".")[0]);
                 var node = n.ResolvePath("info")?.Cache();
-                if (node == null) return;
-                await _manager.Insert(new TemplateProviderLazy<IItemTemplate>(
-                    id,
-                    () => new ItemPetTemplate(id, node)
-                ));
+                if (node == null)
+                    return;
+                await _manager.Insert(
+                    new TemplateProviderLazy<IItemTemplate>(id, () => new ItemPetTemplate(id, node))
+                );
             })
             .ToFrozenSet();
 
         await Task.WhenAll(loadEquip);
         await Task.WhenAll(loadBundle);
-        if (loadPet != null) await Task.WhenAll(loadPet);
+        if (loadPet != null)
+            await Task.WhenAll(loadPet);
 
         _manager.Freeze();
         return _manager.Count;

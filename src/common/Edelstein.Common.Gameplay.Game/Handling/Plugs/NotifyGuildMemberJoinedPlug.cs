@@ -35,7 +35,11 @@ public class NotifyGuildMemberJoinedPlug : IPipelinePlug<NotifyGuildMemberJoined
         var users = await _stage.Users.RetrieveAll();
         var guildMembers = users
             .Where(u => u.Guild?.ID == message.GuildID)
-            .Append(await _stage.Users.Retrieve(message.NewMember.CharacterID) is { } newUser ? newUser : null!)
+            .Append(
+                await _stage.Users.Retrieve(message.NewMember.CharacterID) is { } newUser
+                    ? newUser
+                    : null!
+            )
             .Where(u => u != null)
             .DistinctBy(u => u.Character?.ID ?? 0)
             .ToImmutableArray();
@@ -47,8 +51,9 @@ public class NotifyGuildMemberJoinedPlug : IPipelinePlug<NotifyGuildMemberJoined
             if (!isNewMember && user.Guild != null)
             {
                 // Eagerly update the existing member's in-memory roster snapshot.
-                user.Guild.Members[message.NewMember.CharacterID] =
-                    new GuildMembershipMember(message.NewMember);
+                user.Guild.Members[message.NewMember.CharacterID] = new GuildMembershipMember(
+                    message.NewMember
+                );
             }
 
             using var packet = new PacketWriter(PacketSendOperations.GuildResult);

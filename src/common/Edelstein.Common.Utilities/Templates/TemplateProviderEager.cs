@@ -2,7 +2,8 @@
 
 namespace Edelstein.Common.Utilities.Templates;
 
-public class TemplateProviderEager<TTemplate> : ITemplateProvider<TTemplate> where TTemplate : ITemplate
+public class TemplateProviderEager<TTemplate> : ITemplateProvider<TTemplate>
+    where TTemplate : ITemplate
 {
     private readonly TTemplate _template;
 

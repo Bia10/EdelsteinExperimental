@@ -2,9 +2,7 @@
 
 namespace Edelstein.Common.Gameplay.Game.Objects.User.Effects;
 
-public record QuestEffect(
-    ICollection<Tuple<int, int>> Items
-) : IPacketWritable
+public record QuestEffect(ICollection<Tuple<int, int>> Items) : IPacketWritable
 {
     public void WriteTo(IPacketWriter writer)
     {

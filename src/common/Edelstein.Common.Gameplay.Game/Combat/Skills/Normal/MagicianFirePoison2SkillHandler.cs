@@ -9,26 +9,32 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class MagicianFirePoison2SkillHandler : Magician1SkillHandler
 {
     public override int ID => Job.WizardFirePoison;
-    
-    public override async Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
+
+    public override async Task HandleAttackMob(
+        ISkillContext context,
+        IFieldUser user,
+        IFieldMob mob
+    )
     {
         switch (context.Skill?.ID)
         {
             case Skill.Wizard1PoisonBreath:
-                context.AddMobBurnedInfo(await user.Damage.CalculateBurnedDamage(
-                    user.Character,
-                    user.Stats,
-                    mob,
-                    mob.Stats,
-                    context.Skill!.ID,
-                    context.SkillLevel!.Level
-                ));
+                context.AddMobBurnedInfo(
+                    await user.Damage.CalculateBurnedDamage(
+                        user.Character,
+                        user.Stats,
+                        mob,
+                        mob.Stats,
+                        context.Skill!.ID,
+                        context.SkillLevel!.Level
+                    )
+                );
                 break;
         }
-        
+
         await base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

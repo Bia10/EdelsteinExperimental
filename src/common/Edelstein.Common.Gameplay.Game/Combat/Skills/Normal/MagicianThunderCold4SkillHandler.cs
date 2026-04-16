@@ -11,27 +11,33 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class MagicianThunderCold4SkillHandler : MagicianThunderCold3SkillHandler
 {
     public override int ID => Job.ArchmageThunderCold;
-    
-    public override async Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
+
+    public override async Task HandleAttackMob(
+        ISkillContext context,
+        IFieldUser user,
+        IFieldMob mob
+    )
     {
         switch (context.Skill?.ID)
         {
             case Skill.Archmage2IceDemon:
             case Skill.Archmage2Blizzard:
-                context.AddMobBurnedInfo(await user.Damage.CalculateBurnedDamage(
-                    user.Character,
-                    user.Stats,
-                    mob,
-                    mob.Stats,
-                    context.Skill!.ID,
-                    context.SkillLevel!.Level
-                ));
+                context.AddMobBurnedInfo(
+                    await user.Damage.CalculateBurnedDamage(
+                        user.Character,
+                        user.Stats,
+                        mob,
+                        mob.Stats,
+                        context.Skill!.ID,
+                        context.SkillLevel!.Level
+                    )
+                );
                 break;
         }
 
         await base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

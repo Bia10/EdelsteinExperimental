@@ -1,24 +1,37 @@
 ﻿using System.Text;
-using Iced.Intel;
-using IcedDecoder = Iced.Intel.Decoder;
-using Microsoft.Extensions.Logging;
 using Edelstein.Plugin.Rue.ClientAnalysis.RuntimeFunctionDumping;
+using Iced.Intel;
+using Microsoft.Extensions.Logging;
+using IcedDecoder = Iced.Intel.Decoder;
 
 namespace Edelstein.Plugin.Rue.ClientAnalysis;
 
 public partial class RuntimeFunctionDumper
 {
-    public FunctionDump? DumpFunction(string name, uint address, int maxBytes = 4096, int maxInstructions = 500)
+    public FunctionDump? DumpFunction(
+        string name,
+        uint address,
+        int maxBytes = 4096,
+        int maxInstructions = 500
+    )
     {
         var bytes = ReadBytes(address, maxBytes);
         if (bytes == null)
         {
-            _logger?.LogError("[FuncDump] Failed to read {Count} bytes from 0x{Addr:X8}", maxBytes, address);
+            _logger?.LogError(
+                "[FuncDump] Failed to read {Count} bytes from 0x{Addr:X8}",
+                maxBytes,
+                address
+            );
             return null;
         }
 
-        _logger?.LogDebug("[FuncDump] Read {Count} bytes from {Name} at 0x{Addr:X8}",
-            bytes.Length, name, address);
+        _logger?.LogDebug(
+            "[FuncDump] Read {Count} bytes from {Name} at 0x{Addr:X8}",
+            bytes.Length,
+            name,
+            address
+        );
 
         var rawBranches = new List<(uint Target, uint SourceIP, FlowControl Flow)>();
         var findings = new List<string>();
@@ -52,11 +65,15 @@ public partial class RuntimeFunctionDumper
             {
                 invalidCount++;
                 var badByte = bytes[(int)(instrIP - address)];
-                sb.AppendLine($"  {instrIP:x8}: {badByte:x2}                       db 0x{badByte:x2}");
+                sb.AppendLine(
+                    $"  {instrIP:x8}: {badByte:x2}                       db 0x{badByte:x2}"
+                );
 
                 if (invalidCount > 10)
                 {
-                    findings.Add("Stopped after 10+ consecutive invalid instructions — likely VM-protected code");
+                    findings.Add(
+                        "Stopped after 10+ consecutive invalid instructions — likely VM-protected code"
+                    );
                     break;
                 }
                 instructionCount++;
@@ -81,7 +98,7 @@ public partial class RuntimeFunctionDumper
             var hex = hexParts.ToString().TrimEnd();
 
             var annotation = AnnotateInstruction(instr, provenance);
-            var line = $"  {instrIP:x8}: {hex,-24} {text}";
+            var line = $"  {instrIP:x8}: {hex, -24} {text}";
             if (annotation != null)
                 line += $"  ; {annotation}";
             sb.AppendLine(line);
@@ -93,7 +110,9 @@ public partial class RuntimeFunctionDumper
                     var target = (uint)instr.NearBranchTarget;
                     rawBranches.Add((target, (uint)instrIP, instr.FlowControl));
 
-                    var targetLabel = _knownPointers.TryGetValue(target, out var kn) ? kn : $"sub_{target:X}";
+                    var targetLabel = _knownPointers.TryGetValue(target, out var kn)
+                        ? kn
+                        : $"sub_{target:X}";
                     var callType = instr.FlowControl == FlowControl.Call ? "Calls" : "Jumps to";
                     findings.Add($"{callType} 0x{target:X8} ({targetLabel})");
                 }
@@ -116,7 +135,9 @@ public partial class RuntimeFunctionDumper
 
             if (instructionCount >= maxInstructions)
             {
-                findings.Add($"Stopped after {maxInstructions} instructions (function may be longer)");
+                findings.Add(
+                    $"Stopped after {maxInstructions} instructions (function may be longer)"
+                );
                 break;
             }
         }
@@ -152,13 +173,17 @@ public partial class RuntimeFunctionDumper
             while (decoder2.IP < endAddress && total2 < instructionCount)
             {
                 var instr2 = decoder2.Decode();
-                if (instr2.IsInvalid) totalInvalid++;
+                if (instr2.IsInvalid)
+                    totalInvalid++;
                 total2++;
             }
 
             var invalidRatio = totalInvalid / (double)instructionCount;
             if (invalidRatio > 0.3)
-                findings.Insert(0, $"HIGH INVALID RATIO ({invalidRatio:P0}) — code may be VM-protected or packed");
+                findings.Insert(
+                    0,
+                    $"HIGH INVALID RATIO ({invalidRatio:P0}) — code may be VM-protected or packed"
+                );
         }
 
         {
@@ -170,7 +195,16 @@ public partial class RuntimeFunctionDumper
                 findings.Insert(0, "Function starts with JMP — likely a trampoline/redirect");
         }
 
-        return new FunctionDump(name, address, funcEnd, bytes.Length, bytes, sb.ToString(), classifiedTargets, findings);
+        return new FunctionDump(
+            name,
+            address,
+            funcEnd,
+            bytes.Length,
+            bytes,
+            sb.ToString(),
+            classifiedTargets,
+            findings
+        );
     }
 
     private string? AnnotateInstruction(Instruction instr, RegisterProvenance provenance)
@@ -203,7 +237,8 @@ public partial class RuntimeFunctionDumper
                     {
                         var label = fieldName;
                         if (fieldName.Contains(" / ", StringComparison.Ordinal))
-                            label = $"offset 0x{disp:X} (candidates: {fieldName.Replace(" / ", ", ")})";
+                            label =
+                                $"offset 0x{disp:X} (candidates: {fieldName.Replace(" / ", ", ")})";
                         return $"{accessType} {label} via [{instr.MemoryBase}+0x{disp:X}]";
                     }
                 }
@@ -217,7 +252,12 @@ public partial class RuntimeFunctionDumper
             }
         }
 
-        if (instr.FlowControl is FlowControl.Call or FlowControl.UnconditionalBranch or FlowControl.ConditionalBranch)
+        if (
+            instr.FlowControl
+            is FlowControl.Call
+                or FlowControl.UnconditionalBranch
+                or FlowControl.ConditionalBranch
+        )
         {
             if (instr.Op0Kind is OpKind.NearBranch32 or OpKind.NearBranch16)
             {
@@ -230,7 +270,11 @@ public partial class RuntimeFunctionDumper
         return null;
     }
 
-    private static void AnalyzeMemoryAccess(Instruction instr, List<string> findings, RegisterProvenance provenance)
+    private static void AnalyzeMemoryAccess(
+        Instruction instr,
+        List<string> findings,
+        RegisterProvenance provenance
+    )
     {
         for (var i = 0; i < instr.OpCount; i++)
         {
@@ -238,7 +282,8 @@ public partial class RuntimeFunctionDumper
                 continue;
 
             var disp = (int)instr.MemoryDisplacement32;
-            if (disp <= 0) continue;
+            if (disp <= 0)
+                continue;
 
             var isWrite = i == 0 && IsStoreInstruction(instr);
             var baseReg = instr.MemoryBase;
@@ -274,7 +319,7 @@ public partial class RuntimeFunctionDumper
             Mnemonic.Btr => true,
             Mnemonic.Bts => true,
             Mnemonic.Bound => false,
-            _ => true
+            _ => true,
         };
     }
 
@@ -289,7 +334,16 @@ public partial class RuntimeFunctionDumper
             return null;
 
         var buffer = new byte[count];
-        if (Win32Api.ReadProcessMemory(_processHandle, new IntPtr(address), buffer, count, out var bytesRead) && bytesRead > 0)
+        if (
+            Win32Api.ReadProcessMemory(
+                _processHandle,
+                new IntPtr(address),
+                buffer,
+                count,
+                out var bytesRead
+            )
+            && bytesRead > 0
+        )
             return buffer[..bytesRead];
 
         return null;

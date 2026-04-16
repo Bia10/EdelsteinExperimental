@@ -41,5 +41,5 @@ public enum LoginResult : byte
     SSNNotConfirmed = 0x21,
     WorldTooBusy = 0x22,
     OTPReissuing = 0x23,
-    OTPInfoNotExist = 0x24
+    OTPInfoNotExist = 0x24,
 }

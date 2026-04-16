@@ -12,12 +12,13 @@ public class NotifyPartyMemberInvitedPlug : IPipelinePlug<NotifyPartyMemberInvit
     private readonly IGameStage _stage;
 
     public NotifyPartyMemberInvitedPlug(IGameStage stage) => _stage = stage;
-    
+
     public async Task Handle(IPipelineContext ctx, NotifyPartyMemberInvited message)
     {
         var user = await _stage.Users.Retrieve(message.CharacterID);
-        if (user == null) return;
-        
+        if (user == null)
+            return;
+
         using var packet = new PacketWriter(PacketSendOperations.PartyResult);
         packet.WriteByte((byte)PartyRequestOperations.InviteParty);
         packet.WriteInt(message.PartyID);

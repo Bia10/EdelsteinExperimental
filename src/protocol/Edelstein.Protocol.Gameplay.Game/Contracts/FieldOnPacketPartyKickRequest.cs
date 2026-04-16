@@ -2,7 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketPartyKickRequest(
-    IFieldUser User,
-    int CharacterID
-);
+public record FieldOnPacketPartyKickRequest(IFieldUser User, int CharacterID);

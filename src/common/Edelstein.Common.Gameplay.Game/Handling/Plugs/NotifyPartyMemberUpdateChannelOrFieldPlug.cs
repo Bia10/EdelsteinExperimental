@@ -8,22 +8,22 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class NotifyPartyMemberUpdateChannelOrFieldPlug : IPipelinePlug<NotifyPartyMemberUpdateChannelOrField>
+public class NotifyPartyMemberUpdateChannelOrFieldPlug
+    : IPipelinePlug<NotifyPartyMemberUpdateChannelOrField>
 {
     private readonly IGameStage _stage;
-    
+
     public NotifyPartyMemberUpdateChannelOrFieldPlug(IGameStage stage) => _stage = stage;
-    
+
     public async Task Handle(IPipelineContext ctx, NotifyPartyMemberUpdateChannelOrField message)
     {
         var users = await _stage.Users.RetrieveAll();
-        var partied = users
-            .Where(u => u.Party?.PartyID == message.PartyID)
-            .ToImmutableArray();
-        
+        var partied = users.Where(u => u.Party?.PartyID == message.PartyID).ToImmutableArray();
+
         foreach (var user in partied)
         {
-            if (user.Party == null) continue;
+            if (user.Party == null)
+                continue;
             if (user.Party.CharacterID == message.CharacterID)
             {
                 user.Party.ChannelID = message.ChannelID;
@@ -35,7 +35,7 @@ public class NotifyPartyMemberUpdateChannelOrFieldPlug : IPipelinePlug<NotifyPar
                 member.ChannelID = message.ChannelID;
                 member.FieldID = message.FieldID;
             }
-            
+
             using var packet = new PacketWriter(PacketSendOperations.PartyResult);
             packet.WriteByte((byte)PartyResultOperations.UserMigration);
             packet.WriteInt(message.PartyID);

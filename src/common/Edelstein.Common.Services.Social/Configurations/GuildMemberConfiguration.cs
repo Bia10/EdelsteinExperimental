@@ -1,4 +1,4 @@
-using Edelstein.Common.Services.Social.Entities;
+﻿using Edelstein.Common.Services.Social.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,9 +12,7 @@ public class GuildMemberConfiguration : IEntityTypeConfiguration<GuildMemberEnti
 
         builder.HasKey(m => m.ID);
 
-        builder
-            .HasIndex(m => m.CharacterID)
-            .IsUnique();
+        builder.HasIndex(m => m.CharacterID).IsUnique();
 
         builder
             .HasOne(m => m.Guild)

@@ -8,7 +8,8 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class NotifyPartyMemberUpdateLevelOrJobPlug : IPipelinePlug<NotifyPartyMemberUpdateLevelOrJob>
+public class NotifyPartyMemberUpdateLevelOrJobPlug
+    : IPipelinePlug<NotifyPartyMemberUpdateLevelOrJob>
 {
     private readonly IGameStage _stage;
 
@@ -17,13 +18,12 @@ public class NotifyPartyMemberUpdateLevelOrJobPlug : IPipelinePlug<NotifyPartyMe
     public async Task Handle(IPipelineContext ctx, NotifyPartyMemberUpdateLevelOrJob message)
     {
         var users = await _stage.Users.RetrieveAll();
-        var partied = users
-            .Where(u => u.Party?.PartyID == message.PartyID)
-            .ToImmutableArray();
+        var partied = users.Where(u => u.Party?.PartyID == message.PartyID).ToImmutableArray();
 
         foreach (var user in partied)
         {
-            if (user.Party == null) continue;
+            if (user.Party == null)
+                continue;
             if (user.Party.CharacterID == message.CharacterID)
             {
                 user.Party.Level = message.Level;

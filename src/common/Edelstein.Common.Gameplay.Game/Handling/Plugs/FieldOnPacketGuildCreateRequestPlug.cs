@@ -26,7 +26,8 @@ public class FieldOnPacketGuildCreateRequestPlug : IPipelinePlug<FieldOnPacketGu
                 message.User.StageUser.Context.Options.ChannelID,
                 message.User.Field?.ID ?? 999999999,
                 message.GuildName
-            ));
+            )
+        );
 
         // Success → NotifyGuildCreated broadcast handles the full client update.
         if (response.Result == GuildResult.Success)
@@ -35,9 +36,10 @@ public class FieldOnPacketGuildCreateRequestPlug : IPipelinePlug<FieldOnPacketGu
         var opcode = response.Result switch
         {
             GuildResult.FailedAlreadyInGuild => GuildResultOperations.CreateNewGuild_AlreadyJoined,
-            GuildResult.FailedNameTaken => GuildResultOperations.CreateNewGuild_GuildNameAlreadyExist,
+            GuildResult.FailedNameTaken =>
+                GuildResultOperations.CreateNewGuild_GuildNameAlreadyExist,
             GuildResult.FailedBeginner => GuildResultOperations.CreateNewGuild_Beginner,
-            _ => GuildResultOperations.CreateNewGuild_Unknown
+            _ => GuildResultOperations.CreateNewGuild_Unknown,
         };
 
         using var packet = new PacketWriter(PacketSendOperations.GuildResult);

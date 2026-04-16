@@ -16,8 +16,9 @@ public class AuthService : IAuthService
         try
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
-            var identity = await db.Identities
-                .FirstOrDefaultAsync(i => i.Username.ToLower().Equals(request.Username.ToLower()));
+            var identity = await db.Identities.FirstOrDefaultAsync(i =>
+                i.Username.ToLower().Equals(request.Username.ToLower())
+            );
 
             if (identity == null)
                 return new AuthResponse(AuthResult.FailedInvalidUsername);
@@ -38,14 +39,20 @@ public class AuthService : IAuthService
         {
             await using var db = await _dbFactory.CreateDbContextAsync();
 
-            if (await db.Identities.AnyAsync(i => i.Username.ToLower().Equals(request.Username.ToLower())))
+            if (
+                await db.Identities.AnyAsync(i =>
+                    i.Username.ToLower().Equals(request.Username.ToLower())
+                )
+            )
                 return new AuthResponse(AuthResult.FailedUsernameExists);
 
-            db.Identities.Add(new IdentityEntity
-            {
-                Username = request.Username,
-                Password = BCrypt.Net.BCrypt.HashPassword(request.Password)
-            });
+            db.Identities.Add(
+                new IdentityEntity
+                {
+                    Username = request.Username,
+                    Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                }
+            );
             await db.SaveChangesAsync();
 
             return new AuthResponse(AuthResult.Success);

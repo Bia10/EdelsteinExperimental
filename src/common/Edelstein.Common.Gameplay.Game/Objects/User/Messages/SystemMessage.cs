@@ -2,9 +2,7 @@
 
 namespace Edelstein.Common.Gameplay.Game.Objects.User.Messages;
 
-public record SystemMessage(
-    string Message
-) : IPacketWritable
+public record SystemMessage(string Message) : IPacketWritable
 {
     public void WriteTo(IPacketWriter writer)
     {

@@ -9,10 +9,8 @@ public class AskAvatarRequest : AbstractConversationMessageRequest<byte>
     private readonly int[] _styles;
     private readonly string _text;
 
-    public AskAvatarRequest(
-        IConversationSpeaker speaker,
-        string text, int[] styles
-    ) : base(speaker)
+    public AskAvatarRequest(IConversationSpeaker speaker, string text, int[] styles)
+        : base(speaker)
     {
         _text = text;
         _styles = styles;
@@ -26,6 +24,7 @@ public class AskAvatarRequest : AbstractConversationMessageRequest<byte>
     {
         writer.WriteString(_text);
         writer.WriteByte((byte)_styles.Length);
-        foreach (var style in _styles) writer.WriteInt(style);
+        foreach (var style in _styles)
+            writer.WriteInt(style);
     }
 }

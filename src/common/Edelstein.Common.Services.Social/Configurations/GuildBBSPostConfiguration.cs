@@ -24,15 +24,10 @@ public class GuildBBSPostConfiguration : IEntityTypeConfiguration<GuildBBSPostEn
             .HasForeignKey(c => c.PostID)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder
-            .HasIndex(p => p.GuildID);
+        builder.HasIndex(p => p.GuildID);
 
-        builder
-            .Property(p => p.Title)
-            .HasMaxLength(25);
+        builder.Property(p => p.Title).HasMaxLength(25);
 
-        builder
-            .Property(p => p.Content)
-            .HasMaxLength(255);
+        builder.Property(p => p.Content).HasMaxLength(255);
     }
 }

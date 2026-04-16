@@ -2,7 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Contracts;
 
-public record NotifyFriendUpdateList(
-    int CharacterID,
-    IFriendList FriendList
-);
+public record NotifyFriendUpdateList(int CharacterID, IFriendList FriendList);

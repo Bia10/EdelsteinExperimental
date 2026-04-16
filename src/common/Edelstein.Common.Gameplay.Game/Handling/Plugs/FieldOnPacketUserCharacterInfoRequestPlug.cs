@@ -7,7 +7,8 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class FieldOnPacketUserCharacterInfoRequestPlug : IPipelinePlug<FieldOnPacketUserCharacterInfoRequest>
+public class FieldOnPacketUserCharacterInfoRequestPlug
+    : IPipelinePlug<FieldOnPacketUserCharacterInfoRequest>
 {
     public async Task Handle(IPipelineContext ctx, FieldOnPacketUserCharacterInfoRequest message)
     {
@@ -29,10 +30,10 @@ public class FieldOnPacketUserCharacterInfoRequestPlug : IPipelinePlug<FieldOnPa
 
         packet.WriteByte(0); // TamingMobInfo
 
-        var wishlist = message.Target.Character.Wishlist.Records
-            .Where(c => c > 0)
+        var wishlist = message
+            .Target.Character.Wishlist.Records.Where(c => c > 0)
             .ToImmutableArray();
-        
+
         packet.WriteByte((byte)wishlist.Length);
         foreach (var commodity in wishlist)
             packet.WriteInt(commodity);
@@ -40,12 +41,15 @@ public class FieldOnPacketUserCharacterInfoRequestPlug : IPipelinePlug<FieldOnPa
         packet.WriteInt(0); // MedalAchievementInfo
         packet.WriteShort(0);
 
-        var chairs = message.Target.Character.Inventories[ItemInventoryType.Install]?.Items
-            .Select(kv => kv.Value)
-            .Select(i => i.ID)
-            .Where(i => i / 10000 == 301)
-            .ToImmutableArray() ?? ImmutableArray<int>.Empty;
-        
+        var chairs =
+            message
+                .Target.Character.Inventories[ItemInventoryType.Install]
+                ?.Items.Select(kv => kv.Value)
+                .Select(i => i.ID)
+                .Where(i => i / 10000 == 301)
+                .ToImmutableArray()
+            ?? ImmutableArray<int>.Empty;
+
         packet.WriteInt(chairs.Length);
         foreach (var chair in chairs)
             packet.WriteInt(chair);

@@ -2,7 +2,5 @@
 
 namespace Edelstein.Protocol.Gameplay.Contracts;
 
-public record UserOnPacket<TStageUser>(
-    TStageUser User,
-    IPacket Packet
-) where TStageUser : IStageUser<TStageUser>;
+public record UserOnPacket<TStageUser>(TStageUser User, IPacket Packet)
+    where TStageUser : IStageUser<TStageUser>;

@@ -25,7 +25,8 @@ public class NotifyGuildMemberInvitedPlug : IPipelinePlug<NotifyGuildMemberInvit
     public async Task Handle(IPipelineContext ctx, NotifyGuildMemberInvited message)
     {
         var target = await _stage.Users.Retrieve(message.TargetCharacterID);
-        if (target == null) return;
+        if (target == null)
+            return;
 
         // Inviter job/level are not persisted in the notification; look them up
         // from the stage. Fall back to 0 if the inviter went offline.
@@ -42,4 +43,3 @@ public class NotifyGuildMemberInvitedPlug : IPipelinePlug<NotifyGuildMemberInvit
         _ = target.Dispatch(packet.Build());
     }
 }
-

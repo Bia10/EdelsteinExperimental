@@ -17,6 +17,6 @@ public enum QuestResultType
     FailedEquipped = 0xF,
     FailedOnlyItem = 0x10,
     FailedTimeOver = 0x11,
-    
-    ResetQuestTimer = 0x12
+
+    ResetQuestTimer = 0x12,
 }

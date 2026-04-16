@@ -2,7 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketUserMove(
-    IFieldUser User,
-    IFieldUserMovePath Path
-);
+public record FieldOnPacketUserMove(IFieldUser User, IFieldUserMovePath Path);

@@ -1,5 +1,3 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <Import Project="..\Protocol.targets" />
-
 </Project>

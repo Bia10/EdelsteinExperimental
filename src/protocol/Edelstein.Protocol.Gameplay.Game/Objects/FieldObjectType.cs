@@ -13,5 +13,5 @@ public enum FieldObjectType
     TownPortal,
     OpenGate,
     Reactor,
-    Etc
+    Etc,
 }

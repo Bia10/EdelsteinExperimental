@@ -20,10 +20,8 @@ public class FieldOnPacketGuildDisbandRequestPlug : IPipelinePlug<FieldOnPacketG
             return;
 
         var response = await message.User.StageUser.Context.Services.Guild.Disband(
-            new GuildDisbandRequest(
-                message.User.StageUser.Guild.ID,
-                message.User.Character.ID
-            ));
+            new GuildDisbandRequest(message.User.StageUser.Guild.ID, message.User.Character.ID)
+        );
 
         // Success → NotifyGuildDisbanded handles broadcast.
         if (response.Result == GuildResult.Success)

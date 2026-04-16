@@ -10,7 +10,10 @@ public class NPCStringTemplateLoader : ITemplateLoader
     private readonly IDataNamespace _data;
     private readonly ITemplateManager<INPCStringTemplate> _manager;
 
-    public NPCStringTemplateLoader(IDataNamespace data, ITemplateManager<INPCStringTemplate> manager)
+    public NPCStringTemplateLoader(
+        IDataNamespace data,
+        ITemplateManager<INPCStringTemplate> manager
+    )
     {
         _data = data;
         _manager = manager;
@@ -18,19 +21,22 @@ public class NPCStringTemplateLoader : ITemplateLoader
 
     public async Task<int> Load()
     {
-        await Task.WhenAll(_data.ResolvePath("String/Npc.img")?.Children
-            .Select(async n =>
-            {
-                var id = Convert.ToInt32(n.Name);
-                await _manager.Insert(new TemplateProviderEager<INPCStringTemplate>(
-                    id,
-                    new NPCStringTemplate(
-                        id,
-                        n.Cache()
-                    )
-                ));
-            }) ?? Array.Empty<Task>());
-        
+        await Task.WhenAll(
+            _data
+                .ResolvePath("String/Npc.img")
+                ?.Children.Select(async n =>
+                {
+                    var id = Convert.ToInt32(n.Name);
+                    await _manager.Insert(
+                        new TemplateProviderEager<INPCStringTemplate>(
+                            id,
+                            new NPCStringTemplate(id, n.Cache())
+                        )
+                    );
+                })
+                ?? Array.Empty<Task>()
+        );
+
         _manager.Freeze();
         return _manager.Count;
     }

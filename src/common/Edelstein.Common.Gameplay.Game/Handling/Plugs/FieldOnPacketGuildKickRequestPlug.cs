@@ -22,10 +22,11 @@ public class FieldOnPacketGuildKickRequestPlug : IPipelinePlug<FieldOnPacketGuil
         var response = await message.User.StageUser.Context.Services.Guild.Kick(
             new GuildKickRequest(
                 message.User.StageUser.Guild.ID,
-                message.User.Character.ID,        // masterID
+                message.User.Character.ID, // masterID
                 message.TargetCharacterID,
                 message.TargetCharacterName
-            ));
+            )
+        );
 
         // Success → NotifyGuildMemberWithdrawn (isKicked=true) handles broadcast.
         if (response.Result == GuildResult.Success)

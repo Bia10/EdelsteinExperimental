@@ -2,7 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketPartyInviteRequest(
-    IFieldUser User,
-    string CharacterName
-);
+public record FieldOnPacketPartyInviteRequest(IFieldUser User, string CharacterName);

@@ -39,5 +39,5 @@ public enum MobTemporaryStatType
     Weakness = 0x22,
     TimeBomb = 0x23,
     MagicCrash = 0x24,
-    HealByDamage = 0x25
+    HealByDamage = 0x25,
 }

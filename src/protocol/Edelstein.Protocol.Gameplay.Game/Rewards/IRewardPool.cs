@@ -2,7 +2,5 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Rewards;
 
-public interface IRewardPool<TReward> : 
-    IIdentifiable<int>,
-    IRepository<int, TReward> 
+public interface IRewardPool<TReward> : IIdentifiable<int>, IRepository<int, TReward>
     where TReward : IReward;

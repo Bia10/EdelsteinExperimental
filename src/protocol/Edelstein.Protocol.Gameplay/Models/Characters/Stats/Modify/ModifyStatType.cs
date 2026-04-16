@@ -30,5 +30,5 @@ public enum ModifyStatType
     POP = 0x20000,
 
     Money = 0x40000,
-    TempEXP = 0x200000
+    TempEXP = 0x200000,
 }

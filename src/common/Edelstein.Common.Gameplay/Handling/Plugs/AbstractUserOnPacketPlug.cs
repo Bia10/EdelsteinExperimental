@@ -9,9 +9,9 @@ public abstract class AbstractUserOnPacketPlug<TStageUser> : IPipelinePlug<UserO
 {
     private readonly IPacketHandlerManager<TStageUser> _handler;
 
-    public AbstractUserOnPacketPlug(IPacketHandlerManager<TStageUser> handler)
-        => _handler = handler;
+    public AbstractUserOnPacketPlug(IPacketHandlerManager<TStageUser> handler) =>
+        _handler = handler;
 
-    public Task Handle(IPipelineContext ctx, UserOnPacket<TStageUser> message)
-        => _handler.Process(message.User, message.Packet);
+    public Task Handle(IPipelineContext ctx, UserOnPacket<TStageUser> message) =>
+        _handler.Process(message.User, message.Packet);
 }

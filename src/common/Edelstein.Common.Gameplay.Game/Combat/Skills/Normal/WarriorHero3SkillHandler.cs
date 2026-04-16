@@ -31,7 +31,7 @@ public class WarriorHero3SkillHandler : WarriorHero2SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
 
@@ -50,7 +50,7 @@ public class WarriorHero3SkillHandler : WarriorHero2SkillHandler
                 context.ResetMobTemporaryStatPositive();
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

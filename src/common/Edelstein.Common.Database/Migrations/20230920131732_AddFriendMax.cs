@@ -15,15 +15,14 @@ namespace Edelstein.Common.Database.Migrations
                 table: "characters",
                 type: "smallint",
                 nullable: false,
-                defaultValue: (byte)0);
+                defaultValue: (byte)0
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "FriendMax",
-                table: "characters");
+            migrationBuilder.DropColumn(name: "FriendMax", table: "characters");
         }
     }
 }

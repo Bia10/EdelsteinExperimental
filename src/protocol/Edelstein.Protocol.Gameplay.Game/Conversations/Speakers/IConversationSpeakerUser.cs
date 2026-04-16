@@ -1,4 +1,4 @@
-using Edelstein.Protocol.Gameplay.Game.Conversations.Speakers.Facades;
+﻿using Edelstein.Protocol.Gameplay.Game.Conversations.Speakers.Facades;
 using Edelstein.Protocol.Utilities.Spatial;
 
 namespace Edelstein.Protocol.Gameplay.Game.Conversations.Speakers;
@@ -33,13 +33,13 @@ public interface IConversationSpeakerUser : IConversationSpeaker
     short POP { get; set; }
 
     int Money { get; set; }
-    
+
     int Gender { get; }
-    
+
     ISpeakerUserInventory Inventory { get; }
     ISpeakerUserQuests Quests { get; }
     ISpeakerField? Field { get; }
-        
+
     void IncEXP(int amount);
     void IncPOP(short amount);
     void IncMoney(int amount);
@@ -51,13 +51,18 @@ public interface IConversationSpeakerUser : IConversationSpeaker
 
     void Message(string message);
     void MessageScriptProgress(string message);
-    void MessageBalloon(string message, short? width = null, short? duration = null, IPoint2D? position = null);
-    
+    void MessageBalloon(
+        string message,
+        short? width = null,
+        short? duration = null,
+        IPoint2D? position = null
+    );
+
     void EffectPlayPortalSE();
     void EffectSquib(string path);
     void EffectReserved(string path);
     void EffectAvatarOriented(string path);
-    
+
     void EffectFieldScreen(string path);
     void EffectFieldTremble(bool isHeavyAndShort, int delay);
 

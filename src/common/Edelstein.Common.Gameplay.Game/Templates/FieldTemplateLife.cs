@@ -7,14 +7,14 @@ namespace Edelstein.Common.Gameplay.Game.Templates;
 
 public record FieldTemplateLife : IFieldTemplateLife
 {
-
     public FieldTemplateLife(IDataNode node)
     {
         ID = Convert.ToInt32(node.ResolveString("id") ?? "-1");
 
-        Type = node.ResolveString("type")?.ToLower() == "n"
-            ? FieldLifeType.NPC
-            : FieldLifeType.Monster;
+        Type =
+            node.ResolveString("type")?.ToLower() == "n"
+                ? FieldLifeType.NPC
+                : FieldLifeType.Monster;
 
         MobTime = node.ResolveInt("mobTime") ?? 0;
 
@@ -29,6 +29,7 @@ public record FieldTemplateLife : IFieldTemplateLife
         );
         FootholdID = node.ResolveInt("fh") ?? 0;
     }
+
     public int ID { get; }
 
     public FieldLifeType Type { get; }

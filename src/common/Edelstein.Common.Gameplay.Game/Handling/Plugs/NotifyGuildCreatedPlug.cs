@@ -21,7 +21,8 @@ public class NotifyGuildCreatedPlug : IPipelinePlug<NotifyGuildCreated>
     public async Task Handle(IPipelineContext ctx, NotifyGuildCreated message)
     {
         var user = await _stage.Users.Retrieve(message.CharacterID);
-        if (user == null) return;
+        if (user == null)
+            return;
 
         user.Guild = message.Guild;
 

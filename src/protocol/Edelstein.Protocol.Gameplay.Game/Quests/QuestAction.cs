@@ -3,5 +3,5 @@
 public enum QuestAction
 {
     Start,
-    End
+    End,
 }

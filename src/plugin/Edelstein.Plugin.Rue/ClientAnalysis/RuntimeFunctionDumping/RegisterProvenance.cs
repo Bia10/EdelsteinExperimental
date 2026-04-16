@@ -23,7 +23,10 @@ public sealed class RegisterProvenance
 
     public bool TryResolveField(Register baseReg, int disp, out string label)
     {
-        if (_registers.TryGetValue(baseReg, out var info) && info.Kind == RegisterValueKind.StructBase)
+        if (
+            _registers.TryGetValue(baseReg, out var info)
+            && info.Kind == RegisterValueKind.StructBase
+        )
         {
             var offset = info.BaseOffset + disp;
             if (StructFieldRegistry.TryGetField(info.TypeName, offset, out var fieldName))
@@ -100,22 +103,42 @@ public sealed class RegisterProvenance
                     Clear(dest);
                 break;
             case OpKind.Memory:
-                if (IsAbsoluteMemoryOperand(instr) && _singletonTypes.TryGetValue((uint)instr.MemoryDisplacement32, out var absType))
+                if (
+                    IsAbsoluteMemoryOperand(instr)
+                    && _singletonTypes.TryGetValue(
+                        (uint)instr.MemoryDisplacement32,
+                        out var absType
+                    )
+                )
                 {
                     SetStruct(dest, absType, 0);
                     return;
                 }
 
-                if (_registers.TryGetValue(instr.MemoryBase, out var baseInfo) && baseInfo.Kind == RegisterValueKind.SingletonPointerAddress && instr.MemoryIndex == Register.None)
+                if (
+                    _registers.TryGetValue(instr.MemoryBase, out var baseInfo)
+                    && baseInfo.Kind == RegisterValueKind.SingletonPointerAddress
+                    && instr.MemoryIndex == Register.None
+                )
                 {
                     SetStruct(dest, baseInfo.TypeName, 0);
                     return;
                 }
 
-                if (instr.MemoryIndex == Register.None && _registers.TryGetValue(instr.MemoryBase, out var structInfo) && structInfo.Kind == RegisterValueKind.StructBase)
+                if (
+                    instr.MemoryIndex == Register.None
+                    && _registers.TryGetValue(instr.MemoryBase, out var structInfo)
+                    && structInfo.Kind == RegisterValueKind.StructBase
+                )
                 {
                     var offset = structInfo.BaseOffset + (int)instr.MemoryDisplacement32;
-                    if (StructFieldRegistry.TryGetPointerTarget(structInfo.TypeName, offset, out var targetType))
+                    if (
+                        StructFieldRegistry.TryGetPointerTarget(
+                            structInfo.TypeName,
+                            offset,
+                            out var targetType
+                        )
+                    )
                     {
                         SetStruct(dest, targetType, 0);
                         return;
@@ -139,7 +162,11 @@ public sealed class RegisterProvenance
         var baseReg = instr.MemoryBase;
         var disp = (int)instr.MemoryDisplacement32;
 
-        if (_registers.TryGetValue(baseReg, out var baseInfo) && baseInfo.Kind == RegisterValueKind.StructBase && instr.MemoryIndex == Register.None)
+        if (
+            _registers.TryGetValue(baseReg, out var baseInfo)
+            && baseInfo.Kind == RegisterValueKind.StructBase
+            && instr.MemoryIndex == Register.None
+        )
         {
             SetStruct(dest, baseInfo.TypeName, baseInfo.BaseOffset + disp);
             return;
@@ -175,7 +202,9 @@ public sealed class RegisterProvenance
         if (instr.Op0Kind != OpKind.Register)
             return;
 
-        if (instr.Op1Kind is not (OpKind.Immediate8 or OpKind.Immediate32 or OpKind.Immediate32to64))
+        if (
+            instr.Op1Kind is not (OpKind.Immediate8 or OpKind.Immediate32 or OpKind.Immediate32to64)
+        )
             return;
 
         var reg = instr.Op0Register;
@@ -189,7 +218,11 @@ public sealed class RegisterProvenance
 
     private void ApplyZeroing(Instruction instr)
     {
-        if (instr.Op0Kind == OpKind.Register && instr.Op1Kind == OpKind.Register && instr.Op0Register == instr.Op1Register)
+        if (
+            instr.Op0Kind == OpKind.Register
+            && instr.Op1Kind == OpKind.Register
+            && instr.Op0Register == instr.Op1Register
+        )
             Clear(instr.Op0Register);
     }
 
@@ -206,7 +239,11 @@ public sealed class RegisterProvenance
 
     private void SetSingletonAddress(Register reg, string typeName)
     {
-        _registers[reg] = new RegisterTypeInfo(typeName, 0, RegisterValueKind.SingletonPointerAddress);
+        _registers[reg] = new RegisterTypeInfo(
+            typeName,
+            0,
+            RegisterValueKind.SingletonPointerAddress
+        );
     }
 
     private void Clear(Register reg)

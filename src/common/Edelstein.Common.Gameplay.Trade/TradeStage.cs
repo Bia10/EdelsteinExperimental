@@ -18,21 +18,21 @@ public class TradeStage : AbstractStage<ITradeStageUser>, ITradeStage
             await user.Disconnect();
             return;
         }
-        
+
         using var packet = new PacketWriter(PacketSendOperations.SetITC);
-        
+
         packet.WriteCharacterData(
-            user.Character, 
-            DbFlags.Character | 
-            DbFlags.Money | 
-            DbFlags.ItemSlotEquip | 
-            DbFlags.ItemSlotConsume | 
-            DbFlags.ItemSlotInstall |
-            DbFlags.ItemSlotEtc | 
-            DbFlags.ItemSlotCash | 
-            DbFlags.InventorySize
+            user.Character,
+            DbFlags.Character
+                | DbFlags.Money
+                | DbFlags.ItemSlotEquip
+                | DbFlags.ItemSlotConsume
+                | DbFlags.ItemSlotInstall
+                | DbFlags.ItemSlotEtc
+                | DbFlags.ItemSlotCash
+                | DbFlags.InventorySize
         );
-        
+
         packet.WriteString(user.Account.Username);
 
         packet.WriteInt(user.Context.Options.RegisterFeeMeso);

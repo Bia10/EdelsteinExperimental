@@ -5,9 +5,8 @@ namespace Edelstein.Common.Gameplay.Game.Conversations.Messages;
 
 public class AskAcceptRequest : AskYesNoRequest
 {
+    public AskAcceptRequest(IConversationSpeaker speaker, string text)
+        : base(speaker, text) { }
 
-    public AskAcceptRequest(IConversationSpeaker speaker, string text) : base(speaker, text)
-    {
-    }
     public override ConversationMessageType Type => ConversationMessageType.AskAccept;
 }

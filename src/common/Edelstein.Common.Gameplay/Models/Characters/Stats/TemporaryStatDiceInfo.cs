@@ -25,7 +25,7 @@ public record TemporaryStatDiceInfo : ITemporaryStatDiceInfo
     public int ASRr { get; set; }
     public int TERr { get; set; }
     public int MESOr { get; set; }
-    
+
     public void Reset()
     {
         MHPr = 0;

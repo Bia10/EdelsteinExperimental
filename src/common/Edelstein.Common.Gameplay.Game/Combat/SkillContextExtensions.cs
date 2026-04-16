@@ -6,9 +6,11 @@ namespace Edelstein.Common.Gameplay.Game.Combat;
 
 public static class SkillContextExtensions
 {
-    public static void ResetTemporaryStatComboCounter(this ISkillContext context, int comboCounter = 0) 
-        => context.ResetTemporaryStatExisting(TemporaryStatType.ComboCounter, comboCounter + 1);
-    
+    public static void ResetTemporaryStatComboCounter(
+        this ISkillContext context,
+        int comboCounter = 0
+    ) => context.ResetTemporaryStatExisting(TemporaryStatType.ComboCounter, comboCounter + 1);
+
     public static void ResetTemporaryStatAuras(this ISkillContext context)
     {
         context.ResetTemporaryStatByType(TemporaryStatType.DarkAura);
@@ -28,7 +30,7 @@ public static class SkillContextExtensions
         context.ResetTemporaryStatByType(TemporaryStatType.Slow);
         context.ResetTemporaryStatByType(TemporaryStatType.Blind);
     }
-    
+
     public static void ResetMobTemporaryStatPositive(this ISkillContext context)
     {
         context.ResetMobTemporaryStatByType(MobTemporaryStatType.PowerUp);

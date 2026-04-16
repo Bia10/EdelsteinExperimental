@@ -9,7 +9,6 @@ public record GameContextServices(
     IServerService Server,
     ISessionService Session,
     IMigrationService Migration,
-    
     IFriendService Friend,
     IPartyService Party,
     IGuildService Guild

@@ -2,6 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketUserMigrateToCashShopRequest(
-    IFieldUser User
-);
+public record FieldOnPacketUserMigrateToCashShopRequest(IFieldUser User);

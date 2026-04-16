@@ -1,4 +1,4 @@
-using Edelstein.Protocol.Gameplay.Game;
+﻿using Edelstein.Protocol.Gameplay.Game;
 
 namespace Edelstein.Application.Server.Configs;
 

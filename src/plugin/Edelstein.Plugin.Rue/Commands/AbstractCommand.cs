@@ -3,7 +3,8 @@ using PowerArgs;
 
 namespace Edelstein.Plugin.Rue.Commands;
 
-public abstract class AbstractCommand<TArgs> : AbstractCommand where TArgs : CommandArgs
+public abstract class AbstractCommand<TArgs> : AbstractCommand
+    where TArgs : CommandArgs
 {
     public override async Task Execute(IFieldUser user, string[] args)
     {
@@ -33,8 +34,7 @@ public abstract class AbstractCommand : CommandManager, ICommand
 
     public ICollection<string> Aliases { get; }
 
-    protected AbstractCommand()
-        => Aliases = new List<string>();
+    protected AbstractCommand() => Aliases = new List<string>();
 
     public override async Task<bool> Process(IFieldUser user, string[] args)
     {
@@ -56,5 +56,6 @@ public abstract class AbstractCommand : CommandManager, ICommand
     }
 
     public virtual bool Check(IFieldUser user) => true;
+
     public abstract Task Execute(IFieldUser user, string[] args);
 }

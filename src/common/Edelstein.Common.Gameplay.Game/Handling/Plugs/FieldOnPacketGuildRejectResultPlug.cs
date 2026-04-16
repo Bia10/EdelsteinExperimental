@@ -23,6 +23,7 @@ public class FieldOnPacketGuildRejectResultPlug : IPipelinePlug<FieldOnPacketGui
                 message.User.Character.ID,
                 message.User.Character.Name,
                 message.IsAlreadyInvited
-            ));
+            )
+        );
     }
 }

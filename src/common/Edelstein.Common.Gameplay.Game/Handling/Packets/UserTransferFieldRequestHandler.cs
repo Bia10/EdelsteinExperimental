@@ -6,17 +6,18 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
-public class UserTransferFieldRequestHandler : AbstractPipedFieldHandler<FieldOnPacketUserTransferFieldRequest>
+public class UserTransferFieldRequestHandler
+    : AbstractPipedFieldHandler<FieldOnPacketUserTransferFieldRequest>
 {
     public override short Operation => (short)PacketRecvOperations.UserTransferFieldRequest;
 
-    public UserTransferFieldRequestHandler(IPipeline<FieldOnPacketUserTransferFieldRequest> pipeline) : base(pipeline)
-    {
-    }
-    protected override FieldOnPacketUserTransferFieldRequest? Serialize(IFieldUser user, IPacketReader reader)
-        => new(
-            user,
-            reader.Skip(1).ReadInt(),
-            reader.ReadString()
-        );
+    public UserTransferFieldRequestHandler(
+        IPipeline<FieldOnPacketUserTransferFieldRequest> pipeline
+    )
+        : base(pipeline) { }
+
+    protected override FieldOnPacketUserTransferFieldRequest? Serialize(
+        IFieldUser user,
+        IPacketReader reader
+    ) => new(user, reader.Skip(1).ReadInt(), reader.ReadString());
 }

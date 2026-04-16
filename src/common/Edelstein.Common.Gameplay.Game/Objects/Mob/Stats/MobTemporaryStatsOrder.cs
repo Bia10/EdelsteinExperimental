@@ -41,6 +41,6 @@ internal static class MobTemporaryStatsOrder
         MobTemporaryStatType.Showdown,
         MobTemporaryStatType.MagicCrash,
         MobTemporaryStatType.DamagedElemAttr,
-        MobTemporaryStatType.HealByDamage
+        MobTemporaryStatType.HealByDamage,
     };
 }

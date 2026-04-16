@@ -1,4 +1,4 @@
-using Edelstein.Protocol.Gameplay.Game.Continents.Templates;
+﻿using Edelstein.Protocol.Gameplay.Game.Continents.Templates;
 using Edelstein.Protocol.Gameplay.Game.Objects;
 using Edelstein.Protocol.Utilities.Repositories;
 

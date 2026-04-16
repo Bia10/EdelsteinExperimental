@@ -6,6 +6,6 @@ public record TwoStatePartyBoosterRecord : TwoStateTemporaryStatRecord, ITwoStat
 {
     public DateTime DateStart { get; set; }
     public TimeSpan Term { get; set; }
-    
+
     public virtual bool IsExpired(DateTime now) => now > DateStart.Add(Term);
 }

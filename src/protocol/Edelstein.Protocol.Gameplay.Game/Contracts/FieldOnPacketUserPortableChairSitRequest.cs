@@ -2,7 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketUserPortableChairSitRequest(
-    IFieldUser User,
-    int TemplateID
-);
+public record FieldOnPacketUserPortableChairSitRequest(IFieldUser User, int TemplateID);

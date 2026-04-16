@@ -17,13 +17,15 @@ public class TickerManager : ITickerManager, ITickable
 
     public async Task OnTick(DateTime now)
     {
-        await Task.WhenAll(_tickables.Select(b =>
-            Task.Run(async () =>
-            {
-                if (!b.IsRequestedCancellation && now >= b.TickNext)
-                    await b.OnTick(now);
-            })
-        ));
+        await Task.WhenAll(
+            _tickables.Select(b =>
+                Task.Run(async () =>
+                {
+                    if (!b.IsRequestedCancellation && now >= b.TickNext)
+                        await b.OnTick(now);
+                })
+            )
+        );
 
         foreach (var b in _tickables.Where(b => b.IsRequestedCancellation))
             _tickables.Remove(b);
@@ -43,15 +45,17 @@ public class TickerManager : ITickerManager, ITickable
         return Task.CompletedTask;
     }
 
-    public ITickerManagerContext Schedule(ITickable tickable)
-        => Schedule(tickable, TimeSpan.Zero);
+    public ITickerManagerContext Schedule(ITickable tickable) => Schedule(tickable, TimeSpan.Zero);
 
-    public ITickerManagerContext Schedule(ITickable tickable, TimeSpan frequency)
-        => Schedule(tickable, frequency, frequency);
+    public ITickerManagerContext Schedule(ITickable tickable, TimeSpan frequency) =>
+        Schedule(tickable, frequency, frequency);
 
     public ITickerManagerContext Schedule(ITickable tickable, TimeSpan frequency, TimeSpan delay)
     {
-        var ctx = new TickerManagerContext(tickable, frequency) { TickNext = DateTime.UtcNow + delay };
+        var ctx = new TickerManagerContext(tickable, frequency)
+        {
+            TickNext = DateTime.UtcNow + delay,
+        };
         _tickables.Add(ctx);
         return ctx;
     }

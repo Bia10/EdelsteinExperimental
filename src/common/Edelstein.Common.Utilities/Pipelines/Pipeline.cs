@@ -6,10 +6,11 @@ public class Pipeline<TMessage> : IPipeline<TMessage>
 {
     private readonly ICollection<PipelinePart<TMessage>> _parts;
 
-    public Pipeline() 
-        => _parts = new SortedSet<PipelinePart<TMessage>>(new PipelinePartComparer<TMessage>());
-    
-    public Pipeline(IEnumerable<IPipelinePlug<TMessage>> plugs) : this()
+    public Pipeline() =>
+        _parts = new SortedSet<PipelinePart<TMessage>>(new PipelinePartComparer<TMessage>());
+
+    public Pipeline(IEnumerable<IPipelinePlug<TMessage>> plugs)
+        : this()
     {
         foreach (var plug in plugs)
             _parts.Add(new PipelinePart<TMessage>(PipelinePriority.Reserved, true, plug));
@@ -18,13 +19,13 @@ public class Pipeline<TMessage> : IPipeline<TMessage>
     public void Add(int priority, IPipelinePlug<TMessage> plug) =>
         _parts.Add(new PipelinePart<TMessage>(priority, false, plug));
 
-    public void Add(IPipelinePlug<TMessage> plug) =>
-        Add(PipelinePriority.Normal, plug);
+    public void Add(IPipelinePlug<TMessage> plug) => Add(PipelinePriority.Normal, plug);
 
     public void Remove(IPipelinePlug<TMessage> plug)
     {
         var part = _parts.FirstOrDefault(p => p.Plug == plug);
-        if (part != null) _parts.Remove(part);
+        if (part != null)
+            _parts.Remove(part);
     }
 
     public async Task<IPipelineContext> Process(TMessage message)

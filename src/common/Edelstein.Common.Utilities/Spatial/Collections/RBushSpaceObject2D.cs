@@ -3,18 +3,14 @@ using RBush;
 
 namespace Edelstein.Common.Utilities.Spatial.Collections;
 
-public class RBushSpaceObject2D<TObject> : ISpatialData where TObject : IObject2D
+public class RBushSpaceObject2D<TObject> : ISpatialData
+    where TObject : IObject2D
 {
     private readonly Envelope _envelope;
 
     public RBushSpaceObject2D(TObject obj)
     {
-        _envelope = new Envelope(
-            obj.MinX,
-            obj.MinY,
-            obj.MaxX,
-            obj.MaxY
-        );
+        _envelope = new Envelope(obj.MinX, obj.MinY, obj.MaxX, obj.MaxY);
         Object = obj;
     }
 

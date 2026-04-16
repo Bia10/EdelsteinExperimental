@@ -5,6 +5,6 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
 public class FieldOnPacketDragonMovePlug : IPipelinePlug<FieldOnPacketDragonMove>
 {
-    public Task Handle(IPipelineContext ctx, FieldOnPacketDragonMove message)
-        => message.Dragon.Move(message.Path, message.User);
+    public Task Handle(IPipelineContext ctx, FieldOnPacketDragonMove message) =>
+        message.Dragon.Move(message.Path, message.User);
 }

@@ -1,4 +1,4 @@
-using Edelstein.Protocol.Gameplay.Game.Contracts;
+﻿using Edelstein.Protocol.Gameplay.Game.Contracts;
 using Edelstein.Protocol.Services.Social.Contracts;
 using Edelstein.Protocol.Utilities.Pipelines;
 
@@ -24,6 +24,7 @@ public class FieldOnPacketGuildSetMarkRequestPlug : IPipelinePlug<FieldOnPacketG
                 message.MarkBgColor,
                 message.Mark,
                 message.MarkColor
-            ));
+            )
+        );
     }
 }

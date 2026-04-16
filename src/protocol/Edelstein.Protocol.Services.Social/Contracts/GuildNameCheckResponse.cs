@@ -1,4 +1,4 @@
-namespace Edelstein.Protocol.Services.Social.Contracts;
+﻿namespace Edelstein.Protocol.Services.Social.Contracts;
 
 /// <summary>
 /// Result of a guild name availability check.

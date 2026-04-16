@@ -17,7 +17,7 @@ public class Pirate1SkillHandler : NoviceSkillHandler
                 context.SetTwoStateDashJump(context.SkillLevel!.Y);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

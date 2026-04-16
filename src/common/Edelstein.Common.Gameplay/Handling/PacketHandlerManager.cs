@@ -19,9 +19,12 @@ public class PacketHandlerManager<TStageUser> : IPacketHandlerManager<TStageUser
 
     public PacketHandlerManager(
         ILogger<PacketHandlerManager<TStageUser>> logger,
-        IEnumerable<IPacketHandler<TStageUser>> handlers) : this(logger)
+        IEnumerable<IPacketHandler<TStageUser>> handlers
+    )
+        : this(logger)
     {
-        foreach (var handler in handlers) Add(handler);
+        foreach (var handler in handlers)
+            Add(handler);
     }
 
     public void Add(IPacketHandler<TStageUser> handler)
@@ -29,12 +32,16 @@ public class PacketHandlerManager<TStageUser> : IPacketHandlerManager<TStageUser
         if (_handlers.ContainsKey(handler.Operation))
             _logger.LogWarning(
                 "Overriding packet handler for operation 0x{Operation:X} ({OperationName}) to {Handler}",
-                handler.Operation, Enum.GetName((PacketRecvOperations)handler.Operation), handler.GetType().Name
+                handler.Operation,
+                Enum.GetName((PacketRecvOperations)handler.Operation),
+                handler.GetType().Name
             );
         else
             _logger.LogDebug(
                 "Set packet handler for operation 0x{Operation:X} ({OperationName}) to {Handler}",
-                handler.Operation, Enum.GetName((PacketRecvOperations)handler.Operation), handler.GetType().Name
+                handler.Operation,
+                Enum.GetName((PacketRecvOperations)handler.Operation),
+                handler.GetType().Name
             );
         _handlers[handler.Operation] = handler;
     }
@@ -43,7 +50,8 @@ public class PacketHandlerManager<TStageUser> : IPacketHandlerManager<TStageUser
     {
         _logger.LogWarning(
             "Removing packet handler for operation 0x{Operation:X} ({OperationName})",
-            handler.Operation, Enum.GetName((PacketRecvOperations)handler.Operation)
+            handler.Operation,
+            Enum.GetName((PacketRecvOperations)handler.Operation)
         );
         _handlers.Remove(handler.Operation);
     }
@@ -58,17 +66,20 @@ public class PacketHandlerManager<TStageUser> : IPacketHandlerManager<TStageUser
         {
             _logger.LogWarning(
                 "Unhandled packet operation 0x{Operation:X} ({OperationName})",
-                operation, Enum.GetName((PacketRecvOperations)operation)
+                operation,
+                Enum.GetName((PacketRecvOperations)operation)
             );
             return;
         }
 
-        if (handler.Check(user)) 
+        if (handler.Check(user))
             await handler.Handle(user, reader);
 
         _logger.LogDebug(
             "Handled packet operation 0x{Operation:X} ({OperationName}) with {Available} available bytes left",
-            operation, Enum.GetName((PacketRecvOperations)operation), reader.Available
+            operation,
+            Enum.GetName((PacketRecvOperations)operation),
+            reader.Available
         );
     }
 }

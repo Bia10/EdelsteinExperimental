@@ -9,14 +9,16 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
 public class UserThrowGrenadeHandler : AbstractPipedFieldHandler<FieldOnPacketUserThrowGrenade>
 {
-    public UserThrowGrenadeHandler(IPipeline<FieldOnPacketUserThrowGrenade> pipeline) : base(pipeline)
-    {
-    }
+    public UserThrowGrenadeHandler(IPipeline<FieldOnPacketUserThrowGrenade> pipeline)
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.UserThrowGrenade;
 
-    protected override FieldOnPacketUserThrowGrenade? Serialize(IFieldUser user, IPacketReader reader)
-        => new(
+    protected override FieldOnPacketUserThrowGrenade? Serialize(
+        IFieldUser user,
+        IPacketReader reader
+    ) =>
+        new(
             user,
             new Point2D(reader.ReadInt(), reader.ReadInt()),
             reader.ReadInt(),

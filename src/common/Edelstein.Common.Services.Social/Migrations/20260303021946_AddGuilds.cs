@@ -16,8 +16,12 @@ namespace Edelstein.Common.Services.Social.Migrations
                 name: "guilds",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ID = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     Name = table.Column<string>(type: "text", nullable: false),
                     GradeName1 = table.Column<string>(type: "text", nullable: false),
                     GradeName2 = table.Column<string>(type: "text", nullable: false),
@@ -33,23 +37,31 @@ namespace Edelstein.Common.Services.Social.Migrations
                     Notice = table.Column<string>(type: "text", nullable: false),
                     Point = table.Column<int>(type: "integer", nullable: false),
                     GuildLevel = table.Column<byte>(type: "smallint", nullable: false),
-                    AllianceID = table.Column<int>(type: "integer", nullable: false)
+                    AllianceID = table.Column<int>(type: "integer", nullable: false),
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_guilds", x => x.ID);
-                });
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "guild_invitations",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ID = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     GuildID = table.Column<int>(type: "integer", nullable: false),
                     InviterID = table.Column<int>(type: "integer", nullable: false),
                     CharacterID = table.Column<int>(type: "integer", nullable: false),
-                    DateExpire = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    DateExpire = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
                 },
                 constraints: table =>
                 {
@@ -59,15 +71,21 @@ namespace Edelstein.Common.Services.Social.Migrations
                         column: x => x.GuildID,
                         principalTable: "guilds",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "guild_members",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ID = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     GuildID = table.Column<int>(type: "integer", nullable: false),
                     CharacterID = table.Column<int>(type: "integer", nullable: false),
                     CharacterName = table.Column<string>(type: "text", nullable: false),
@@ -76,7 +94,7 @@ namespace Edelstein.Common.Services.Social.Migrations
                     Grade = table.Column<int>(type: "integer", nullable: false),
                     ChannelID = table.Column<int>(type: "integer", nullable: false),
                     Commitment = table.Column<int>(type: "integer", nullable: false),
-                    AllianceGrade = table.Column<int>(type: "integer", nullable: false)
+                    AllianceGrade = table.Column<int>(type: "integer", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -86,20 +104,29 @@ namespace Edelstein.Common.Services.Social.Migrations
                         column: x => x.GuildID,
                         principalTable: "guilds",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateTable(
                 name: "guild_skills",
                 columns: table => new
                 {
-                    ID = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    ID = table
+                        .Column<int>(type: "integer", nullable: false)
+                        .Annotation(
+                            "Npgsql:ValueGenerationStrategy",
+                            NpgsqlValueGenerationStrategy.IdentityByDefaultColumn
+                        ),
                     GuildID = table.Column<int>(type: "integer", nullable: false),
                     SkillID = table.Column<int>(type: "integer", nullable: false),
                     Level = table.Column<int>(type: "integer", nullable: false),
-                    DateExpire = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    BuyerName = table.Column<string>(type: "text", nullable: false)
+                    DateExpire = table.Column<DateTime>(
+                        type: "timestamp with time zone",
+                        nullable: false
+                    ),
+                    BuyerName = table.Column<string>(type: "text", nullable: false),
                 },
                 constraints: table =>
                 {
@@ -109,52 +136,55 @@ namespace Edelstein.Common.Services.Social.Migrations
                         column: x => x.GuildID,
                         principalTable: "guilds",
                         principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_guild_invitations_GuildID",
                 table: "guild_invitations",
-                column: "GuildID");
+                column: "GuildID"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_guild_members_GuildID",
                 table: "guild_members",
-                column: "GuildID");
+                column: "GuildID"
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_guild_members_CharacterID",
                 table: "guild_members",
                 column: "CharacterID",
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_guild_skills_GuildID_SkillID",
                 table: "guild_skills",
                 columns: new[] { "GuildID", "SkillID" },
-                unique: true);
+                unique: true
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_guilds_Name",
                 table: "guilds",
                 column: "Name",
-                unique: true);
+                unique: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "guild_invitations");
+            migrationBuilder.DropTable(name: "guild_invitations");
 
-            migrationBuilder.DropTable(
-                name: "guild_members");
+            migrationBuilder.DropTable(name: "guild_members");
 
-            migrationBuilder.DropTable(
-                name: "guild_skills");
+            migrationBuilder.DropTable(name: "guild_skills");
 
-            migrationBuilder.DropTable(
-                name: "guilds");
+            migrationBuilder.DropTable(name: "guilds");
         }
     }
 }

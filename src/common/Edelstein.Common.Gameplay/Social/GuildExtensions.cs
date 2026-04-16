@@ -28,7 +28,10 @@ public static class GuildExtensions
     /// Writes a single <c>GUILDDATA::SKILLENTRY</c> block.
     /// Layout: nLevel(2) + dateExpire(8 raw FILETIME) + strBuyCharacterName(str).
     /// </summary>
-    public static IPacketWriter WriteGuildSkillEntry(this IPacketWriter writer, IGuildSkillRecord skill)
+    public static IPacketWriter WriteGuildSkillEntry(
+        this IPacketWriter writer,
+        IGuildSkillRecord skill
+    )
     {
         writer.WriteShort((short)skill.Level);
         writer.WriteDateTime(skill.DateExpire);
@@ -46,7 +49,10 @@ public static class GuildExtensions
     /// required by <c>CWvsContext::AmIGuildMaster</c> that reads
     /// <c>adwCharacterID[0]</c> to identify the master.
     /// </remarks>
-    public static IPacketWriter WriteGuildData(this IPacketWriter writer, IGuildMembership membership)
+    public static IPacketWriter WriteGuildData(
+        this IPacketWriter writer,
+        IGuildMembership membership
+    )
     {
         writer.WriteInt(membership.ID);
         writer.WriteString(membership.Name);
@@ -58,8 +64,8 @@ public static class GuildExtensions
         writer.WriteString(membership.GradeName4);
         writer.WriteString(membership.GradeName5);
 
-        var members = membership.Members.Values
-            .OrderBy(m => m.Grade)
+        var members = membership
+            .Members.Values.OrderBy(m => m.Grade)
             .ThenBy(m => m.CharacterID)
             .ToImmutableList();
 

@@ -15,7 +15,8 @@ public class PacketWriter : IPacketWriter
         _writer = new BinaryWriter(_stream);
     }
 
-    public PacketWriter(Enum operation) : this() => WriteShort(Convert.ToInt16(operation));
+    public PacketWriter(Enum operation)
+        : this() => WriteShort(Convert.ToInt16(operation));
 
     public long Length => _stream.Length;
 
@@ -77,7 +78,8 @@ public class PacketWriter : IPacketWriter
     {
         if (length.HasValue)
         {
-            if (value.Length > length) value = value[..length.Value];
+            if (value.Length > length)
+                value = value[..length.Value];
             WriteBytes(_encoding.GetBytes(value.PadRight(length.Value, '\0')));
         }
         else
@@ -95,8 +97,7 @@ public class PacketWriter : IPacketWriter
         return this;
     }
 
-    public IPacket Build() 
-        => new Packet(_stream);
+    public IPacket Build() => new Packet(_stream);
 
     public void Dispose()
     {

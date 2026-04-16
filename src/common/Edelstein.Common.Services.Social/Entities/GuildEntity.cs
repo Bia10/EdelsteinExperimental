@@ -35,5 +35,6 @@ public class GuildEntity : IGuild, IIdentifiable<int>
 
     public ICollection<GuildMemberEntity> Members { get; set; } = new List<GuildMemberEntity>();
     public ICollection<GuildSkillEntity> Skills { get; set; } = new List<GuildSkillEntity>();
-    public ICollection<GuildInvitationEntity> Invitations { get; set; } = new List<GuildInvitationEntity>();
+    public ICollection<GuildInvitationEntity> Invitations { get; set; } =
+        new List<GuildInvitationEntity>();
 }

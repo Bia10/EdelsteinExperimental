@@ -9,5 +9,5 @@ public enum Element
     Poison = 0x4,
     Holy = 0x5,
     Dark = 0x6,
-    Undead = 0x7
+    Undead = 0x7,
 }

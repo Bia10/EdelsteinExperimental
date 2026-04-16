@@ -59,8 +59,7 @@ public class AccountRepository : IAccountRepository
     public async Task<IAccount?> RetrieveByUsername(string username)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
-        var entity = await db.Accounts
-            .FirstOrDefaultAsync(a => a.Username.Equals(username));
+        var entity = await db.Accounts.FirstOrDefaultAsync(a => a.Username.Equals(username));
         return entity != null ? _mapper.Map<Account>(entity) : null;
     }
 }

@@ -56,7 +56,7 @@ public class UserOnPacketCreateNewCharacterPlug : IPipelinePlug<UserOnPacketCrea
                         RaceSelectType.Cygnus => 1000,
                         RaceSelectType.Aran => 2000,
                         RaceSelectType.Evan => 2001,
-                        _ => 0
+                        _ => 0,
                     },
                     Face = message.Face,
                     Hair = message.Hair + message.HairColor,
@@ -69,12 +69,21 @@ public class UserOnPacketCreateNewCharacterPlug : IPipelinePlug<UserOnPacketCrea
                         RaceSelectType.Cygnus => 130030000,
                         RaceSelectType.Aran => 914000000,
                         RaceSelectType.Evan => 900010000,
-                        _ => 0
+                        _ => 0,
                     },
                     FieldPortal = 0,
-                    SubJob = (short)(message.Race == RaceSelectType.Normal ? message.SubJob > 0 ? 1 : 0 : 0)
+                    SubJob = (short)(
+                        message.Race == RaceSelectType.Normal
+                            ? message.SubJob > 0
+                                ? 1
+                                : 0
+                            : 0
+                    ),
                 };
-                var context = new ModifyInventoryGroupContext(character.Inventories, _templateManager);
+                var context = new ModifyInventoryGroupContext(
+                    character.Inventories,
+                    _templateManager
+                );
 
                 context.SetEquipped(BodyPart.Clothes, message.Coat);
                 context.SetEquipped(BodyPart.Shoes, message.Shoes);
@@ -86,7 +95,9 @@ public class UserOnPacketCreateNewCharacterPlug : IPipelinePlug<UserOnPacketCrea
 
                 _logger.LogDebug(
                     "Created new {Race} character: {Name} (ID: {ID})",
-                    message.Race, message.Name, character.ID
+                    message.Race,
+                    message.Name,
+                    character.ID
                 );
 
                 packet.WriteCharacterStats(character);

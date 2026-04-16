@@ -8,6 +8,5 @@ public interface IPlugin<TContext> : IIdentifiable<string>
     Task OnStart(IPluginHost<TContext> host, TContext ctx);
     Task OnStop();
 
-    Task<object?> Call(string type, params object[] args)
-        => Task.FromResult<object?>(default);
+    Task<object?> Call(string type, params object[] args) => Task.FromResult<object?>(default);
 }

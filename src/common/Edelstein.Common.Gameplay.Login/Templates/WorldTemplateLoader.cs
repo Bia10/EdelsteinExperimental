@@ -20,15 +20,15 @@ public class WorldTemplateLoader : ITemplateLoader
     {
         var directory = _data.ResolvePath("Server/World.img");
 
-        if (directory == null) return 0;
+        if (directory == null)
+            return 0;
         foreach (var node in directory)
         {
             var id = Convert.ToInt32(node.Name.Split(".")[0]);
 
-            await _manager.Insert(new TemplateProviderLazy<IWorldTemplate>(
-                id,
-                () => new WorldTemplate(id, node)
-            ));
+            await _manager.Insert(
+                new TemplateProviderLazy<IWorldTemplate>(id, () => new WorldTemplate(id, node))
+            );
         }
 
         _manager.Freeze();

@@ -1,4 +1,4 @@
-using Microsoft.IO;
+﻿using Microsoft.IO;
 
 namespace Edelstein.Common.Utilities.Packets;
 

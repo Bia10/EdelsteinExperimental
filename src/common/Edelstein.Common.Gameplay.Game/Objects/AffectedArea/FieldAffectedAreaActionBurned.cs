@@ -12,8 +12,14 @@ public class FieldAffectedAreaActionBurned : AbstractFieldAffectedAreaAction
     private readonly int _skillLevel;
     private readonly TimeSpan _interval;
     private readonly TimeSpan _duration;
-    
-    public FieldAffectedAreaActionBurned(IFieldUser user, int skillID, int skillLevel, TimeSpan interval, TimeSpan duration)
+
+    public FieldAffectedAreaActionBurned(
+        IFieldUser user,
+        int skillID,
+        int skillLevel,
+        TimeSpan interval,
+        TimeSpan duration
+    )
     {
         _user = user;
         _skillID = skillID;
@@ -21,7 +27,7 @@ public class FieldAffectedAreaActionBurned : AbstractFieldAffectedAreaAction
         _interval = interval;
         _duration = duration;
     }
-    
+
     public override async Task OnEnter(IFieldObject obj)
     {
         await OnTick(obj);
@@ -30,13 +36,15 @@ public class FieldAffectedAreaActionBurned : AbstractFieldAffectedAreaAction
 
     public override async Task OnTick(IFieldObject obj)
     {
-        if (obj is not IFieldMob mob) return;
-        if (mob.TemporaryStats.BurnedInfo
-                .FirstOrDefault(b => 
-                    b.CharacterID == _user.Character.ID && 
-                    b.SkillID == _skillID) != null
-           ) return;
-            
+        if (obj is not IFieldMob mob)
+            return;
+        if (
+            mob.TemporaryStats.BurnedInfo.FirstOrDefault(b =>
+                b.CharacterID == _user.Character.ID && b.SkillID == _skillID
+            ) != null
+        )
+            return;
+
         var now = DateTime.UtcNow;
         var damage = await _user.Damage.CalculateBurnedDamage(
             _user.Character,
@@ -47,14 +55,18 @@ public class FieldAffectedAreaActionBurned : AbstractFieldAffectedAreaAction
             _skillLevel
         );
 
-        _ = mob.ModifyTemporaryStats(s => s.SetBurnedInfo(new MobBurnedInfo(
-            _user.Character.ID,
-            _skillID,
-            damage,
-            _interval,
-            now,
-            now.Add(_duration)
-        )));
+        _ = mob.ModifyTemporaryStats(s =>
+            s.SetBurnedInfo(
+                new MobBurnedInfo(
+                    _user.Character.ID,
+                    _skillID,
+                    damage,
+                    _interval,
+                    now,
+                    now.Add(_duration)
+                )
+            )
+        );
 
         await base.OnTick(obj);
     }

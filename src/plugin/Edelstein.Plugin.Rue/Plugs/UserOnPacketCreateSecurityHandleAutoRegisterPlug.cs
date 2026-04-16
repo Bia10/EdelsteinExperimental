@@ -16,7 +16,8 @@ public class UserOnPacketCreateSecurityHandleAutoRegisterPlug(
     LoginContext context,
     MemoryContext? memoryContext = null,
     LoginDiagnostics? diagnostics = null,
-    LoginMilestonesTracker? tracker = null) : IPipelinePlug<UserOnPacketCreateSecurityHandle>
+    LoginMilestonesTracker? tracker = null
+) : IPipelinePlug<UserOnPacketCreateSecurityHandle>
 {
     private readonly ILogger? _logger = logger;
     private readonly RueConfigLogin _config = options.Value;
@@ -27,7 +28,10 @@ public class UserOnPacketCreateSecurityHandleAutoRegisterPlug(
 
     public async Task Handle(IPipelineContext ctx, UserOnPacketCreateSecurityHandle message)
     {
-        if (!_config.IsAutoLogin || _config.LoginCredentials is not { Username: not null, Password: not null })
+        if (
+            !_config.IsAutoLogin
+            || _config.LoginCredentials is not { Username: not null, Password: not null }
+        )
             return;
 
         var t0 = Environment.TickCount64;
@@ -40,12 +44,20 @@ public class UserOnPacketCreateSecurityHandleAutoRegisterPlug(
 
         if (clientMemoryEnabled && _memoryContext != null)
         {
-            if (_memoryContext.TryInitialize(_config.ClientMemory!, _logger, _diagnostics, _config.DiagnosticsEnabled))
+            if (
+                _memoryContext.TryInitialize(
+                    _config.ClientMemory!,
+                    _logger,
+                    _diagnostics,
+                    _config.DiagnosticsEnabled
+                )
+            )
             {
                 var monitor = _memoryContext.Monitor!;
                 var ok = await monitor.WaitWithTimeout(
                     ct => monitor.WaitForSingleton("CLoginGradeWnd", ct),
-                    "CLoginGradeWnd");
+                    "CLoginGradeWnd"
+                );
 
                 if (!ok)
                     _logger?.LogWarning("[Rue-AutoLogin] CLoginGradeWnd timeout - proceeding");
@@ -62,16 +74,21 @@ public class UserOnPacketCreateSecurityHandleAutoRegisterPlug(
             var delay = _config.AutoSelectDelayMs;
             if (delay > 0)
             {
-                _logger?.LogInformation("[Rue-AutoLogin] Waiting {Delay}ms for client init (delay-based)", delay);
+                _logger?.LogInformation(
+                    "[Rue-AutoLogin] Waiting {Delay}ms for client init (delay-based)",
+                    delay
+                );
                 await Task.Delay(delay);
             }
         }
 
-        var result = await _context.Pipelines.UserOnPacketCheckPassword.Process(new UserOnPacketCheckPasswordFlipped(
-            message.User,
-            _config.LoginCredentials.Username,
-            _config.LoginCredentials.Password
-        ));
+        var result = await _context.Pipelines.UserOnPacketCheckPassword.Process(
+            new UserOnPacketCheckPasswordFlipped(
+                message.User,
+                _config.LoginCredentials.Username,
+                _config.LoginCredentials.Password
+            )
+        );
 
         _diagnostics?.RecordMilestone("CheckPasswordResult");
     }

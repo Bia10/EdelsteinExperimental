@@ -36,10 +36,10 @@ public class MobTemporaryStatCommand : AbstractCommand<MobTemporaryStatCommandAr
     {
         if (user.FieldSplit != null)
             await Task.WhenAll(
-                user.FieldSplit
-                    .Objects
-                    .OfType<IFieldMob>()
-                    .Select(m => m.ModifyTemporaryStats(s => s.Set(args.Type, args.Value, args.Reason)))
+                user.FieldSplit.Objects.OfType<IFieldMob>()
+                    .Select(m =>
+                        m.ModifyTemporaryStats(s => s.Set(args.Type, args.Value, args.Reason))
+                    )
             );
     }
 }

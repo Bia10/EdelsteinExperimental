@@ -19,10 +19,10 @@ public class WarriorHero4SkillHandler : WarriorHero3SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -36,16 +36,16 @@ public class WarriorHero4SkillHandler : WarriorHero3SkillHandler
                 break;
             case Skill.HeroEnrage:
                 context.ResetTemporaryStatComboCounter();
-                context.AddTemporaryStat(TemporaryStatType.Enrage, (short)(
-                    context.SkillLevel!.X * 100 +
-                    context.SkillLevel!.MobCount)
+                context.AddTemporaryStat(
+                    TemporaryStatType.Enrage,
+                    (short)(context.SkillLevel!.X * 100 + context.SkillLevel!.MobCount)
                 );
                 break;
             case Skill.HeroHerosWill:
                 context.ResetTemporaryStatNegative();
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

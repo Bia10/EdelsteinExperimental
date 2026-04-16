@@ -8,7 +8,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class WarriorDarkKnight3SkillHandler : WarriorDarkKnight2SkillHandler
 {
     public override int ID => Job.DragonKnight;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)

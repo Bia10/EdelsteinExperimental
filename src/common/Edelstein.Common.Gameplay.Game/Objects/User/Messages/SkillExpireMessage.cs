@@ -2,9 +2,7 @@
 
 namespace Edelstein.Common.Gameplay.Game.Objects.User.Messages;
 
-public record SkillExpireMessage(
-    ICollection<int> SkillID
-) : IPacketWritable
+public record SkillExpireMessage(ICollection<int> SkillID) : IPacketWritable
 {
     public void WriteTo(IPacketWriter writer)
     {

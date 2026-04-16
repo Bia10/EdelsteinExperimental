@@ -14,9 +14,12 @@ public abstract class AbstractModifyInventory : IModifyInventory
     public abstract IEnumerable<AbstractModifyInventoryOperation> Operations { get; }
 
     public bool IsUpdated => Operations.Any();
-    public bool IsUpdatedAvatar => Operations.Any(o => o is 
-        { Inventory: ItemInventoryType.Equip, Slot: < 0 } or 
-        MoveModifyInventoryOperation { ToSlot: < 0 });
+    public bool IsUpdatedAvatar =>
+        Operations.Any(o =>
+            o
+                is { Inventory: ItemInventoryType.Equip, Slot: < 0 }
+                    or MoveModifyInventoryOperation { ToSlot: < 0 }
+        );
 
     public abstract short Add(IItemSlot item);
 

@@ -17,7 +17,7 @@ public class FieldOnPacketMobMovePlug : IPipelinePlug<FieldOnPacketMobMove>
         packet.WriteShort(0); // nMP
         packet.WriteByte(0); // SkillCommand
         packet.WriteByte(0); // SLV
-        
+
         await message.User.Dispatch(packet.Build());
         await message.Mob.Move(message.Path, message.User);
     }

@@ -11,8 +11,8 @@ public class QuestCommand : AbstractTemplateCommand<IQuestTemplate>
 
     private readonly ITemplateManager<IQuestTemplate> _templates;
 
-    public QuestCommand(ITemplateManager<IQuestTemplate> templates) : base(templates)
-        => _templates = templates;
+    public QuestCommand(ITemplateManager<IQuestTemplate> templates)
+        : base(templates) => _templates = templates;
 
     protected override async Task<IReadOnlyList<TemplateCommandIndex>> Indices()
     {
@@ -29,6 +29,9 @@ public class QuestCommand : AbstractTemplateCommand<IQuestTemplate>
         return result;
     }
 
-    protected override Task Execute(IFieldUser user, IQuestTemplate template, TemplateCommandArgs args)
-        => Task.CompletedTask;
+    protected override Task Execute(
+        IFieldUser user,
+        IQuestTemplate template,
+        TemplateCommandArgs args
+    ) => Task.CompletedTask;
 }

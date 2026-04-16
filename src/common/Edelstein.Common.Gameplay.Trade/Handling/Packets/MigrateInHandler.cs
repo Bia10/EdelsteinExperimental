@@ -7,7 +7,6 @@ namespace Edelstein.Common.Gameplay.Trade.Handling.Packets;
 
 public class MigrateInHandler : AbstractMigrateInHandler<ITradeStageUser>
 {
-    public MigrateInHandler(IPipeline<UserOnPacketMigrateIn<ITradeStageUser>> pipeline) : base(pipeline)
-    {
-    }
+    public MigrateInHandler(IPipeline<UserOnPacketMigrateIn<ITradeStageUser>> pipeline)
+        : base(pipeline) { }
 }

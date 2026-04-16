@@ -1,11 +1,11 @@
 ﻿using System.Collections.Immutable;
 using Edelstein.Common.Gameplay.Game.Objects.Mob.Rewards;
 using Edelstein.Common.Gameplay.Game.Rewards;
-using Edelstein.Protocol.Gameplay.Game.Rewards;
 using Edelstein.Protocol.Gameplay.Game.Objects;
 using Edelstein.Protocol.Gameplay.Game.Objects.Mob;
 using Edelstein.Protocol.Gameplay.Game.Objects.Mob.Rewards;
 using Edelstein.Protocol.Gameplay.Game.Objects.User;
+using Edelstein.Protocol.Gameplay.Game.Rewards;
 using PowerArgs;
 
 namespace Edelstein.Plugin.Rue.Commands.Admin;
@@ -30,25 +30,27 @@ public sealed class DropCommand : AbstractCommand<DropCommandArgs>
 
     private int GetNextRewardId() => Interlocked.Decrement(ref _nextRewardId);
 
-    private MobReward CloneReward(IMobReward source) => new(GetNextRewardId(), source.Proc)
-    {
-        ItemID = source.ItemID,
-        Money = source.Money,
-        NumberMin = source.NumberMin,
-        NumberMax = source.NumberMax,
-        ReqQuest = source.ReqQuest,
-        ReqLevelMin = source.ReqLevelMin,
-        ReqLevelMax = source.ReqLevelMax,
-        ReqMobLevelMin = source.ReqMobLevelMin,
-        ReqMobLevelMax = source.ReqMobLevelMax,
-        DateStart = source.DateStart,
-        DateEnd = source.DateEnd
-    };
+    private MobReward CloneReward(IMobReward source) =>
+        new(GetNextRewardId(), source.Proc)
+        {
+            ItemID = source.ItemID,
+            Money = source.Money,
+            NumberMin = source.NumberMin,
+            NumberMax = source.NumberMax,
+            ReqQuest = source.ReqQuest,
+            ReqLevelMin = source.ReqLevelMin,
+            ReqLevelMax = source.ReqLevelMax,
+            ReqMobLevelMin = source.ReqMobLevelMin,
+            ReqMobLevelMax = source.ReqMobLevelMax,
+            DateStart = source.DateStart,
+            DateEnd = source.DateEnd,
+        };
 
     private async Task<IRewardPool<IMobReward>> GetOrCreatePoolAsync(int mobId)
     {
         var pool = await _rewardPool.Retrieve(mobId);
-        if (pool != null) return pool;
+        if (pool != null)
+            return pool;
 
         pool = new RewardPool<IMobReward>(mobId);
         await _rewardPool.Insert(pool);
@@ -113,11 +115,13 @@ public sealed class DropCommand : AbstractCommand<DropCommandArgs>
         {
             ItemID = itemId,
             NumberMin = args.Min,
-            NumberMax = args.Max
+            NumberMax = args.Max,
         };
         await pool.Insert(reward);
 
-        await user.Message($"Added item drop {itemId} to mob {mobId} (rate: {args.Rate:P0}, qty: {args.Min ?? 1}-{args.Max ?? 1})");
+        await user.Message(
+            $"Added item drop {itemId} to mob {mobId} (rate: {args.Rate:P0}, qty: {args.Min ?? 1}-{args.Max ?? 1})"
+        );
     }
 
     private async Task ExecuteAddMoney(IFieldUser user, DropCommandArgs args)
@@ -129,10 +133,7 @@ public sealed class DropCommand : AbstractCommand<DropCommandArgs>
         }
 
         var pool = await GetOrCreatePoolAsync(mobId);
-        var reward = new MobReward(GetNextRewardId(), args.Rate)
-        {
-            Money = amount
-        };
+        var reward = new MobReward(GetNextRewardId(), args.Rate) { Money = amount };
         await pool.Insert(reward);
 
         await user.Message($"Added money drop {amount} to mob {mobId} (rate: {args.Rate:P0})");
@@ -165,11 +166,13 @@ public sealed class DropCommand : AbstractCommand<DropCommandArgs>
         {
             ItemID = itemId,
             NumberMin = min,
-            NumberMax = max
+            NumberMax = max,
         };
         await _rewardPool.Global.Insert(reward);
 
-        await user.Message($"Added global item drop {itemId} (rate: {rate:P0}, qty: {min ?? 1}-{max ?? 1})");
+        await user.Message(
+            $"Added global item drop {itemId} (rate: {rate:P0}, qty: {min ?? 1}-{max ?? 1})"
+        );
     }
 
     private async Task ExecuteList(IFieldUser user, DropCommandArgs args)
@@ -254,7 +257,8 @@ public sealed class DropCommand : AbstractCommand<DropCommandArgs>
         var line = $"  #{reward.ID}: ";
 
         if (reward.ItemID is { } itemId)
-            line += $"Item {itemId} @ {reward.Proc:P0} x{reward.NumberMin ?? 1}-{reward.NumberMax ?? 1}";
+            line +=
+                $"Item {itemId} @ {reward.Proc:P0} x{reward.NumberMin ?? 1}-{reward.NumberMax ?? 1}";
         else if (reward.Money is { } money)
             line += $"Meso {money} @ {reward.Proc:P0}";
         else
@@ -382,18 +386,20 @@ public sealed class DropCommand : AbstractCommand<DropCommandArgs>
         await user.Prompt(s => s.Say(output), default);
     }
 
-    private async Task<List<(int? ItemId, int? Money, double Rate, int Qty)>> GenerateRandomDropsForMob(int mobId, int count, double rate)
+    private async Task<
+        List<(int? ItemId, int? Money, double Rate, int Qty)>
+    > GenerateRandomDropsForMob(int mobId, int count, double rate)
     {
         var pool = await GetOrCreatePoolAsync(mobId);
 
         var itemRanges = new (int min, int max)[]
         {
-            (2000000, 2000100),  // Consumables
-            (2010000, 2010100),  // Pills
-            (2020000, 2020060),  // Food
-            (4000000, 4000500),  // Etc items
-            (4010000, 4010007),  // Ores
-            (4020000, 4020009),  // Jewels
+            (2000000, 2000100), // Consumables
+            (2010000, 2010100), // Pills
+            (2020000, 2020060), // Food
+            (4000000, 4000500), // Etc items
+            (4010000, 4010007), // Ores
+            (4020000, 4020009), // Jewels
         };
 
         var generated = new List<(int? ItemId, int? Money, double Rate, int Qty)>();
@@ -410,17 +416,14 @@ public sealed class DropCommand : AbstractCommand<DropCommandArgs>
             {
                 ItemID = itemId,
                 NumberMin = 1,
-                NumberMax = qty
+                NumberMax = qty,
             };
             await pool.Insert(reward);
             generated.Add((itemId, null, dropRate, qty));
         }
 
         var mesoAmount = Random.Shared.Next(50, 500);
-        var mesoReward = new MobReward(GetNextRewardId(), rate)
-        {
-            Money = mesoAmount
-        };
+        var mesoReward = new MobReward(GetNextRewardId(), rate) { Money = mesoAmount };
         await pool.Insert(mesoReward);
         generated.Add((null, mesoAmount, rate, 1));
 
@@ -445,8 +448,10 @@ public sealed class DropCommand : AbstractCommand<DropCommandArgs>
         var pool1 = await _rewardPool.Retrieve(mobId1);
         var pool2 = await _rewardPool.Retrieve(mobId2);
 
-        var rewards1 = pool1 != null ? (await pool1.RetrieveAll()).ToList() : new List<IMobReward>();
-        var rewards2 = pool2 != null ? (await pool2.RetrieveAll()).ToList() : new List<IMobReward>();
+        var rewards1 =
+            pool1 != null ? (await pool1.RetrieveAll()).ToList() : new List<IMobReward>();
+        var rewards2 =
+            pool2 != null ? (await pool2.RetrieveAll()).ToList() : new List<IMobReward>();
 
         var newPool1 = new RewardPool<IMobReward>(mobId1);
         var newPool2 = new RewardPool<IMobReward>(mobId2);
@@ -460,7 +465,9 @@ public sealed class DropCommand : AbstractCommand<DropCommandArgs>
         await _rewardPool.Update(newPool1);
         await _rewardPool.Update(newPool2);
 
-        await user.Message($"Swapped drops between mob {mobId1} ({rewards1.Count} drops) and mob {mobId2} ({rewards2.Count} drops)");
+        await user.Message(
+            $"Swapped drops between mob {mobId1} ({rewards1.Count} drops) and mob {mobId2} ({rewards2.Count} drops)"
+        );
     }
 
     private async Task ExecuteCopy(IFieldUser user, DropCommandArgs args)
@@ -491,7 +498,9 @@ public sealed class DropCommand : AbstractCommand<DropCommandArgs>
         foreach (var reward in fromRewards)
             await toPool.Insert(CloneReward(reward));
 
-        await user.Message($"Copied {fromRewards.Count} drops from mob {fromMobId} to mob {toMobId}");
+        await user.Message(
+            $"Copied {fromRewards.Count} drops from mob {fromMobId} to mob {toMobId}"
+        );
     }
 
     private async Task ExecuteRemove(IFieldUser user, DropCommandArgs args)
@@ -538,7 +547,8 @@ public sealed class DropCommand : AbstractCommand<DropCommandArgs>
         var pool = await _rewardPool.Retrieve(mobId);
         var globalPool = _rewardPool.Global;
 
-        var mobRewards = pool != null ? (await pool.RetrieveAll()).ToList() : new List<IMobReward>();
+        var mobRewards =
+            pool != null ? (await pool.RetrieveAll()).ToList() : new List<IMobReward>();
         var globalRewards = (await globalPool.RetrieveAll()).ToList();
         var allRewards = mobRewards.Concat(globalRewards).ToList();
 
@@ -584,27 +594,29 @@ public sealed class DropCommand : AbstractCommand<DropCommandArgs>
             output += $"  Expected: {expected:F1} | Actual: {actual} | {varianceStr}\\r\\n";
         }
 
-        output += $"\\r\\n#rTotal rewards: {allRewards.Count} (mob: {mobRewards.Count}, global: {globalRewards.Count})#k";
+        output +=
+            $"\\r\\n#rTotal rewards: {allRewards.Count} (mob: {mobRewards.Count}, global: {globalRewards.Count})#k";
 
         await user.Prompt(s => s.Say(output), default);
     }
 
     private static async Task ShowHelp(IFieldUser user)
     {
-        var help = "#e#bDrop Command Help#n\\r\\n\\r\\n" +
-                   "#eManage Drops:#n\\r\\n" +
-                   "/drop add <mob> <item> [rate] [min] [max]\\r\\n" +
-                   "/drop addmoney <mob> <amount> [rate]\\r\\n" +
-                   "/drop global <item> [rate] [min] [max]\\r\\n" +
-                   "/drop remove <mob> <rewardId>\\r\\n" +
-                   "/drop clear <mob> | /drop clearglobal\\r\\n\\r\\n" +
-                   "#eGenerate:#n\\r\\n" +
-                   "/drop random <mob|0> [count] [rate]\\r\\n" +
-                   "/drop copy <fromMob> <toMob>\\r\\n" +
-                   "/drop swap <mob1> <mob2>\\r\\n\\r\\n" +
-                   "#eDiagnostics:#n\\r\\n" +
-                   "/drop list [mob|-1] - show drops\\r\\n" +
-                   "/drop test <mob> [iterations] - simulate";
+        var help =
+            "#e#bDrop Command Help#n\\r\\n\\r\\n"
+            + "#eManage Drops:#n\\r\\n"
+            + "/drop add <mob> <item> [rate] [min] [max]\\r\\n"
+            + "/drop addmoney <mob> <amount> [rate]\\r\\n"
+            + "/drop global <item> [rate] [min] [max]\\r\\n"
+            + "/drop remove <mob> <rewardId>\\r\\n"
+            + "/drop clear <mob> | /drop clearglobal\\r\\n\\r\\n"
+            + "#eGenerate:#n\\r\\n"
+            + "/drop random <mob|0> [count] [rate]\\r\\n"
+            + "/drop copy <fromMob> <toMob>\\r\\n"
+            + "/drop swap <mob1> <mob2>\\r\\n\\r\\n"
+            + "#eDiagnostics:#n\\r\\n"
+            + "/drop list [mob|-1] - show drops\\r\\n"
+            + "/drop test <mob> [iterations] - simulate";
 
         await user.Prompt(s => s.Say(help), default);
     }

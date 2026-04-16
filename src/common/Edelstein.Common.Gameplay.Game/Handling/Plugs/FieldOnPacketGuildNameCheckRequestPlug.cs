@@ -27,7 +27,8 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 /// (5) On success the creation fee is deducted and <c>NotifyGuildCreated</c>
 ///     delivers case 34 (full GUILDDATA) to the creator via the message bus.
 /// </summary>
-public class FieldOnPacketGuildNameCheckRequestPlug : IPipelinePlug<FieldOnPacketGuildNameCheckRequest>
+public class FieldOnPacketGuildNameCheckRequestPlug
+    : IPipelinePlug<FieldOnPacketGuildNameCheckRequest>
 {
     private readonly IGameStage _stage;
     private readonly GuildOptions _options;
@@ -42,13 +43,15 @@ public class FieldOnPacketGuildNameCheckRequestPlug : IPipelinePlug<FieldOnPacke
     {
         // Step 1 — validate the proposed guild name via the service.
         var nameCheck = await message.User.StageUser.Context.Services.Guild.CheckName(
-            new GuildNameCheckRequest(message.GuildName));
+            new GuildNameCheckRequest(message.GuildName)
+        );
 
         if (nameCheck.Result != GuildResult.Success)
         {
-            var errOpcode = nameCheck.Result == GuildResult.FailedNameTaken
-                ? GuildResultOperations.CheckGuildName_AlreadyUsed
-                : GuildResultOperations.CheckGuildName_Unknown;
+            var errOpcode =
+                nameCheck.Result == GuildResult.FailedNameTaken
+                    ? GuildResultOperations.CheckGuildName_AlreadyUsed
+                    : GuildResultOperations.CheckGuildName_Unknown;
             using var err = new PacketWriter(PacketSendOperations.GuildResult);
             err.WriteByte((byte)errOpcode);
             await message.User.Dispatch(err.Build());
@@ -115,16 +118,19 @@ public class FieldOnPacketGuildNameCheckRequestPlug : IPipelinePlug<FieldOnPacke
                 message.User.StageUser.Context.Options.ChannelID,
                 message.User.Field?.ID ?? 999999999,
                 message.GuildName
-            ));
+            )
+        );
 
         if (createResponse.Result != GuildResult.Success)
         {
             var errOpcode = createResponse.Result switch
             {
-                GuildResult.FailedAlreadyInGuild => GuildResultOperations.CreateNewGuild_AlreadyJoined,
-                GuildResult.FailedNameTaken => GuildResultOperations.CreateNewGuild_GuildNameAlreadyExist,
+                GuildResult.FailedAlreadyInGuild =>
+                    GuildResultOperations.CreateNewGuild_AlreadyJoined,
+                GuildResult.FailedNameTaken =>
+                    GuildResultOperations.CreateNewGuild_GuildNameAlreadyExist,
                 GuildResult.FailedBeginner => GuildResultOperations.CreateNewGuild_Beginner,
-                _ => GuildResultOperations.CreateNewGuild_Unknown
+                _ => GuildResultOperations.CreateNewGuild_Unknown,
             };
             using var err = new PacketWriter(PacketSendOperations.GuildResult);
             err.WriteByte((byte)errOpcode);

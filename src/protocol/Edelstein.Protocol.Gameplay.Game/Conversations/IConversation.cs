@@ -4,9 +4,5 @@ namespace Edelstein.Protocol.Gameplay.Game.Conversations;
 
 public interface IConversation
 {
-    Task Start(
-        IConversationContext ctx,
-        IConversationSpeaker self,
-        IConversationSpeaker target
-    );
+    Task Start(IConversationContext ctx, IConversationSpeaker self, IConversationSpeaker target);
 }

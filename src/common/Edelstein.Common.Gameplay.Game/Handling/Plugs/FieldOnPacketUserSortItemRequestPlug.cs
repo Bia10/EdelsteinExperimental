@@ -10,10 +10,10 @@ public class FieldOnPacketUserSortItemRequestPlug : IPipelinePlug<FieldOnPacketU
     public async Task Handle(IPipelineContext ctx, FieldOnPacketUserSortItemRequest message)
     {
         using var packet = new PacketWriter(PacketSendOperations.SortItemResult);
-        
+
         packet.WriteBool(false);
         packet.WriteByte((byte)message.Type);
-        
+
         await message.User.ModifyInventory(i => i[message.Type]?.Sort(), true);
         await message.User.Dispatch(packet.Build());
     }

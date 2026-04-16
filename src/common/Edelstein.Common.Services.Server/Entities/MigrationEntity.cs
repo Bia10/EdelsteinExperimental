@@ -6,7 +6,6 @@ namespace Edelstein.Common.Services.Server.Entities;
 
 public record MigrationEntity : IMigration
 {
-
     public ServerEntity FromServer { get; set; }
     public ServerEntity ToServer { get; set; }
 

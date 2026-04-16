@@ -11,8 +11,12 @@ public class ClearDropsCommand : AbstractCommand
 
     public override async Task Execute(IFieldUser user, string[] args)
     {
-        if (user.Field == null) return;
-        foreach (var drop in user.Field.GetPool(FieldObjectType.Drop)?.Objects ?? ImmutableArray<IFieldObject>.Empty)
+        if (user.Field == null)
+            return;
+        foreach (
+            var drop in user.Field.GetPool(FieldObjectType.Drop)?.Objects
+                ?? ImmutableArray<IFieldObject>.Empty
+        )
             await user.Field.Leave(drop);
     }
 }

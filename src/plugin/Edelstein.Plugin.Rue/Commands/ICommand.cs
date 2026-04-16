@@ -2,10 +2,7 @@
 
 namespace Edelstein.Plugin.Rue.Commands;
 
-public interface ICommand :
-    ICommandManager,
-    ICommandExecutable,
-    IIdentifiable<string>
+public interface ICommand : ICommandManager, ICommandExecutable, IIdentifiable<string>
 {
     string Name { get; }
     string Description { get; }

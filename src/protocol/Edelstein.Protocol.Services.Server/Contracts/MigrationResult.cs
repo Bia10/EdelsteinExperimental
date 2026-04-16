@@ -8,5 +8,5 @@ public enum MigrationResult
     FailedAlreadyStarted = 0x3,
     FailedNotStarted = 0x4,
     FailedInvalidKey = 0x5,
-    FailedInvalidServer = 0x5
+    FailedInvalidServer = 0x5,
 }

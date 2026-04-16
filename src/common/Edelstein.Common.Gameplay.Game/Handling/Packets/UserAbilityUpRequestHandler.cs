@@ -7,17 +7,16 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
-public class UserAbilityUpRequestHandler : AbstractPipedFieldHandler<FieldOnPacketUserAbilityUpRequest>
+public class UserAbilityUpRequestHandler
+    : AbstractPipedFieldHandler<FieldOnPacketUserAbilityUpRequest>
 {
     public override short Operation => (short)PacketRecvOperations.UserAbilityUpRequest;
 
-    public UserAbilityUpRequestHandler(IPipeline<FieldOnPacketUserAbilityUpRequest> pipeline) : base(pipeline)
-    {
-    }
+    public UserAbilityUpRequestHandler(IPipeline<FieldOnPacketUserAbilityUpRequest> pipeline)
+        : base(pipeline) { }
 
-    protected override FieldOnPacketUserAbilityUpRequest? Serialize(IFieldUser user, IPacketReader reader)
-        => new(
-            user, 
-            (ModifyStatType)reader.Skip(4).ReadInt()
-        );
+    protected override FieldOnPacketUserAbilityUpRequest? Serialize(
+        IFieldUser user,
+        IPacketReader reader
+    ) => new(user, (ModifyStatType)reader.Skip(4).ReadInt());
 }

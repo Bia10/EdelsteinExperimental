@@ -18,4 +18,5 @@ public sealed record WorldSelectContext(
     LoginContext Context,
     ILoginStageUser User,
     int WorldId,
-    int ChannelId);
+    int ChannelId
+);

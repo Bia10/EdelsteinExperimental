@@ -21,7 +21,7 @@ public class Wildhunter1SkillHandler : CitizenSkillHandler
                 context.AddTemporaryStat(TemporaryStatType.Booster, context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 

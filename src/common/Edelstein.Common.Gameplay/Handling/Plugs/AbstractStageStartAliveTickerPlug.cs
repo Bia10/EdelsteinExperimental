@@ -6,7 +6,9 @@ using Edelstein.Protocol.Utilities.Tickers;
 
 namespace Edelstein.Common.Gameplay.Handling.Plugs;
 
-public abstract class AbstractStageStartAliveTickerPlug<TStageUser> : IPipelinePlug<StageStart>, ITickable
+public abstract class AbstractStageStartAliveTickerPlug<TStageUser>
+    : IPipelinePlug<StageStart>,
+        ITickable
     where TStageUser : class, IStageUser<TStageUser>
 {
     private readonly IStage<TStageUser> _stage;
@@ -23,11 +25,14 @@ public abstract class AbstractStageStartAliveTickerPlug<TStageUser> : IPipelineP
 
     public async Task OnTick(DateTime now)
     {
-        using var packet =  new PacketWriter(PacketSendOperations.AliveReq);
+        using var packet = new PacketWriter(PacketSendOperations.AliveReq);
         var built = packet.Build();
-        
-        foreach (var user in (await _stage.Users.RetrieveAll())
-                 .Where(u => now - u.Socket.LastAliveSent > TimeSpan.FromMinutes(2)))
+
+        foreach (
+            var user in (await _stage.Users.RetrieveAll()).Where(u =>
+                now - u.Socket.LastAliveSent > TimeSpan.FromMinutes(2)
+            )
+        )
         {
             user.Socket.LastAliveSent = now;
             await user.Socket.Dispatch(built);

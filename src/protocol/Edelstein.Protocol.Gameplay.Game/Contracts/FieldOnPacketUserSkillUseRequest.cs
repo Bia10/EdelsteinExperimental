@@ -2,7 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketUserSkillUseRequest(
-    IFieldUser User,
-    int SkillID
-);
+public record FieldOnPacketUserSkillUseRequest(IFieldUser User, int SkillID);

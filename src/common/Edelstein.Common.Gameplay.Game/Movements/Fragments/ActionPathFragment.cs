@@ -9,9 +9,8 @@ public class ActionPathFragment<TMoveAction> : AbstractMovePathFragment<TMoveAct
     private byte _action;
     private short _elapse;
 
-    public ActionPathFragment(MovePathFragmentType type) : base(type)
-    {
-    }
+    public ActionPathFragment(MovePathFragmentType type)
+        : base(type) { }
 
     protected override void ReadBody(IPacketReader reader)
     {
@@ -25,6 +24,5 @@ public class ActionPathFragment<TMoveAction> : AbstractMovePathFragment<TMoveAct
         writer.WriteShort(_elapse);
     }
 
-    public override void Apply(AbstractMovePath<TMoveAction> path) =>
-        path.ActionRaw = _action;
+    public override void Apply(AbstractMovePath<TMoveAction> path) => path.ActionRaw = _action;
 }

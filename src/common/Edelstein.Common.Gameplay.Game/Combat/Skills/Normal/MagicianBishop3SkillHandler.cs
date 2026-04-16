@@ -12,7 +12,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class MagicianBishop3SkillHandler : MagicianBishop2SkillHandler
 {
     public override int ID => Job.Priest;
-    
+
     public override Task HandleAttackMob(ISkillContext context, IFieldUser user, IFieldMob mob)
     {
         switch (context.Skill?.ID)
@@ -22,10 +22,10 @@ public class MagicianBishop3SkillHandler : MagicianBishop2SkillHandler
                 context.AddMobTemporaryStat(MobTemporaryStatType.Stun, 1);
                 break;
         }
-        
+
         return base.HandleAttackMob(context, user, mob);
     }
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -51,7 +51,11 @@ public class MagicianBishop3SkillHandler : MagicianBishop2SkillHandler
                 context.ResetSummoned(Skill.BishopBahamut);
                 break;
             case Skill.PriestTeleportMastery:
-                context.AddTemporaryStat(TemporaryStatType.TeleportMasteryOn, context.SkillLevel!.X, expire: DateTime.MaxValue);
+                context.AddTemporaryStat(
+                    TemporaryStatType.TeleportMasteryOn,
+                    context.SkillLevel!.X,
+                    expire: DateTime.MaxValue
+                );
                 break;
         }
 

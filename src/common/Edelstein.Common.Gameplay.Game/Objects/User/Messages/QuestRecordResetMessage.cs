@@ -2,9 +2,7 @@
 
 namespace Edelstein.Common.Gameplay.Game.Objects.User.Messages;
 
-public record QuestRecordResetMessage(
-    int QuestID
-) : IPacketWritable
+public record QuestRecordResetMessage(int QuestID) : IPacketWritable
 {
     public void WriteTo(IPacketWriter writer)
     {

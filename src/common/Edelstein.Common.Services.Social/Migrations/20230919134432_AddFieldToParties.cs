@@ -15,15 +15,14 @@ namespace Edelstein.Common.Services.Social.Migrations
                 table: "party_members",
                 type: "integer",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "FieldID",
-                table: "party_members");
+            migrationBuilder.DropColumn(name: "FieldID", table: "party_members");
         }
     }
 }

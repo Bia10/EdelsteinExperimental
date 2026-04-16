@@ -16,21 +16,25 @@ public class ConversationContext : IConversationContext
     {
         _adapter = adapter;
         TokenSource = new CancellationTokenSource();
-        _channel = Channel.CreateBounded<object>(new BoundedChannelOptions(1)
-        {
-            FullMode = BoundedChannelFullMode.DropWrite
-        });
+        _channel = Channel.CreateBounded<object>(
+            new BoundedChannelOptions(1) { FullMode = BoundedChannelFullMode.DropWrite }
+        );
     }
+
     public CancellationTokenSource TokenSource { get; }
 
     public async Task<T> Request<T>(IConversationMessageRequest<T> messageRequest)
     {
-        using var packet =  new PacketWriter(PacketSendOperations.ScriptMessage)
-            .Write(messageRequest);
-        
+        using var packet = new PacketWriter(PacketSendOperations.ScriptMessage).Write(
+            messageRequest
+        );
+
         await _adapter.Dispatch(packet.Build());
 
-        if (await _channel.Reader.ReadAsync(TokenSource.Token) is not IConversationMessageResponse<T> response)
+        if (
+            await _channel.Reader.ReadAsync(TokenSource.Token)
+            is not IConversationMessageResponse<T> response
+        )
             throw new InvalidDataException("Invalid response");
         if (messageRequest.Type != response.Type || !messageRequest.Check(response.Value))
             throw new InvalidDataException("Invalid response type or value");

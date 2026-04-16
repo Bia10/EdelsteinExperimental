@@ -15,15 +15,14 @@ namespace Edelstein.Common.Database.Migrations
                 table: "characters",
                 type: "json",
                 nullable: false,
-                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterQuickslotKeys, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[System.Int32, System.Private.CoreLib],[System.Int32, System.Private.CoreLib]], System.Private.CoreLib\"}}");
+                defaultValue: "{\"$type\":\"Edelstein.Common.Gameplay.Models.Characters.CharacterQuickslotKeys, Edelstein.Common.Gameplay\",\"Records\":{\"$type\":\"System.Collections.Generic.Dictionary`2[[System.Int32, System.Private.CoreLib],[System.Int32, System.Private.CoreLib]], System.Private.CoreLib\"}}"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "QuickslotKeys",
-                table: "characters");
+            migrationBuilder.DropColumn(name: "QuickslotKeys", table: "characters");
         }
     }
 }

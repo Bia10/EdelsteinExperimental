@@ -67,50 +67,46 @@ public class NotifyGuildInit : IPipelinePlug<StageStart>
 
     public async Task Handle(IPipelineContext ctx, StageStart message)
     {
-        await _messaging.SubscribeAsync<NotifyGuildCreated>(
-            e => _notifyGuildCreated.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildCreated>(e => _notifyGuildCreated.Process(e));
+        await _messaging.SubscribeAsync<NotifyGuildDisbanded>(e =>
+            _notifyGuildDisbanded.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyGuildDisbanded>(
-            e => _notifyGuildDisbanded.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildMemberInvited>(e =>
+            _notifyGuildMemberInvited.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyGuildMemberInvited>(
-            e => _notifyGuildMemberInvited.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildInviteRejected>(e =>
+            _notifyGuildInviteRejected.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyGuildInviteRejected>(
-            e => _notifyGuildInviteRejected.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildMemberJoined>(e =>
+            _notifyGuildMemberJoined.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyGuildMemberJoined>(
-            e => _notifyGuildMemberJoined.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildMemberWithdrawn>(e =>
+            _notifyGuildMemberWithdrawn.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyGuildMemberWithdrawn>(
-            e => _notifyGuildMemberWithdrawn.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildUpdated>(e => _notifyGuildUpdated.Process(e));
+        await _messaging.SubscribeAsync<NotifyGuildMemberLevelOrJobChanged>(e =>
+            _notifyGuildMemberLevelOrJobChanged.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyGuildUpdated>(
-            e => _notifyGuildUpdated.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildMemberOnlineChanged>(e =>
+            _notifyGuildMemberOnlineChanged.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyGuildMemberLevelOrJobChanged>(
-            e => _notifyGuildMemberLevelOrJobChanged.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildNoticeChanged>(e =>
+            _notifyGuildNoticeChanged.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyGuildMemberOnlineChanged>(
-            e => _notifyGuildMemberOnlineChanged.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildGradeNamesChanged>(e =>
+            _notifyGuildGradeNamesChanged.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyGuildNoticeChanged>(
-            e => _notifyGuildNoticeChanged.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildMemberGradeChanged>(e =>
+            _notifyGuildMemberGradeChanged.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyGuildGradeNamesChanged>(
-            e => _notifyGuildGradeNamesChanged.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildMarkChanged>(e =>
+            _notifyGuildMarkChanged.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyGuildMemberGradeChanged>(
-            e => _notifyGuildMemberGradeChanged.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildSkillUpdated>(e =>
+            _notifyGuildSkillUpdated.Process(e)
         );
-        await _messaging.SubscribeAsync<NotifyGuildMarkChanged>(
-            e => _notifyGuildMarkChanged.Process(e)
-        );
-        await _messaging.SubscribeAsync<NotifyGuildSkillUpdated>(
-            e => _notifyGuildSkillUpdated.Process(e)
-        );
-        await _messaging.SubscribeAsync<NotifyGuildMaxMemberChanged>(
-            e => _notifyGuildMaxMemberChanged.Process(e)
+        await _messaging.SubscribeAsync<NotifyGuildMaxMemberChanged>(e =>
+            _notifyGuildMaxMemberChanged.Process(e)
         );
     }
 }

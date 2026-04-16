@@ -11,19 +11,22 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 public class FieldOnPacketFriendAcceptRequestPlug : IPipelinePlug<FieldOnPacketFriendAcceptRequest>
 {
     private readonly IFriendService _service;
-    
+
     public FieldOnPacketFriendAcceptRequestPlug(IFriendService service) => _service = service;
-    
+
     public async Task Handle(IPipelineContext ctx, FieldOnPacketFriendAcceptRequest message)
     {
-        var response = await _service.InviteAccept(new FriendInviteAcceptRequest(
-            message.FriendID,
-            message.User.Character.ID,
-            message.User.StageUser.Context.Options.ChannelID
-        ));
-        
-        if (response.Result == FriendResult.Success) return;
-        
+        var response = await _service.InviteAccept(
+            new FriendInviteAcceptRequest(
+                message.FriendID,
+                message.User.Character.ID,
+                message.User.StageUser.Context.Options.ChannelID
+            )
+        );
+
+        if (response.Result == FriendResult.Success)
+            return;
+
         using var packet = new PacketWriter(PacketSendOperations.FriendResult);
         packet.WriteByte((byte)FriendResultOperations.AcceptFriendUnknown);
         packet.WriteBool(false);

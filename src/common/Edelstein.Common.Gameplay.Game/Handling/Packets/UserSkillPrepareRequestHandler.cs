@@ -6,20 +6,16 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
-public class UserSkillPrepareRequestHandler : AbstractPipedFieldHandler<FieldOnPacketUserSkillPrepareRequest>
+public class UserSkillPrepareRequestHandler
+    : AbstractPipedFieldHandler<FieldOnPacketUserSkillPrepareRequest>
 {
-    public UserSkillPrepareRequestHandler(IPipeline<FieldOnPacketUserSkillPrepareRequest> pipeline) : base(pipeline)
-    {
-    }
+    public UserSkillPrepareRequestHandler(IPipeline<FieldOnPacketUserSkillPrepareRequest> pipeline)
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.UserSkillPrepareRequest;
 
-    protected override FieldOnPacketUserSkillPrepareRequest? Serialize(IFieldUser user, IPacketReader reader)
-        => new(
-            user, 
-            reader.ReadInt(), 
-            reader.ReadByte(), 
-            reader.ReadShort(), 
-            reader.ReadByte()
-        );
+    protected override FieldOnPacketUserSkillPrepareRequest? Serialize(
+        IFieldUser user,
+        IPacketReader reader
+    ) => new(user, reader.ReadInt(), reader.ReadByte(), reader.ReadShort(), reader.ReadByte());
 }

@@ -2,6 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketUserMigrateToITCRequest(
-    IFieldUser User
-);
+public record FieldOnPacketUserMigrateToITCRequest(IFieldUser User);

@@ -29,7 +29,10 @@ public sealed class LoginMilestonesTracker
             _lastStepStable = null;
         }
 
-        _logger?.LogInformation("[Rue-AutoLogin] Login started for {Username}", string.IsNullOrWhiteSpace(username) ? "unknown" : username);
+        _logger?.LogInformation(
+            "[Rue-AutoLogin] Login started for {Username}",
+            string.IsNullOrWhiteSpace(username) ? "unknown" : username
+        );
     }
 
     public void RecordServerState(LoginState next)
@@ -50,10 +53,12 @@ public sealed class LoginMilestonesTracker
             startTick = _loginStartTick;
         }
 
-        _logger?.LogInformation("[Rue-AutoLogin] Server state: {Prev} -> {Next} (+{Elapsed})",
+        _logger?.LogInformation(
+            "[Rue-AutoLogin] Server state: {Prev} -> {Next} (+{Elapsed})",
             prev?.ToString() ?? "none",
             next,
-            FormatElapsed(now - startTick));
+            FormatElapsed(now - startTick)
+        );
     }
 
     public void RecordClientStep(int? prev, int? next)
@@ -71,10 +76,12 @@ public sealed class LoginMilestonesTracker
             startTick = _loginStartTick;
         }
 
-        _logger?.LogInformation("[Rue-AutoLogin] Client step: {Prev} -> {Next} (+{Elapsed})",
+        _logger?.LogInformation(
+            "[Rue-AutoLogin] Client step: {Prev} -> {Next} (+{Elapsed})",
             DescribeLoginStep(prev),
             DescribeLoginStep(next),
-            FormatElapsed(now - startTick));
+            FormatElapsed(now - startTick)
+        );
     }
 
     public void RecordClientStepStability(bool stable)
@@ -94,16 +101,20 @@ public sealed class LoginMilestonesTracker
             startTick = _loginStartTick;
         }
 
-        _logger?.LogInformation("[Rue-AutoLogin] Client step: {State} (+{Elapsed})",
+        _logger?.LogInformation(
+            "[Rue-AutoLogin] Client step: {State} (+{Elapsed})",
             stable ? "stable" : "transitioning",
-            FormatElapsed(now - startTick));
+            FormatElapsed(now - startTick)
+        );
     }
 
     public void RecordSingletonReady(string className, long elapsedMs)
     {
-        _logger?.LogInformation("[Rue-AutoLogin] Class {ClassName} came into existence in ~{Elapsed}",
+        _logger?.LogInformation(
+            "[Rue-AutoLogin] Class {ClassName} came into existence in ~{Elapsed}",
             className,
-            FormatElapsed(elapsedMs));
+            FormatElapsed(elapsedMs)
+        );
     }
 
     public void RecordCompletion()
@@ -118,7 +129,10 @@ public sealed class LoginMilestonesTracker
             startTick = _loginStartTick;
         }
 
-        _logger?.LogInformation("[Rue-AutoLogin] Login complete: connect -> in-game in {Ms}ms", now - startTick);
+        _logger?.LogInformation(
+            "[Rue-AutoLogin] Login complete: connect -> in-game in {Ms}ms",
+            now - startTick
+        );
     }
 
     public void RecordWriterAttached(string mode)
@@ -128,7 +142,11 @@ public sealed class LoginMilestonesTracker
 
     public void RecordMonitorStarted(int pollIntervalMs, int timeoutMs)
     {
-        _logger?.LogInformation("[Rue-AutoLogin] Monitor started (poll={PollMs}ms, timeout={TimeoutMs}ms)", pollIntervalMs, timeoutMs);
+        _logger?.LogInformation(
+            "[Rue-AutoLogin] Monitor started (poll={PollMs}ms, timeout={TimeoutMs}ms)",
+            pollIntervalMs,
+            timeoutMs
+        );
     }
 
     public static string FormatElapsed(long ms)

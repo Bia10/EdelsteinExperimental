@@ -9,5 +9,5 @@ public enum FieldEffectType
     Sound = 0x4,
     MobHPTag = 0x5,
     ChangeBGM = 0x6,
-    RewordRullet = 0x7
+    RewordRullet = 0x7,
 }

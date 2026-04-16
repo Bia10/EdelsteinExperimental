@@ -59,11 +59,11 @@ public class GuildBBSHandler : AbstractFieldHandler
             // ── 0x00: Register (write new post or modify existing) ─────────────
             case GuildBBSRequestOperations.Register:
             {
-                var bModify    = reader.ReadByte() != 0;
-                var articleID  = bModify ? reader.ReadInt() : (int?)null;
-                var isNotice   = reader.ReadByte() != 0;
-                var title      = reader.ReadString();
-                var content    = reader.ReadString();
+                var bModify = reader.ReadByte() != 0;
+                var articleID = bModify ? reader.ReadInt() : (int?)null;
+                var isNotice = reader.ReadByte() != 0;
+                var title = reader.ReadString();
+                var content = reader.ReadString();
                 var emoticonID = reader.ReadInt();
 
                 if (bModify && articleID.HasValue)
@@ -76,7 +76,9 @@ public class GuildBBSHandler : AbstractFieldHandler
                             isNotice,
                             title,
                             content,
-                            emoticonID));
+                            emoticonID
+                        )
+                    );
 
                     if (response.Result == GuildResult.FailedPostNotFound)
                     {
@@ -97,7 +99,9 @@ public class GuildBBSHandler : AbstractFieldHandler
                             isNotice,
                             title,
                             content,
-                            emoticonID));
+                            emoticonID
+                        )
+                    );
 
                     if (response.Result != GuildResult.Success || response.Post == null)
                         return;
@@ -111,14 +115,20 @@ public class GuildBBSHandler : AbstractFieldHandler
             {
                 var articleID = reader.ReadInt();
                 var deleteResponse = await guildService.BBSDelete(
-                    new GuildBBSDeleteRequest(guild.ID, articleID, user.Character.ID));
+                    new GuildBBSDeleteRequest(guild.ID, articleID, user.Character.ID)
+                );
 
                 if (deleteResponse.Result != GuildResult.Success)
                     return;
 
                 var loadResponse = await guildService.BBSLoad(new GuildBBSLoadRequest(guild.ID));
                 if (loadResponse.Result == GuildResult.Success)
-                    await SendLoadListResult(user, loadResponse.Notice, loadResponse.Posts!, loadResponse.TotalCount);
+                    await SendLoadListResult(
+                        user,
+                        loadResponse.Notice,
+                        loadResponse.Posts!,
+                        loadResponse.TotalCount
+                    );
                 break;
             }
 
@@ -127,10 +137,16 @@ public class GuildBBSHandler : AbstractFieldHandler
             {
                 var entryListStart = reader.ReadInt();
                 var response = await guildService.BBSLoad(
-                    new GuildBBSLoadRequest(guild.ID, entryListStart));
+                    new GuildBBSLoadRequest(guild.ID, entryListStart)
+                );
                 if (response.Result != GuildResult.Success)
                     return;
-                await SendLoadListResult(user, response.Notice, response.Posts!, response.TotalCount);
+                await SendLoadListResult(
+                    user,
+                    response.Notice,
+                    response.Posts!,
+                    response.TotalCount
+                );
                 break;
             }
 
@@ -139,7 +155,8 @@ public class GuildBBSHandler : AbstractFieldHandler
             {
                 var articleID = reader.ReadInt();
                 var response = await guildService.BBSView(
-                    new GuildBBSViewRequest(guild.ID, articleID));
+                    new GuildBBSViewRequest(guild.ID, articleID)
+                );
 
                 if (response.Result == GuildResult.FailedPostNotFound)
                 {
@@ -156,7 +173,7 @@ public class GuildBBSHandler : AbstractFieldHandler
             case GuildBBSRequestOperations.WriteComment:
             {
                 var articleID = reader.ReadInt();
-                var content   = reader.ReadString();
+                var content = reader.ReadString();
 
                 var response = await guildService.BBSWriteComment(
                     new GuildBBSWriteCommentRequest(
@@ -164,7 +181,9 @@ public class GuildBBSHandler : AbstractFieldHandler
                         articleID,
                         user.Character.ID,
                         user.Character.Name,
-                        content));
+                        content
+                    )
+                );
 
                 if (response.Result == GuildResult.FailedPostNotFound)
                 {
@@ -181,14 +200,16 @@ public class GuildBBSHandler : AbstractFieldHandler
             case GuildBBSRequestOperations.DeleteComment:
             {
                 var articleID = reader.ReadInt();
-                var commentSN = reader.ReadInt();  // m_nSN (comment serial number / ID)
+                var commentSN = reader.ReadInt(); // m_nSN (comment serial number / ID)
 
                 var response = await guildService.BBSDeleteComment(
                     new GuildBBSDeleteCommentRequest(
                         guild.ID,
                         articleID,
                         commentSN,
-                        user.Character.ID));
+                        user.Character.ID
+                    )
+                );
 
                 if (response.Result == GuildResult.FailedPostNotFound)
                 {
@@ -205,7 +226,8 @@ public class GuildBBSHandler : AbstractFieldHandler
                 _logger.LogDebug(
                     "Unhandled CP_GuildBBS sub-opcode 0x{Type:X2} from character {Name}",
                     (byte)type,
-                    user.Character.Name);
+                    user.Character.Name
+                );
                 break;
         }
     }
@@ -227,7 +249,8 @@ public class GuildBBSHandler : AbstractFieldHandler
         IFieldUser user,
         IGuildBBSPost? notice,
         IReadOnlyList<IGuildBBSPost> posts,
-        int totalCount)
+        int totalCount
+    )
     {
         using var packet = new PacketWriter(PacketSendOperations.GuildBBS);
         packet.WriteByte((byte)GuildBBSOperations.LoadListResult);
@@ -242,8 +265,8 @@ public class GuildBBSHandler : AbstractFieldHandler
             packet.WriteByte(0);
         }
 
-        packet.WriteInt(totalCount);    // nEntryListTotalCount
-        packet.WriteInt(posts.Count);   // nPageEntryCount
+        packet.WriteInt(totalCount); // nEntryListTotalCount
+        packet.WriteInt(posts.Count); // nPageEntryCount
         foreach (var post in posts)
             WriteEntryListEntry(packet, post);
 
@@ -263,22 +286,23 @@ public class GuildBBSHandler : AbstractFieldHandler
     private static Task SendViewEntryResult(
         IFieldUser user,
         IGuildBBSPost post,
-        IReadOnlyList<IGuildBBSComment> comments)
+        IReadOnlyList<IGuildBBSComment> comments
+    )
     {
         using var packet = new PacketWriter(PacketSendOperations.GuildBBS);
         packet.WriteByte((byte)GuildBBSOperations.ViewEntryResult);
         packet.WriteInt(post.ID);
         packet.WriteInt(post.AuthorID);
-        packet.WriteDateTime(post.CreatedAt);   // ftCurDate — BEFORE strings
+        packet.WriteDateTime(post.CreatedAt); // ftCurDate — BEFORE strings
         packet.WriteString(post.Title);
         packet.WriteString(post.Content);
         packet.WriteInt(post.EmoticonID);
         packet.WriteInt(comments.Count);
         foreach (var comment in comments)
         {
-            packet.WriteInt(comment.ID);                    // m_nSN
+            packet.WriteInt(comment.ID); // m_nSN
             packet.WriteInt(comment.AuthorID);
-            packet.WriteDateTime(comment.CreatedAt);        // m_ftDate — BEFORE text
+            packet.WriteDateTime(comment.CreatedAt); // m_ftDate — BEFORE text
             packet.WriteString(comment.Content);
         }
         return user.Dispatch(packet.Build());
@@ -299,10 +323,10 @@ public class GuildBBSHandler : AbstractFieldHandler
     private static void WriteEntryListEntry(IPacketWriter packet, IGuildBBSPost post)
     {
         packet.WriteInt(post.ID);
-        packet.WriteInt(post.AuthorID);         // nCharacterID — before sTitle
+        packet.WriteInt(post.AuthorID); // nCharacterID — before sTitle
         packet.WriteString(post.Title);
-        packet.WriteDateTime(post.CreatedAt);   // ftDate (_FILETIME)
-        packet.WriteInt(post.EmoticonID);       // nEmoticon — before nComments
+        packet.WriteDateTime(post.CreatedAt); // ftDate (_FILETIME)
+        packet.WriteInt(post.EmoticonID); // nEmoticon — before nComments
         packet.WriteInt(post.CommentCount);
     }
 }

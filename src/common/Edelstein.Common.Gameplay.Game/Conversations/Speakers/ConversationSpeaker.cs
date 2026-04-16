@@ -10,7 +10,7 @@ public class ConversationSpeaker : IConversationSpeaker
 
     public ConversationSpeaker(
         IConversationContext context,
-        int id = 9010000, 
+        int id = 9010000,
         ConversationSpeakerFlags flags = 0
     )
     {
@@ -22,20 +22,17 @@ public class ConversationSpeaker : IConversationSpeaker
     public int ID { get; }
     public ConversationSpeakerFlags Flags { get; }
 
-    public IConversationSpeaker Speaker(int id = 9010000, ConversationSpeakerFlags flags = 0)
-        => new ConversationSpeaker(_context, id, flags);
+    public IConversationSpeaker Speaker(int id = 9010000, ConversationSpeakerFlags flags = 0) =>
+        new ConversationSpeaker(_context, id, flags);
 
-    public IConversationSpeech Speech(string message)
-        => new ConversationSpeech(this, message);
+    public IConversationSpeech Speech(string message) => new ConversationSpeech(this, message);
 
-    public byte Say(string text, bool prev = false, bool next = true) => 
+    public byte Say(string text, bool prev = false, bool next = true) =>
         _context.Request(new SayRequest(this, text, prev, next)).Result;
 
-    public byte Say(string[] text, int current = 0)
-        => SaySpeech(text
-            .Select(Speech)
-            .ToArray(), current);
-    
+    public byte Say(string[] text, int current = 0) =>
+        SaySpeech(text.Select(Speech).ToArray(), current);
+
     public byte SaySpeech(IConversationSpeech[] speech, int current = 0)
     {
         byte result = 0;
@@ -44,8 +41,10 @@ public class ConversationSpeaker : IConversationSpeaker
         {
             result = speech[current].Speaker.Say(speech[current].Message, current > 0);
 
-            if (result == 0) current = Math.Max(0, --current);
-            if (result != 1) continue;
+            if (result == 0)
+                current = Math.Max(0, --current);
+            if (result != 1)
+                continue;
             if (current == speech.Length)
                 break;
             current = Math.Min(speech.Length, ++current);
@@ -53,27 +52,32 @@ public class ConversationSpeaker : IConversationSpeaker
 
         return result;
     }
-    
-    public byte SayImage(string image) 
-        => SayImage(new []{image});
-    
+
+    public byte SayImage(string image) => SayImage(new[] { image });
+
     public byte SayImage(string[] images) =>
         _context.Request(new SayImageRequest(this, images)).Result;
 
-    public bool AskYesNo(string text) =>
-        _context.Request(new AskYesNoRequest(this, text)).Result;
+    public bool AskYesNo(string text) => _context.Request(new AskYesNoRequest(this, text)).Result;
 
-    public bool AskAccept(string text) =>
-        _context.Request(new AskAcceptRequest(this, text)).Result;
+    public bool AskAccept(string text) => _context.Request(new AskAcceptRequest(this, text)).Result;
 
-    public string AskText(string text, string def = "", short lenMin = 0, short lenMax = short.MaxValue) =>
-        _context.Request(new AskTextRequest(this, text, def, lenMin, lenMax)).Result;
+    public string AskText(
+        string text,
+        string def = "",
+        short lenMin = 0,
+        short lenMax = short.MaxValue
+    ) => _context.Request(new AskTextRequest(this, text, def, lenMin, lenMax)).Result;
 
     public string AskBoxText(string text, string def = "", short rows = 4, short cols = 24) =>
         _context.Request(new AskBoxTextRequest(this, text, def, rows, cols)).Result;
 
-    public int AskNumber(string text, int def = 0, int min = int.MinValue, int max = int.MaxValue) =>
-        _context.Request(new AskNumberRequest(this, text, def, min, max)).Result;
+    public int AskNumber(
+        string text,
+        int def = 0,
+        int min = int.MinValue,
+        int max = int.MaxValue
+    ) => _context.Request(new AskNumberRequest(this, text, def, min, max)).Result;
 
     public int AskMenu(string text, IDictionary<int, string> options) =>
         _context.Request(new AskMenuRequest(this, text, options)).Result;

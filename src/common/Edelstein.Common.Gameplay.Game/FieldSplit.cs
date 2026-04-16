@@ -26,9 +26,14 @@ public class FieldSplit : AbstractFieldObjectPool, IFieldSplit
     public IReadOnlyCollection<IFieldSplitObserver> Observers => _observers.ToImmutableArray();
 
     public override Task Enter(IFieldObject obj) => Enter(obj, null);
+
     public override Task Leave(IFieldObject obj) => Leave(obj, null);
 
-    public async Task Enter(IFieldObject obj, Func<IPacket>? getEnterPacket, Func<IPacket>? getLeavePacket = null)
+    public async Task Enter(
+        IFieldObject obj,
+        Func<IPacket>? getEnterPacket,
+        Func<IPacket>? getLeavePacket = null
+    )
     {
         var from = obj.FieldSplit;
 
@@ -59,9 +64,10 @@ public class FieldSplit : AbstractFieldObjectPool, IFieldSplit
 
         if (obj is IFieldSplitObserver observer)
         {
-            var enclosingSplits = observer.Field?.GetEnclosingSplits(this) ?? Array.Empty<IFieldSplit>();
-            var oldSplits = observer.Observing
-                .Except(enclosingSplits)
+            var enclosingSplits =
+                observer.Field?.GetEnclosingSplits(this) ?? Array.Empty<IFieldSplit>();
+            var oldSplits = observer
+                .Observing.Except(enclosingSplits)
                 .Where(s => s != null)
                 .ToImmutableArray();
             var newSplits = enclosingSplits
@@ -102,37 +108,40 @@ public class FieldSplit : AbstractFieldObjectPool, IFieldSplit
         _observers.Add(observer);
         observer.Observing.Add(this);
 
-        await Task.WhenAll(Objects
-            .Where(o => o != observer)
-            .Where(o => o.IsVisibleTo(observer))
-            .Select(o => observer.Dispatch(o.GetEnterFieldPacket())));
+        await Task.WhenAll(
+            Objects
+                .Where(o => o != observer)
+                .Where(o => o.IsVisibleTo(observer))
+                .Select(o => observer.Dispatch(o.GetEnterFieldPacket()))
+        );
         await UpdateControllableObjects();
     }
-    
+
     public async Task Unobserve(IFieldSplitObserver observer, bool quiet = false)
     {
         _observers.Remove(observer);
         observer.Observing.Remove(this);
 
         if (!quiet)
-            await Task.WhenAll(Objects
-                .Where(o => o != observer)
-                .Where(o => o.IsVisibleTo(observer))
-                .Select(o => observer.Dispatch(o.GetLeaveFieldPacket())));
+            await Task.WhenAll(
+                Objects
+                    .Where(o => o != observer)
+                    .Where(o => o.IsVisibleTo(observer))
+                    .Select(o => observer.Dispatch(o.GetLeaveFieldPacket()))
+            );
         await UpdateControllableObjects();
     }
 
     public override Task Dispatch(IPacket packet) =>
-        Task.WhenAll(Observers
-            .Select(a => a.Dispatch(packet)));
+        Task.WhenAll(Observers.Select(a => a.Dispatch(packet)));
 
     public override Task Dispatch(IPacket packet, IFieldObject obj) =>
-        Task.WhenAll(Observers
-            .Where(a => a != obj)
-            .Where(obj.IsVisibleTo)
-            .Select(a => a.Dispatch(packet)));
+        Task.WhenAll(
+            Observers.Where(a => a != obj).Where(obj.IsVisibleTo).Select(a => a.Dispatch(packet))
+        );
 
-    public override IFieldObject? GetObject(int id) => Objects.FirstOrDefault(o => o.ObjectID == id);
+    public override IFieldObject? GetObject(int id) =>
+        Objects.FirstOrDefault(o => o.ObjectID == id);
 
     private async Task UpdateControllableObjects()
     {
@@ -140,13 +149,12 @@ public class FieldSplit : AbstractFieldObjectPool, IFieldSplit
             .OfType<IFieldObjectController>()
             .OrderBy(u => u.Controlled.Count)
             .ToImmutableArray();
-        var controlled = Objects
-            .OfType<IFieldObjectControllable>()
-            .ToImmutableArray();
+        var controlled = Objects.OfType<IFieldObjectControllable>().ToImmutableArray();
 
-        await Task.WhenAll(controlled
-            .Where(c => c.Controller == null || !controllers.Contains(c.Controller))
-            .Select(c => c.Control(controllers
-                .FirstOrDefault(u => u.IsVisibleTo(c)))));
+        await Task.WhenAll(
+            controlled
+                .Where(c => c.Controller == null || !controllers.Contains(c.Controller))
+                .Select(c => c.Control(controllers.FirstOrDefault(u => u.IsVisibleTo(c))))
+        );
     }
 }

@@ -6,7 +6,6 @@ namespace Edelstein.Common.Gameplay.Trade.Handling.Plugs;
 
 public class StageStartAliveTickerPlug : AbstractStageStartAliveTickerPlug<ITradeStageUser>
 {
-    public StageStartAliveTickerPlug(ITickerManager ticker, ITradeStage stage) : base(ticker, stage)
-    {
-    }
+    public StageStartAliveTickerPlug(ITickerManager ticker, ITradeStage stage)
+        : base(ticker, stage) { }
 }

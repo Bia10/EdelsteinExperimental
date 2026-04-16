@@ -3,10 +3,7 @@ using Edelstein.Protocol.Utilities.Packets;
 
 namespace Edelstein.Common.Gameplay.Game.Objects.User.Messages;
 
-public record QuestRecordCompleteMessage(
-    int QuestID,
-    DateTime DateFinish
-) : IPacketWritable
+public record QuestRecordCompleteMessage(int QuestID, DateTime DateFinish) : IPacketWritable
 {
     public void WriteTo(IPacketWriter writer)
     {

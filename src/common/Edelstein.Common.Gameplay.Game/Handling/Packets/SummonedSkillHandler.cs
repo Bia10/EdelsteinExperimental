@@ -10,14 +10,17 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
 public class SummonedSkillHandler : AbstractPipedFieldSummonedHandler<FieldOnPacketSummonedSkill>
 {
-    public SummonedSkillHandler(IPipeline<FieldOnPacketSummonedSkill> pipeline) : base(pipeline)
-    {
-    }
+    public SummonedSkillHandler(IPipeline<FieldOnPacketSummonedSkill> pipeline)
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.SummonedSkill;
 
-    protected override FieldOnPacketSummonedSkill? Serialize(IFieldUser user, IFieldSummoned summoned, IPacketReader reader)
-        => new(
+    protected override FieldOnPacketSummonedSkill? Serialize(
+        IFieldUser user,
+        IFieldSummoned summoned,
+        IPacketReader reader
+    ) =>
+        new(
             user,
             summoned,
             reader.ReadInt(),

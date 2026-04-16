@@ -12,18 +12,23 @@ public partial class RuntimeFunctionDumper
         byte[] RawBytes,
         string Disassembly,
         List<CallTarget> Targets,
-        List<string> Findings)
+        List<string> Findings
+    )
     {
         public IReadOnlyList<uint> ExternalCallAddresses =>
-         [.. Targets
-            .Where(t => t.Kind == TargetKind.ExternalCall)
-            .Select(t => t.Address)
-            .Distinct()];
+            [
+                .. Targets
+                    .Where(t => t.Kind == TargetKind.ExternalCall)
+                    .Select(t => t.Address)
+                    .Distinct(),
+            ];
 
         public IReadOnlyList<uint> FollowableAddresses =>
-        [.. Targets
-            .Where(t => t.Kind is TargetKind.ExternalCall or TargetKind.TailJump)
-            .Select(t => t.Address)
-            .Distinct()];
+            [
+                .. Targets
+                    .Where(t => t.Kind is TargetKind.ExternalCall or TargetKind.TailJump)
+                    .Select(t => t.Address)
+                    .Distinct(),
+            ];
     }
 }

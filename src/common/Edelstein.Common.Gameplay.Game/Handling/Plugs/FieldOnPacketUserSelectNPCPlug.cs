@@ -13,8 +13,11 @@ public class FieldOnPacketUserSelectNPCPlug : IPipelinePlug<FieldOnPacketUserSel
 {
     private readonly INamedConversationManager _conversationManager;
     private readonly INPCShopManager _shopManager;
-    
-    public FieldOnPacketUserSelectNPCPlug(INamedConversationManager conversationManager, INPCShopManager shopManager)
+
+    public FieldOnPacketUserSelectNPCPlug(
+        INamedConversationManager conversationManager,
+        INPCShopManager shopManager
+    )
     {
         _conversationManager = conversationManager;
         _shopManager = shopManager;
@@ -29,16 +32,22 @@ public class FieldOnPacketUserSelectNPCPlug : IPipelinePlug<FieldOnPacketUserSel
             await message.User.Dialogue(new DialogueNPCShop(shop));
             return;
         }
-        
+
         var script = message.NPC.Template.Scripts.FirstOrDefault()?.Script;
-        if (script == null) return;
-        var conversation = await _conversationManager.Retrieve(script) as IConversation ?? 
-                           new FallbackConversation(script, message.User);
+        if (script == null)
+            return;
+        var conversation =
+            await _conversationManager.Retrieve(script) as IConversation
+            ?? new FallbackConversation(script, message.User);
 
         _ = message.User.Converse(
             conversation,
             c => new ConversationSpeakerNPC(message.NPC, c, message.NPC.Template.ID),
-            c => new ConversationSpeakerUser(message.User, c, flags: ConversationSpeakerFlags.NPCReplacedByUser)
+            c => new ConversationSpeakerUser(
+                message.User,
+                c,
+                flags: ConversationSpeakerFlags.NPCReplacedByUser
+            )
         );
     }
 }

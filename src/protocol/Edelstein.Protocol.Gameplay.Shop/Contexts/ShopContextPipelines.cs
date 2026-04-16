@@ -12,7 +12,6 @@ public record ShopContextPipelines(
     IPipeline<UserOnException<IShopStageUser>> UserOnException,
     IPipeline<UserOnDisconnect<IShopStageUser>> UserOnDisconnect,
     IPipeline<UserOnPacketAliveAck<IShopStageUser>> UserOnPacketAliveAck,
-    
     IPipeline<ShopOnPacketCashItemBuyRequest> ShopOnPacketCashItemBuyRequest,
     IPipeline<ShopOnPacketCashItemSetWishRequest> ShopOnPacketCashItemSetWishRequest,
     IPipeline<ShopOnPacketCashItemIncSlotCountRequest> ShopOnPacketCashItemIncSlotCountRequest,

@@ -12,7 +12,12 @@ public interface IModifyTemporaryStatContext
     void SetDashSpeed(int? value = null, int? reason = null, TimeSpan? term = null);
     void SetDashJump(int? value = null, int? reason = null, TimeSpan? term = null);
     void SetRideVehicle(int? value = null, int? reason = null);
-    void SetPartyBooster(int? value = null, int? reason = null, DateTime? dateStart = null, TimeSpan? term = null);
+    void SetPartyBooster(
+        int? value = null,
+        int? reason = null,
+        DateTime? dateStart = null,
+        TimeSpan? term = null
+    );
     void SetGuidedBullet(int? value = null, int? reason = null, int? mobID = null);
     void SetUndead(int? value = null, int? reason = null, TimeSpan? term = null);
 
@@ -23,9 +28,9 @@ public interface IModifyTemporaryStatContext
     void ResetPartyBooster();
     void ResetGuidedBullet();
     void ResetUndead();
-    
+
     void ResetByType(TemporaryStatType type);
     void ResetByReason(int reason);
-    
+
     void ResetAll();
 }

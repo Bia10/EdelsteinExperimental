@@ -11,9 +11,7 @@ public class PartyMemberConfiguration : IEntityTypeConfiguration<PartyMemberEnti
         builder.ToTable("party_members");
 
         builder.HasKey(m => m.ID);
-        builder
-            .HasIndex(m => m.CharacterID)
-            .IsUnique();
+        builder.HasIndex(m => m.CharacterID).IsUnique();
         builder
             .HasOne(m => m.Party)
             .WithMany(p => p.Members)

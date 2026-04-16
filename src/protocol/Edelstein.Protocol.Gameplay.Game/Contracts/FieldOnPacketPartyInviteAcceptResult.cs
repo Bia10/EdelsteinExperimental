@@ -2,7 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketPartyInviteAcceptResult(
-    IFieldUser User,
-    int PartyID
-);
+public record FieldOnPacketPartyInviteAcceptResult(IFieldUser User, int PartyID);

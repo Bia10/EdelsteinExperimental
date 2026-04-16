@@ -6,22 +6,28 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
-public abstract class AbstractPipedFieldSummonedHandler<TMessage> : AbstractPipedFieldHandler<TMessage>
+public abstract class AbstractPipedFieldSummonedHandler<TMessage>
+    : AbstractPipedFieldHandler<TMessage>
 {
-    protected AbstractPipedFieldSummonedHandler(IPipeline<TMessage> pipeline) : base(pipeline)
-    {
-    }
+    protected AbstractPipedFieldSummonedHandler(IPipeline<TMessage> pipeline)
+        : base(pipeline) { }
 
     protected override TMessage? Serialize(IFieldUser user, IPacketReader reader)
     {
         var objID = reader.ReadInt();
         var obj = user.Field?.GetPool(FieldObjectType.Summoned)?.GetObject(objID);
 
-        if (obj is not IFieldSummoned summoned) return default;
-        if (summoned.Owner != user) return default;
+        if (obj is not IFieldSummoned summoned)
+            return default;
+        if (summoned.Owner != user)
+            return default;
 
         return Serialize(user, summoned, reader);
     }
 
-    protected abstract TMessage? Serialize(IFieldUser user, IFieldSummoned summoned, IPacketReader reader);
+    protected abstract TMessage? Serialize(
+        IFieldUser user,
+        IFieldSummoned summoned,
+        IPacketReader reader
+    );
 }

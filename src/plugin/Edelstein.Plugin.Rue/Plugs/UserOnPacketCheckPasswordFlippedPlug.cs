@@ -8,7 +8,11 @@ using Microsoft.Extensions.Options;
 
 namespace Edelstein.Plugin.Rue.Plugs;
 
-public class UserOnPacketCheckPasswordFlippedPlug(ILogger? logger, IOptions<RueConfigLogin> options, LoginContext context) : IPipelinePlug<UserOnPacketCheckPassword>
+public class UserOnPacketCheckPasswordFlippedPlug(
+    ILogger? logger,
+    IOptions<RueConfigLogin> options,
+    LoginContext context
+) : IPipelinePlug<UserOnPacketCheckPassword>
 {
     private readonly ILogger? _logger = logger;
     private readonly RueConfigLogin _config = options.Value;
@@ -18,11 +22,13 @@ public class UserOnPacketCheckPasswordFlippedPlug(ILogger? logger, IOptions<RueC
     {
         if (_config.IsFlippedUsername && message is not UserOnPacketCheckPasswordFlipped)
         {
-            await _context.Pipelines.UserOnPacketCheckPassword.Process(new UserOnPacketCheckPasswordFlipped(
-                message.User,
-                message.Password,
-                message.Username
-            ));
+            await _context.Pipelines.UserOnPacketCheckPassword.Process(
+                new UserOnPacketCheckPasswordFlipped(
+                    message.User,
+                    message.Password,
+                    message.Username
+                )
+            );
             ctx.Cancel();
         }
     }

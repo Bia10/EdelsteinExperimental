@@ -6,4 +6,3 @@ public class Striker4SkillHandler : Striker3SkillHandler
 {
     public override int ID => Job.Striker4;
 }
-

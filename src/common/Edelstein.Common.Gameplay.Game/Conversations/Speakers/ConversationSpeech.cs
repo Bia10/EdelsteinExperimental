@@ -9,7 +9,7 @@ public class ConversationSpeech : IConversationSpeech
         Speaker = speaker;
         Message = message;
     }
-    
+
     public IConversationSpeaker Speaker { get; }
     public string Message { get; }
 }

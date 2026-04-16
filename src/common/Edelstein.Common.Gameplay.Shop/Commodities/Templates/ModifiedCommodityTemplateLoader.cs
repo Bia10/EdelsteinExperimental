@@ -8,8 +8,11 @@ public class ModifiedCommodityTemplateLoader : ITemplateLoader
 {
     private readonly IDataNamespace _data;
     private readonly ITemplateManager<ModifiedCommodityTemplate> _manager;
-    
-    public ModifiedCommodityTemplateLoader(IDataNamespace data, ITemplateManager<ModifiedCommodityTemplate> manager)
+
+    public ModifiedCommodityTemplateLoader(
+        IDataNamespace data,
+        ITemplateManager<ModifiedCommodityTemplate> manager
+    )
     {
         _data = data;
         _manager = manager;
@@ -17,15 +20,21 @@ public class ModifiedCommodityTemplateLoader : ITemplateLoader
 
     public async Task<int> Load()
     {
-        await Task.WhenAll(_data.ResolvePath("Server/ModifiedCommodity.img")?.Children
-            .Select(async n =>
-            {
-                var sn = Convert.ToInt32(n.Name);
-                await _manager.Insert(new TemplateProviderEager<ModifiedCommodityTemplate>(
-                    sn,
-                    new ModifiedCommodityTemplate(sn, n.Cache())
-                ));
-            }) ?? Array.Empty<Task>());
+        await Task.WhenAll(
+            _data
+                .ResolvePath("Server/ModifiedCommodity.img")
+                ?.Children.Select(async n =>
+                {
+                    var sn = Convert.ToInt32(n.Name);
+                    await _manager.Insert(
+                        new TemplateProviderEager<ModifiedCommodityTemplate>(
+                            sn,
+                            new ModifiedCommodityTemplate(sn, n.Cache())
+                        )
+                    );
+                })
+                ?? Array.Empty<Task>()
+        );
 
         _manager.Freeze();
         return _manager.Count;

@@ -4,22 +4,28 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class FieldOnPacketUserTransferFieldRequestPlug : IPipelinePlug<FieldOnPacketUserTransferFieldRequest>
+public class FieldOnPacketUserTransferFieldRequestPlug
+    : IPipelinePlug<FieldOnPacketUserTransferFieldRequest>
 {
     private readonly IFieldManager _fieldManager;
-    
-    public FieldOnPacketUserTransferFieldRequestPlug(IFieldManager fieldManager) => _fieldManager = fieldManager;
-    
+
+    public FieldOnPacketUserTransferFieldRequestPlug(IFieldManager fieldManager) =>
+        _fieldManager = fieldManager;
+
     public async Task Handle(IPipelineContext ctx, FieldOnPacketUserTransferFieldRequest message)
     {
         if (message.User.Character.HP <= 0)
         {
-            if (message.User.Field == null) return;
-            
-            var target = await _fieldManager.Retrieve(message.User.Field.Template.FieldReturn ?? message.User.Field.Template.ID);
-            
-            if (target == null) return;
-            
+            if (message.User.Field == null)
+                return;
+
+            var target = await _fieldManager.Retrieve(
+                message.User.Field.Template.FieldReturn ?? message.User.Field.Template.ID
+            );
+
+            if (target == null)
+                return;
+
             await message.User.Modify(m =>
             {
                 m.TemporaryStats(s => s.ResetAll());
@@ -33,13 +39,16 @@ public class FieldOnPacketUserTransferFieldRequestPlug : IPipelinePlug<FieldOnPa
             await target.Enter(message.User);
             return;
         }
-        
-        if (message.FieldID != -1/* && message.User.Account.GradeCode.HasFlag(AccountGradeCode.AdminLevel1)*/)
+
+        if (
+            message.FieldID != -1 /* && message.User.Account.GradeCode.HasFlag(AccountGradeCode.AdminLevel1)*/
+        )
         {
             var target = await _fieldManager.Retrieve(message.FieldID);
-            
-            if (target == null) return;
-            
+
+            if (target == null)
+                return;
+
             await target.Enter(message.User);
 
             if (message.User.IsDirectionMode)
@@ -49,15 +58,18 @@ public class FieldOnPacketUserTransferFieldRequestPlug : IPipelinePlug<FieldOnPa
             return;
         }
 
-        var portal = message.User.Field?.Template.Portals.Objects
-            .FirstOrDefault(o => o.Name == message.PortalID);
-        if (portal == null) return;
+        var portal = message.User.Field?.Template.Portals.Objects.FirstOrDefault(o =>
+            o.Name == message.PortalID
+        );
+        if (portal == null)
+            return;
         var field = await _fieldManager.Retrieve(portal.ToMap);
-        if (field == null) return;
-        
+        if (field == null)
+            return;
+
         if (portal.ToName != null)
             await field.Enter(message.User, portal.ToName);
-        else 
+        else
             await field.Enter(message.User);
     }
 }

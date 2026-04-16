@@ -59,8 +59,9 @@ public class AccountWorldRepository : IAccountWorldRepository
     public async Task<IAccountWorld?> RetrieveByAccountAndWorld(int accountID, int worldID)
     {
         await using var db = await _dbFactory.CreateDbContextAsync();
-        var entity = await db.AccountWorlds
-            .FirstOrDefaultAsync(a => a.AccountID == accountID && a.WorldID == worldID);
+        var entity = await db.AccountWorlds.FirstOrDefaultAsync(a =>
+            a.AccountID == accountID && a.WorldID == worldID
+        );
         return entity != null ? _mapper.Map<AccountWorld>(entity) : null;
     }
 }

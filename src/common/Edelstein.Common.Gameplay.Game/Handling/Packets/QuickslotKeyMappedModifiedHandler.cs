@@ -6,17 +6,22 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
-public class QuickslotKeyMappedModifiedHandler : AbstractPipedFieldHandler<FieldOnPacketUserQuickslotKeyMappedModified>
+public class QuickslotKeyMappedModifiedHandler
+    : AbstractPipedFieldHandler<FieldOnPacketUserQuickslotKeyMappedModified>
 {
-    public QuickslotKeyMappedModifiedHandler(IPipeline<FieldOnPacketUserQuickslotKeyMappedModified> pipeline) : base(pipeline)
-    {
-    }
+    public QuickslotKeyMappedModifiedHandler(
+        IPipeline<FieldOnPacketUserQuickslotKeyMappedModified> pipeline
+    )
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.QuickslotKeyMappedModified;
-    
+
     // TODO petconsume
     // TODO petconsumeMP
-    protected override FieldOnPacketUserQuickslotKeyMappedModified? Serialize(IFieldUser user, IPacketReader reader)
+    protected override FieldOnPacketUserQuickslotKeyMappedModified? Serialize(
+        IFieldUser user,
+        IPacketReader reader
+    )
     {
         var keys = new Dictionary<int, int>();
         for (var i = 0; i < 8; i++)

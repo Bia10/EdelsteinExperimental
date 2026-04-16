@@ -5,5 +5,5 @@ public enum QuestJobExFlags
 {
     Bmage = 0x1,
     Wildhunter = 0x2,
-    Mechanic = 0x8
+    Mechanic = 0x8,
 }

@@ -6,10 +6,10 @@ namespace Edelstein.Common.Gameplay.Models.Characters.Skills.Templates;
 public class SkillStringTemplate : ISkillStringTemplate
 {
     public int ID { get; }
-    
+
     public string Name { get; }
     public string Desc { get; }
-    
+
     public SkillStringTemplate(int id, IDataNode node)
     {
         ID = id;

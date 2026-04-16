@@ -186,5 +186,5 @@ public enum ShopResultOperations
     Give_Failed = 0xBF,
 
     GashItemGachapon_Failed = 0xC0,
-    CashItemGachapon_Done = 0xC1
+    CashItemGachapon_Done = 0xC1,
 }

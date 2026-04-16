@@ -12,19 +12,23 @@ public record ItemSetTemplate : IItemSetTemplate
 
         SetCompleteCount = node.ResolveInt("completeCount") ?? 0;
 
-        Items = node.ResolvePath("ItemID")?.Children
-            .Select(c => c.ResolveInt() ?? 0)
-            .ToFrozenSet() ?? FrozenSet<int>.Empty;
-        Effects = node.ResolvePath("Effect")?.Children
-            .ToFrozenDictionary(
-                c => Convert.ToInt32(c.Name),
-                c => (IItemSetTemplateEffect)new ItemSetTemplateEffect(Convert.ToInt32(c.Name), c.Cache())
-            ) ?? FrozenDictionary<int, IItemSetTemplateEffect>.Empty;
+        Items =
+            node.ResolvePath("ItemID")?.Children.Select(c => c.ResolveInt() ?? 0).ToFrozenSet()
+            ?? FrozenSet<int>.Empty;
+        Effects =
+            node.ResolvePath("Effect")
+                ?.Children.ToFrozenDictionary(
+                    c => Convert.ToInt32(c.Name),
+                    c =>
+                        (IItemSetTemplateEffect)
+                            new ItemSetTemplateEffect(Convert.ToInt32(c.Name), c.Cache())
+                )
+            ?? FrozenDictionary<int, IItemSetTemplateEffect>.Empty;
     }
-    
+
     public int ID { get; }
     public int SetCompleteCount { get; }
-    
+
     public ICollection<int> Items { get; }
     public IDictionary<int, IItemSetTemplateEffect> Effects { get; }
 }

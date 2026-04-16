@@ -10,9 +10,8 @@ public class JumpPathFragment<TMoveAction> : ActionPathFragment<TMoveAction>
 {
     private IPoint2D _vPosition;
 
-    public JumpPathFragment(MovePathFragmentType type) : base(type)
-    {
-    }
+    public JumpPathFragment(MovePathFragmentType type)
+        : base(type) { }
 
     protected override void ReadBody(IPacketReader reader)
     {

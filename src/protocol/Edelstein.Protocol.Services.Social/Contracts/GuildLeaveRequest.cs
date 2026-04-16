@@ -1,7 +1,3 @@
-namespace Edelstein.Protocol.Services.Social.Contracts;
+﻿namespace Edelstein.Protocol.Services.Social.Contracts;
 
-public record GuildLeaveRequest(
-    int GuildID,
-    int CharacterID,
-    string CharacterName
-);
+public record GuildLeaveRequest(int GuildID, int CharacterID, string CharacterName);

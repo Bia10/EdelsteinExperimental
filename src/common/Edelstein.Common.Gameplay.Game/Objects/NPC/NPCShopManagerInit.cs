@@ -10,13 +10,13 @@ public class NPCShopManagerInit : IPipelinePlug<StageStart>
 {
     private readonly INPCShopManager _manager;
     private readonly ITemplateManager<NPCShopTemplate> _templates;
-    
+
     public NPCShopManagerInit(INPCShopManager manager, ITemplateManager<NPCShopTemplate> templates)
     {
         _manager = manager;
         _templates = templates;
     }
 
-    public async Task Handle(IPipelineContext ctx, StageStart message) 
-        => await Task.WhenAll((await _templates.RetrieveAll()).Select(_manager.Insert));
+    public async Task Handle(IPipelineContext ctx, StageStart message) =>
+        await Task.WhenAll((await _templates.RetrieveAll()).Select(_manager.Insert));
 }

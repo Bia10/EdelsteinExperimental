@@ -12,7 +12,13 @@ public class NettyTransportAcceptorState : ITransportContext
     private readonly IEventLoopGroup _group0;
     private readonly IEventLoopGroup _group1;
 
-    public NettyTransportAcceptorState(IChannel channel, IEventLoopGroup group0, IEventLoopGroup group1, TransportVersion version, IReadOnlyRepository<string, ISocket> sockets)
+    public NettyTransportAcceptorState(
+        IChannel channel,
+        IEventLoopGroup group0,
+        IEventLoopGroup group1,
+        TransportVersion version,
+        IReadOnlyRepository<string, ISocket> sockets
+    )
     {
         _channel = channel;
         _group0 = group0;
@@ -26,14 +32,14 @@ public class NettyTransportAcceptorState : ITransportContext
 
     public IReadOnlyRepository<string, ISocket> Sockets { get; }
 
-    public async Task Dispatch(IPacket packet)
-        => await Task.WhenAll((await Sockets.RetrieveAll()).Select(s => s.Dispatch(packet)));
+    public async Task Dispatch(IPacket packet) =>
+        await Task.WhenAll((await Sockets.RetrieveAll()).Select(s => s.Dispatch(packet)));
 
     public async Task Close()
     {
         await Task.WhenAll((await Sockets.RetrieveAll()).Select(s => s.Close()));
         await _channel.CloseAsync();
-        
+
 #if (DEBUG)
         var t0 = _group0.ShutdownGracefullyAsync(TimeSpan.Zero, TimeSpan.Zero);
         var t1 = _group1.ShutdownGracefullyAsync(TimeSpan.Zero, TimeSpan.Zero);

@@ -12,37 +12,37 @@ public interface IDamageCalculator
     uint InitSeed3 { get; }
 
     void Skip();
-    
+
     Task<IDamage[]> CalculatePDamage(
-        ICharacter character, 
-        IFieldUserStats stats, 
-        IFieldMob mob, 
-        IFieldMobStats mobStats, 
+        ICharacter character,
+        IFieldUserStats stats,
+        IFieldMob mob,
+        IFieldMobStats mobStats,
         IAttack attack,
         IAttackMobEntry attackMob
     );
     Task<IDamage[]> CalculateMDamage(
-        ICharacter character, 
-        IFieldUserStats stats, 
-        IFieldMob mob, 
-        IFieldMobStats mobStats, 
+        ICharacter character,
+        IFieldUserStats stats,
+        IFieldMob mob,
+        IFieldMobStats mobStats,
         IAttack attack,
         IAttackMobEntry attackMob
     );
-    
+
     Task<int> CalculatePDamage(
-        ICharacter character, 
-        IFieldUserStats stats, 
-        IFieldMob mob, 
-        IFieldMobStats mobStats, 
+        ICharacter character,
+        IFieldUserStats stats,
+        IFieldMob mob,
+        IFieldMobStats mobStats,
         IFieldSummoned summoned
     );
-    
+
     Task<int> CalculateMDamage(
-        ICharacter character, 
-        IFieldUserStats stats, 
-        IFieldMob mob, 
-        IFieldMobStats mobStats, 
+        ICharacter character,
+        IFieldUserStats stats,
+        IFieldMob mob,
+        IFieldMobStats mobStats,
         IFieldSummoned summoned
     );
 
@@ -56,12 +56,12 @@ public interface IDamageCalculator
     );
 
     Task<int[]> CalculateAdjustedDamage(
-        ICharacter character, 
+        ICharacter character,
         IFieldUserStats stats,
         IFieldMob mob,
-        IFieldMobStats mobStats, 
+        IFieldMobStats mobStats,
         IAttack attack,
-        IDamage[] damage, 
+        IDamage[] damage,
         int mobCount,
         int mobOrder
     );

@@ -7,19 +7,18 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Login.Handling.Packets;
 
-public class CheckUserLimitHandler : AbstractPipedPacketHandler<ILoginStageUser, UserOnPacketCheckUserLimit>
+public class CheckUserLimitHandler
+    : AbstractPipedPacketHandler<ILoginStageUser, UserOnPacketCheckUserLimit>
 {
-    public CheckUserLimitHandler(IPipeline<UserOnPacketCheckUserLimit> pipeline) : base(pipeline)
-    {
-    }
-    
+    public CheckUserLimitHandler(IPipeline<UserOnPacketCheckUserLimit> pipeline)
+        : base(pipeline) { }
+
     public override short Operation => (short)PacketRecvOperations.CheckUserLimit;
 
     public override bool Check(ILoginStageUser user) => user.State == LoginState.SelectWorld;
 
-    public override UserOnPacketCheckUserLimit Serialize(ILoginStageUser user, IPacketReader reader)
-        => new(
-            user,
-            reader.ReadByte()
-        );
+    public override UserOnPacketCheckUserLimit Serialize(
+        ILoginStageUser user,
+        IPacketReader reader
+    ) => new(user, reader.ReadByte());
 }

@@ -29,7 +29,12 @@ public sealed class MemoryContext : IDisposable
     /// Thread-safe and idempotent — only the first call does work.
     /// Returns true if the writer is available for use.
     /// </summary>
-    public bool TryInitialize(RueConfigClientMemory config, ILogger? logger, LoginDiagnostics? diagnostics, bool diagnosticsEnabled)
+    public bool TryInitialize(
+        RueConfigClientMemory config,
+        ILogger? logger,
+        LoginDiagnostics? diagnostics,
+        bool diagnosticsEnabled
+    )
     {
         lock (_lock)
         {
@@ -46,7 +51,10 @@ public sealed class MemoryContext : IDisposable
         var writer = new MemoryWriter(memLogger, config.ProcessName);
         if (!writer.TryAttach())
         {
-            logger?.LogError("[Rue-AutoLogin] Failed to attach to {ProcessName}", config.ProcessName);
+            logger?.LogError(
+                "[Rue-AutoLogin] Failed to attach to {ProcessName}",
+                config.ProcessName
+            );
             lock (_lock)
             {
                 _initializing = false;
@@ -59,9 +67,13 @@ public sealed class MemoryContext : IDisposable
 
         // Create and start the monitor
         var monitor = new LoginStepMonitor(
-            writer, logger, diagnostics, Tracker,
+            writer,
+            logger,
+            diagnostics,
+            Tracker,
             config.MonitorPollIntervalMs,
-            config.MonitorTimeoutMs);
+            config.MonitorTimeoutMs
+        );
         monitor.Start();
 
         Tracker?.RecordMonitorStarted(config.MonitorPollIntervalMs, config.MonitorTimeoutMs);
@@ -109,7 +121,8 @@ public sealed class MemoryContext : IDisposable
                     MaxBytesPerFunction = config.DumpMaxBytes,
                     MaxDepth = config.DumpFollowDepth,
                     MaxFunctionsPerLevel = config.DumpMaxFunctionsPerLevel,
-                });
+                }
+            );
 
             var filePath = LoginDiagnostics.SaveReportToFile(report, "function_dump");
             return filePath;

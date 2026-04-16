@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using Edelstein.Common.Gameplay.Game.Objects;
 using Edelstein.Common.Gameplay.Handling;
 using Edelstein.Common.Utilities.Packets;
@@ -37,21 +37,23 @@ public class ContiMove : AbstractFieldObjectPool, IContiMove, ITickable
 
         var now = DateTime.UtcNow;
 
-        NextBoarding = now
-            .AddMinutes(now.Minute % Template.Term == 0
-                ? 0
-                : Template.Term - now.Minute % Template.Term)
+        NextBoarding = now.AddMinutes(
+                now.Minute % Template.Term == 0 ? 0 : Template.Term - now.Minute % Template.Term
+            )
             .AddMinutes(Template.Delay)
             .AddSeconds(-now.Second);
 
         _logger.LogDebug(
             "{Name} contimove is scheduled to board at {NextBoarding}",
-            Template.Name, NextBoarding
+            Template.Name,
+            NextBoarding
         );
 
         ResetEvent();
 
-        _stateMachine = new StateMachine<ContiMoveState, ContiMoveStateTrigger>(ContiMoveState.Dormant);
+        _stateMachine = new StateMachine<ContiMoveState, ContiMoveStateTrigger>(
+            ContiMoveState.Dormant
+        );
 
         _stateMachine
             .Configure(ContiMoveState.Dormant)
@@ -61,21 +63,24 @@ public class ContiMove : AbstractFieldObjectPool, IContiMove, ITickable
             .Permit(ContiMoveStateTrigger.Start, ContiMoveState.Move);
         _stateMachine
             .Configure(ContiMoveState.Move)
-            .OnEntryFromAsync(ContiMoveStateTrigger.Start, async () =>
-            {
-                using var packet =  new PacketWriter(PacketSendOperations.CONTIMOVE)
-                    .WriteByte((byte)ContiMoveTarget.TargetStartShipMoveField)
-                    .WriteByte((byte)ContiMoveStateTrigger.Start);
-                
-                await Move(WaitField, MoveField);
-                await StartShipMoveField.Dispatch(packet.Build());
-            })
+            .OnEntryFromAsync(
+                ContiMoveStateTrigger.Start,
+                async () =>
+                {
+                    using var packet = new PacketWriter(PacketSendOperations.CONTIMOVE)
+                        .WriteByte((byte)ContiMoveTarget.TargetStartShipMoveField)
+                        .WriteByte((byte)ContiMoveStateTrigger.Start);
+
+                    await Move(WaitField, MoveField);
+                    await StartShipMoveField.Dispatch(packet.Build());
+                }
+            )
             .OnExitAsync(async () =>
             {
-                using var packet =  new PacketWriter(PacketSendOperations.CONTIMOVE)
+                using var packet = new PacketWriter(PacketSendOperations.CONTIMOVE)
                     .WriteByte((byte)ContiMoveTarget.TargetEndShipMoveField)
                     .WriteByte((byte)ContiMoveStateTrigger.End);
-                
+
                 await Move(MoveField, EndField);
                 if (CabinField != null)
                     await Move(CabinField, EndField);
@@ -96,45 +101,45 @@ public class ContiMove : AbstractFieldObjectPool, IContiMove, ITickable
 
                 _logger.LogDebug(
                     "{Name} contimove started the event, ending at {NextEventEnd}",
-                    template.Name, NextEventEnd
+                    template.Name,
+                    NextEventEnd
                 );
 
                 // TODO: Mobspawns
-                using var packet =  new PacketWriter(PacketSendOperations.CONTIMOVE)
+                using var packet = new PacketWriter(PacketSendOperations.CONTIMOVE)
                     .WriteByte((byte)ContiMoveTarget.TargetMoveField)
                     .WriteByte((byte)ContiMoveStateTrigger.MobGen);
 
-                await MoveField.Dispatch(packet.Build()
-                );
+                await MoveField.Dispatch(packet.Build());
             })
             .OnExitAsync(async () =>
             {
-                _logger.LogDebug(
-                    "{Name} contimove ended the event",
-                    template.Name
-                );
+                _logger.LogDebug("{Name} contimove ended the event", template.Name);
 
                 // TODO: Mobspawns
-                
-                using var packet =  new PacketWriter(PacketSendOperations.CONTIMOVE)
+
+                using var packet = new PacketWriter(PacketSendOperations.CONTIMOVE)
                     .WriteByte((byte)ContiMoveTarget.TargetMoveField)
                     .WriteByte((byte)ContiMoveStateTrigger.MobDestroy);
 
-                await MoveField.Dispatch(packet.Build()
-                );
+                await MoveField.Dispatch(packet.Build());
             })
             .Permit(ContiMoveStateTrigger.MobDestroy, ContiMoveState.Move);
 
-        _stateMachine.OnTransitioned(t => _logger.LogDebug(
+        _stateMachine.OnTransitioned(t =>
+            _logger.LogDebug(
                 "{Name} contimove state triggered {Trigger} and transitioned to {State}, next state change at {NextState}",
-                Template.Name, t.Trigger, t.Destination, t.Trigger switch
+                Template.Name,
+                t.Trigger,
+                t.Destination,
+                t.Trigger switch
                 {
                     ContiMoveStateTrigger.Board => NextStart,
                     ContiMoveStateTrigger.Start => NextEvent ?? NextEnd,
                     ContiMoveStateTrigger.MobGen => NextEventEnd,
                     ContiMoveStateTrigger.MobDestroy => NextBoarding,
                     ContiMoveStateTrigger.End => NextBoarding,
-                    _ => NextBoarding
+                    _ => NextBoarding,
                 }
             )
         );
@@ -152,38 +157,34 @@ public class ContiMove : AbstractFieldObjectPool, IContiMove, ITickable
     public IField EndField { get; }
     public IField EndShipMoveField { get; }
 
-
     public DateTime NextBoarding { get; private set; }
     public DateTime NextStart => NextBoarding.AddMinutes(Template.Wait);
     public DateTime NextEnd => NextStart.AddMinutes(Template.Required);
     public DateTime? NextEvent { get; private set; }
-    public DateTime? NextEventEnd => NextBoarding.AddMinutes(Template.Wait).AddMinutes(Template.EventEnd);
+    public DateTime? NextEventEnd =>
+        NextBoarding.AddMinutes(Template.Wait).AddMinutes(Template.EventEnd);
 
-    public override IReadOnlyCollection<IFieldObject> Objects => new[]
-        {
-            StartShipMoveField,
-            WaitField,
-            MoveField,
-            CabinField,
-            EndField,
-            EndShipMoveField
-        }
-        .Where(f => f != null)
-        .SelectMany(f => f!.Objects)
-        .ToImmutableArray();
+    public override IReadOnlyCollection<IFieldObject> Objects =>
+        new[] { StartShipMoveField, WaitField, MoveField, CabinField, EndField, EndShipMoveField }
+            .Where(f => f != null)
+            .SelectMany(f => f!.Objects)
+            .ToImmutableArray();
 
-    public override Task Enter(IFieldObject obj) => (State switch
-    {
-        ContiMoveState.Wait => WaitField,
-        ContiMoveState.Move => MoveField,
-        ContiMoveState.Event => MoveField,
-        _ => StartShipMoveField
-    }).Enter(obj);
+    public override Task Enter(IFieldObject obj) =>
+        (
+            State switch
+            {
+                ContiMoveState.Wait => WaitField,
+                ContiMoveState.Move => MoveField,
+                ContiMoveState.Event => MoveField,
+                _ => StartShipMoveField,
+            }
+        ).Enter(obj);
 
-    public override Task Leave(IFieldObject obj) =>
-        WaitField.Enter(obj);
+    public override Task Leave(IFieldObject obj) => WaitField.Enter(obj);
 
-    public override IFieldObject? GetObject(int id) => Objects.FirstOrDefault(o => o.ObjectID == id);
+    public override IFieldObject? GetObject(int id) =>
+        Objects.FirstOrDefault(o => o.ObjectID == id);
 
     public Task Trigger(ContiMoveStateTrigger trigger) => _stateMachine.FireAsync(trigger);
 
@@ -211,21 +212,20 @@ public class ContiMove : AbstractFieldObjectPool, IContiMove, ITickable
     }
 
     private static Task Move(IField from, IField to) =>
-        Task.WhenAll(from.Objects
-            .OfType<IFieldUser>()
-            .Select(u => to.Enter(u, 0)));
+        Task.WhenAll(from.Objects.OfType<IFieldUser>().Select(u => to.Enter(u, 0)));
 
     private void ResetEvent()
     {
         var random = new Random(
-            NextBoarding.Year +
-            NextBoarding.Month +
-            NextBoarding.Day +
-            NextBoarding.Hour +
-            NextBoarding.Minute
+            NextBoarding.Year
+                + NextBoarding.Month
+                + NextBoarding.Day
+                + NextBoarding.Hour
+                + NextBoarding.Minute
         );
 
-        if (!Template.Event || random.Next(100) > 30) return;
+        if (!Template.Event || random.Next(100) > 30)
+            return;
 
         NextEvent = NextBoarding
             .AddMinutes(Template.Wait)
@@ -233,7 +233,9 @@ public class ContiMove : AbstractFieldObjectPool, IContiMove, ITickable
             .AddMinutes(2);
         _logger.LogDebug(
             "{Name} contimove event is scheduled at {NextEvent} to {NextEventEnd}",
-            Template.Name, NextEvent, NextEventEnd
+            Template.Name,
+            NextEvent,
+            NextEventEnd
         );
     }
 }

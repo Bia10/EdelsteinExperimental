@@ -8,5 +8,5 @@ public enum FieldMobLeaveType
     DestructByMiss = 0x3,
     Swallow = 0x4,
     SummonTimeout = 0x5,
-    None = 0x6
+    None = 0x6,
 }

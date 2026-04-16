@@ -11,16 +11,16 @@ public class MobRewardPoolManagerInit : IPipelinePlug<StageStart>
 {
     private readonly ITemplateManager<MobRewardPoolTemplate> _templates;
     private readonly IMobRewardPoolManager _manager;
-    
+
     public MobRewardPoolManagerInit(
-        ITemplateManager<MobRewardPoolTemplate> templates, 
+        ITemplateManager<MobRewardPoolTemplate> templates,
         IMobRewardPoolManager manager
     )
     {
         _templates = templates;
         _manager = manager;
     }
-    
+
     public async Task Handle(IPipelineContext ctx, StageStart message)
     {
         foreach (var rewards in await _templates.RetrieveAll())

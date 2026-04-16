@@ -5,7 +5,6 @@ namespace Edelstein.Common.Services.Server.Entities;
 
 public record ServerEntity : IIdentifiable<string>, IServer
 {
-
     public DateTime DateUpdated { get; set; }
     public DateTime DateExpire { get; set; }
 

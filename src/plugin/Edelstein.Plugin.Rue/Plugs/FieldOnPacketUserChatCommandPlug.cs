@@ -4,7 +4,8 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Plugin.Rue.Plugs;
 
-public class FieldOnPacketUserChatCommandPlug(ICommandManager commandManager) : IPipelinePlug<FieldOnPacketUserChat>
+public class FieldOnPacketUserChatCommandPlug(ICommandManager commandManager)
+    : IPipelinePlug<FieldOnPacketUserChat>
 {
     private readonly ICommandManager _commandManager = commandManager;
 

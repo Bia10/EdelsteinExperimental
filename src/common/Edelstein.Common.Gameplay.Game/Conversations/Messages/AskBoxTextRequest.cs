@@ -13,8 +13,12 @@ public class AskBoxTextRequest : AbstractConversationMessageRequest<string>
 
     public AskBoxTextRequest(
         IConversationSpeaker speaker,
-        string text, string @default, short rows, short cols
-    ) : base(speaker)
+        string text,
+        string @default,
+        short rows,
+        short cols
+    )
+        : base(speaker)
     {
         _text = text;
         _default = @default;

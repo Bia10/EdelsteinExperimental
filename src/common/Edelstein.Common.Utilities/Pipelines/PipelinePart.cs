@@ -10,7 +10,7 @@ internal class PipelinePart<TMessage>
         IsDefaultAction = isDefaultAction;
         Plug = plug;
     }
-    
+
     public int Priority { get; }
     public bool IsDefaultAction { get; }
     public IPipelinePlug<TMessage> Plug { get; }

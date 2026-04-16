@@ -9,7 +9,8 @@ public record ItemEquipTemplate : ItemTemplate, IItemEquipTemplate
     // public int Transform { get;  }
     // public int IUCMax { get;  }
 
-    public ItemEquipTemplate(int id, IDataNode info) : base(id, info)
+    public ItemEquipTemplate(int id, IDataNode info)
+        : base(id, info)
     {
         ReqSTR = info.ResolveShort("reqSTR") ?? 0;
         ReqDEX = info.ResolveShort("reqDEX") ?? 0;
@@ -37,7 +38,7 @@ public record ItemEquipTemplate : ItemTemplate, IItemEquipTemplate
         IncCraft = info.ResolveShort("incCraft") ?? 0;
         IncSpeed = info.ResolveShort("incSpeed") ?? 0;
         IncJump = info.ResolveShort("incJump") ?? 0;
-        
+
         AttackSpeed = info.ResolveInt("attackSpeed");
 
         OnlyEquip = info.ResolveBool("onlyEquip") ?? false;
@@ -51,6 +52,7 @@ public record ItemEquipTemplate : ItemTemplate, IItemEquipTemplate
         SetItemID = info.ResolveInt("setItemID") ?? 0;
         Durability = info.ResolveInt("durability") ?? -1;
     }
+
     public short ReqSTR { get; }
     public short ReqDEX { get; }
     public short ReqINT { get; }
@@ -77,7 +79,7 @@ public record ItemEquipTemplate : ItemTemplate, IItemEquipTemplate
     public short IncCraft { get; }
     public short IncSpeed { get; }
     public short IncJump { get; }
-    
+
     public int? AttackSpeed { get; }
 
     // fs, swim, tamingmob

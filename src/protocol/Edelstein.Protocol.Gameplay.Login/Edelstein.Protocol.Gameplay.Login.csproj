@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <Import Project="..\Protocol.targets" />
 
   <ItemGroup>
@@ -11,5 +10,4 @@
   <ItemGroup>
     <PackageReference Include="Duey.Abstractions" Version="2.0.0" />
   </ItemGroup>
-
 </Project>

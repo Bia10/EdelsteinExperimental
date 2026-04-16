@@ -7,7 +7,7 @@ namespace Edelstein.Common.Gameplay.Game.Combat.Skills.Normal;
 public class ThiefDual3SkillHandler : ThiefDual2SkillHandler
 {
     public override int ID => Job.Dual3;
-    
+
     public override Task HandleSkillUse(ISkillContext context, IFieldUser user)
     {
         switch (context.Skill?.ID)
@@ -16,7 +16,7 @@ public class ThiefDual3SkillHandler : ThiefDual2SkillHandler
                 context.SetTwoStateDashSpeed(context.SkillLevel!.X);
                 break;
         }
-        
+
         return base.HandleSkillUse(context, user);
     }
 }

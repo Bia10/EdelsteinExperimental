@@ -1,4 +1,4 @@
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 using Edelstein.Common.Gameplay.Game.Rates;
 using Edelstein.Common.Utilities.Repositories;
 using Edelstein.Protocol.Gameplay.Game.Objects.Mob;
@@ -10,9 +10,7 @@ using Edelstein.Protocol.Utilities.Repositories;
 
 namespace Edelstein.Common.Gameplay.Game.Objects.Mob.Rewards;
 
-public class MobRewardPoolManager :
-    Repository<int, IRewardPool<IMobReward>>,
-    IMobRewardPoolManager
+public class MobRewardPoolManager : Repository<int, IRewardPool<IMobReward>>, IMobRewardPoolManager
 {
     public IRepository<int, IMobReward> Global { get; } = new Repository<int, IMobReward>();
 

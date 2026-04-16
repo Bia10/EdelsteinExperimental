@@ -8,22 +8,26 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
-public class FuncKeyMappedModifiedHandler : AbstractPipedFieldHandler<FieldOnPacketUserFuncKeyMappedModified>
+public class FuncKeyMappedModifiedHandler
+    : AbstractPipedFieldHandler<FieldOnPacketUserFuncKeyMappedModified>
 {
-    public FuncKeyMappedModifiedHandler(IPipeline<FieldOnPacketUserFuncKeyMappedModified> pipeline) : base(pipeline)
-    {
-    }
+    public FuncKeyMappedModifiedHandler(IPipeline<FieldOnPacketUserFuncKeyMappedModified> pipeline)
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.FuncKeyMappedModified;
-    
+
     // TODO petconsume
     // TODO petconsumeMP
-    protected override FieldOnPacketUserFuncKeyMappedModified? Serialize(IFieldUser user, IPacketReader reader)
+    protected override FieldOnPacketUserFuncKeyMappedModified? Serialize(
+        IFieldUser user,
+        IPacketReader reader
+    )
     {
         var type = reader.ReadInt();
-        
-        if (type != 0) return null;
-        
+
+        if (type != 0)
+            return null;
+
         var count = reader.ReadInt();
         var keys = new Dictionary<int, ICharacterFuncKeyRecord>();
 
@@ -33,7 +37,7 @@ public class FuncKeyMappedModifiedHandler : AbstractPipedFieldHandler<FieldOnPac
             keys[key] = new CharacterFuncKeyRecord()
             {
                 Type = reader.ReadByte(),
-                Action = reader.ReadInt()
+                Action = reader.ReadInt(),
             };
         }
 

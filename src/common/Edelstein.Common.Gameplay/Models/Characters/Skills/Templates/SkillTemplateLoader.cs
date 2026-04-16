@@ -9,7 +9,7 @@ public class SkillTemplateLoader : ITemplateLoader
 {
     private readonly IDataNamespace _data;
     private readonly ITemplateManager<ISkillTemplate> _manager;
-    
+
     public SkillTemplateLoader(IDataNamespace data, ITemplateManager<ISkillTemplate> manager)
     {
         _data = data;
@@ -20,21 +20,26 @@ public class SkillTemplateLoader : ITemplateLoader
     {
         var dirSkills = _data.ResolvePath("Skill")?.Cache();
 
-        if (dirSkills == null) return 0;
-        
-        await Task.WhenAll(dirSkills.Children
-            .Where(c => c.Name.Split(".")[0].All(char.IsDigit))
-            .Where(c => c.ResolvePath("skill") != null)
-            .SelectMany(c => c.ResolvePath("skill")!.Children)
-            .Select(async n =>
-            {
-                var id = Convert.ToInt32(n.Name);
-                await _manager.Insert(new TemplateProviderLazy<ISkillTemplate>(
-                    id,
-                    () => new SkillTemplate(id, n.Cache())
-                ));
-            }));
-        
+        if (dirSkills == null)
+            return 0;
+
+        await Task.WhenAll(
+            dirSkills
+                .Children.Where(c => c.Name.Split(".")[0].All(char.IsDigit))
+                .Where(c => c.ResolvePath("skill") != null)
+                .SelectMany(c => c.ResolvePath("skill")!.Children)
+                .Select(async n =>
+                {
+                    var id = Convert.ToInt32(n.Name);
+                    await _manager.Insert(
+                        new TemplateProviderLazy<ISkillTemplate>(
+                            id,
+                            () => new SkillTemplate(id, n.Cache())
+                        )
+                    );
+                })
+        );
+
         _manager.Freeze();
         return _manager.Count;
     }

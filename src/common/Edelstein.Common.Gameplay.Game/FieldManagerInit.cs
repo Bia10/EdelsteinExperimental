@@ -17,18 +17,16 @@ public class FieldManagerInit : IPipelinePlug<StageStart>, ITickable
     }
 
     private ITickerManagerContext? Context { get; set; }
-    
+
     public Task Handle(IPipelineContext ctx, StageStart message)
     {
         Context = _tickerManager.Schedule(this, TimeSpan.FromSeconds(1));
         return Task.CompletedTask;
     }
-    
+
     public async Task OnTick(DateTime now)
     {
         var fields = await _fieldManager.RetrieveAll();
-        await Task.WhenAll(fields
-            .OfType<ITickable>()
-            .Select(f => f.OnTick(now)));
+        await Task.WhenAll(fields.OfType<ITickable>().Select(f => f.OnTick(now)));
     }
 }

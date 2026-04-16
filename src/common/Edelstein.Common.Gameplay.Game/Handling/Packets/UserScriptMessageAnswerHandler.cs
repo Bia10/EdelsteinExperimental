@@ -12,8 +12,10 @@ public class UserScriptMessageAnswerHandler : AbstractFieldHandler
 
     protected override async Task Handle(IFieldUser user, IPacketReader reader)
     {
-        if (!user.IsConversing) return;
-        if (user.ActiveConversation == null) return;
+        if (!user.IsConversing)
+            return;
+        if (user.ActiveConversation == null)
+            return;
 
         var type = (ConversationMessageType)reader.ReadByte();
 
@@ -29,17 +31,17 @@ public class UserScriptMessageAnswerHandler : AbstractFieldHandler
 
         if (
             (
-                type != ConversationMessageType.Say &&
-                type != ConversationMessageType.AskYesNo &&
-                type != ConversationMessageType.AskAccept &&
-                answer == byte.MinValue
-            ) ||
-            (
-                type is
-                    ConversationMessageType.Say or
-                    ConversationMessageType.AskYesNo or
-                    ConversationMessageType.AskAccept &&
-                answer == byte.MaxValue
+                type != ConversationMessageType.Say
+                && type != ConversationMessageType.AskYesNo
+                && type != ConversationMessageType.AskAccept
+                && answer == byte.MinValue
+            )
+            || (
+                type
+                    is ConversationMessageType.Say
+                        or ConversationMessageType.AskYesNo
+                        or ConversationMessageType.AskAccept
+                && answer == byte.MaxValue
             )
         )
         {

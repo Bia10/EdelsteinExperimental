@@ -7,7 +7,6 @@ namespace Edelstein.Common.Gameplay.Game.Spatial;
 
 public record FieldFoothold : IFieldFoothold
 {
-
     public FieldFoothold(int id, IDataNode node)
     {
         ID = id;
@@ -20,6 +19,7 @@ public record FieldFoothold : IFieldFoothold
             new Point2D(node.ResolveInt("x2") ?? 0, node.ResolveInt("y2") ?? 0)
         );
     }
+
     public int ID { get; }
 
     public int MinX => Line.MinX;

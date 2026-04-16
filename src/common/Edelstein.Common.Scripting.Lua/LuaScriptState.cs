@@ -9,8 +9,7 @@ public class LuaScriptState : IScriptState
 
     public LuaScriptState(Script script) => _script = script;
 
-    public void Register(string key, object value) =>
-        _script.Globals[key] = value;
+    public void Register(string key, object value) => _script.Globals[key] = value;
 
     public Task<T> Call<T>(string name, params object[] args) =>
         Task.FromResult(_script.Call(name, args).ToObject<T>());
@@ -18,7 +17,5 @@ public class LuaScriptState : IScriptState
     public Task<T> Evaluate<T>(string source) =>
         Task.FromResult(_script.DoString(source).ToObject<T>());
 
-    public void Dispose()
-    {
-    }
+    public void Dispose() { }
 }

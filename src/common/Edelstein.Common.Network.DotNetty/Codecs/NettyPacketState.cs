@@ -3,5 +3,5 @@
 public enum NettyPacketState
 {
     DecodingHeader,
-    DecodingPayload
+    DecodingPayload,
 }

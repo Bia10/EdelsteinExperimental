@@ -8,18 +8,21 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Login.Handling.Packets;
 
-public class CreateNewCharacterHandler : AbstractPipedPacketHandler<ILoginStageUser, UserOnPacketCreateNewCharacter>
+public class CreateNewCharacterHandler
+    : AbstractPipedPacketHandler<ILoginStageUser, UserOnPacketCreateNewCharacter>
 {
-    public CreateNewCharacterHandler(IPipeline<UserOnPacketCreateNewCharacter> pipeline) : base(pipeline)
-    {
-    }
-    
+    public CreateNewCharacterHandler(IPipeline<UserOnPacketCreateNewCharacter> pipeline)
+        : base(pipeline) { }
+
     public override short Operation => (short)PacketRecvOperations.CreateNewCharacter;
 
     public override bool Check(ILoginStageUser user) => user.State == LoginState.SelectCharacter;
 
-    public override UserOnPacketCreateNewCharacter Serialize(ILoginStageUser user, IPacketReader reader)
-        => new(
+    public override UserOnPacketCreateNewCharacter Serialize(
+        ILoginStageUser user,
+        IPacketReader reader
+    ) =>
+        new(
             user,
             reader.ReadString(),
             (RaceSelectType)reader.ReadInt(),

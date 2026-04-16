@@ -1,4 +1,4 @@
-using Edelstein.Protocol.Gameplay.Game.Contracts;
+﻿using Edelstein.Protocol.Gameplay.Game.Contracts;
 using Edelstein.Protocol.Services.Social.Contracts;
 using Edelstein.Protocol.Utilities.Pipelines;
 
@@ -9,7 +9,8 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 /// On success <c>NotifyGuildNoticeChanged</c> broadcasts <c>SetNotice_Done (0x47)</c>
 /// to all online guild members.
 /// </summary>
-public class FieldOnPacketGuildSetNoticeRequestPlug : IPipelinePlug<FieldOnPacketGuildSetNoticeRequest>
+public class FieldOnPacketGuildSetNoticeRequestPlug
+    : IPipelinePlug<FieldOnPacketGuildSetNoticeRequest>
 {
     public async Task Handle(IPipelineContext ctx, FieldOnPacketGuildSetNoticeRequest message)
     {
@@ -21,6 +22,7 @@ public class FieldOnPacketGuildSetNoticeRequestPlug : IPipelinePlug<FieldOnPacke
                 message.User.StageUser.Guild.ID,
                 message.User.Character.ID,
                 message.Notice
-            ));
+            )
+        );
     }
 }

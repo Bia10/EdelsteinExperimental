@@ -25,7 +25,8 @@ public class FieldOnPacketGuildJoinRequestPlug : IPipelinePlug<FieldOnPacketGuil
                 message.User.Character.Level,
                 message.User.StageUser.Context.Options.ChannelID,
                 message.User.Field?.ID ?? 999999999
-            ));
+            )
+        );
 
         // Success → NotifyGuildMemberJoined broadcast handles user state + packets.
         if (response.Result == GuildResult.Success)
@@ -36,7 +37,7 @@ public class FieldOnPacketGuildJoinRequestPlug : IPipelinePlug<FieldOnPacketGuil
             GuildResult.FailedFull => GuildResultOperations.JoinGuild_AlreadyFull,
             GuildResult.FailedAlreadyInGuild => GuildResultOperations.JoinGuild_AlreadyJoined,
             GuildResult.FailedCharacterNotFound => GuildResultOperations.JoinGuild_UnknownUser,
-            _ => GuildResultOperations.JoinGuild_Unknown
+            _ => GuildResultOperations.JoinGuild_Unknown,
         };
 
         using var packet = new PacketWriter(PacketSendOperations.GuildResult);

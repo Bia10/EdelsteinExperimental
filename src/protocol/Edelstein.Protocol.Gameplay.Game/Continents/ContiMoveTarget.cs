@@ -1,4 +1,4 @@
-namespace Edelstein.Protocol.Gameplay.Game.Continents;
+﻿namespace Edelstein.Protocol.Gameplay.Game.Continents;
 
 public enum ContiMoveTarget : byte
 {
@@ -7,5 +7,5 @@ public enum ContiMoveTarget : byte
     TargetWaitField = 0x9,
     TargetMoveField = 0xA,
     TargetEndField = 0xB,
-    TargetEndShipMoveField = 0xC
+    TargetEndShipMoveField = 0xC,
 }

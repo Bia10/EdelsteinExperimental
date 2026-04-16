@@ -31,8 +31,8 @@ public sealed class UserOnPacketDiagnosticsPlug(
     ILogger? logger,
     IOptions<RueConfigLogin> options,
     LoginDiagnostics? sharedDiagnostics = null,
-    MemoryContext? memoryContext = null)
-    : IPipelinePlug<UserOnPacket<ILoginStageUser>>
+    MemoryContext? memoryContext = null
+) : IPipelinePlug<UserOnPacket<ILoginStageUser>>
 {
     private readonly ILogger? _logger = logger;
     private readonly RueConfigLogin _config = options.Value;
@@ -102,7 +102,11 @@ public sealed class UserOnPacketDiagnosticsPlug(
                 : null;
 
             var clientStepLabel = clientStep.HasValue
-                ? (clientStepName != null ? $"{clientStep}({clientStepName})" : clientStep.Value.ToString())
+                ? (
+                    clientStepName != null
+                        ? $"{clientStep}({clientStepName})"
+                        : clientStep.Value.ToString()
+                )
                 : "unavailable";
 
             var details = new Dictionary<string, object?>
@@ -115,7 +119,7 @@ public sealed class UserOnPacketDiagnosticsPlug(
                 ["cliStepName"] = clientStepName,
                 ["cliStepChanging"] = snapshot?.StepChanging,
                 ["cliWorldId"] = snapshot?.WorldId,
-                ["cliChannelId"] = snapshot?.ChannelId
+                ["cliChannelId"] = snapshot?.ChannelId,
             };
 
             _diagnostics.LogPacketReceived(opName, op, details);
@@ -140,7 +144,11 @@ public sealed class UserOnPacketDiagnosticsPlug(
     /// Logs an outgoing packet (S->C) for diagnostics.
     /// Call this from other plugs when sending important packets.
     /// </summary>
-    public void LogPacketSent(string packetName, int opcode, Dictionary<string, object?>? details = null)
+    public void LogPacketSent(
+        string packetName,
+        int opcode,
+        Dictionary<string, object?>? details = null
+    )
     {
         var enabled = _config.DiagnosticsEnabled;
         if (!enabled)
@@ -148,17 +156,17 @@ public sealed class UserOnPacketDiagnosticsPlug(
 
         _diagnostics.LogPacketSent(packetName, opcode, details);
 
-        _logger?.LogInformation(
-            "[Diag] [S->C] 0x{Op:X2} {PacketName}",
-            opcode,
-            packetName
-        );
+        _logger?.LogInformation("[Diag] [S->C] 0x{Op:X2} {PacketName}", opcode, packetName);
     }
 
     /// <summary>
     /// Logs an auto-login step for diagnostics.
     /// </summary>
-    public void LogAutoLoginStep(int step, string description, Dictionary<string, object?>? details = null)
+    public void LogAutoLoginStep(
+        int step,
+        string description,
+        Dictionary<string, object?>? details = null
+    )
     {
         var enabled = _config.DiagnosticsEnabled;
         if (!enabled)
@@ -183,7 +191,10 @@ public sealed class UserOnPacketDiagnosticsPlug(
             }
             catch (Exception ex)
             {
-                _diagnostics.LogError("Diagnostics", $"Failed to read final snapshot: {ex.Message}");
+                _diagnostics.LogError(
+                    "Diagnostics",
+                    $"Failed to read final snapshot: {ex.Message}"
+                );
             }
         }
 
@@ -201,7 +212,14 @@ public sealed class UserOnPacketDiagnosticsPlug(
         if (_memoryContext == null)
             return null;
 
-        if (!_memoryContext.TryInitialize(memConfig, _logger, _diagnostics, _config.DiagnosticsEnabled))
+        if (
+            !_memoryContext.TryInitialize(
+                memConfig,
+                _logger,
+                _diagnostics,
+                _config.DiagnosticsEnabled
+            )
+        )
             return null;
 
         return _memoryContext.Writer;
@@ -273,16 +291,17 @@ public sealed class UserOnPacketDiagnosticsPlug(
         // Note: ClientDumpLog and ExceptionLog are excluded here because they have
         // dedicated handlers (HandleClientDumpLog/HandleExceptionLog) and are handled
         // before this check to avoid duplicate logging.
-        return op is (short)PacketRecvOperations.CheckPassword
-            or (short)PacketRecvOperations.WorldInfoRequest
-            or (short)PacketRecvOperations.WorldRequest
-            or (short)PacketRecvOperations.CheckUserLimit
-            or (short)PacketRecvOperations.SelectWorld
-            or (short)PacketRecvOperations.LogoutWorld
-            or (short)PacketRecvOperations.CheckSPWRequest
-            or (short)PacketRecvOperations.EnableSPWRequest
-            or (short)PacketRecvOperations.CreateNewCharacter
-            or (short)PacketRecvOperations.DeleteCharacter;
+        return op
+            is (short)PacketRecvOperations.CheckPassword
+                or (short)PacketRecvOperations.WorldInfoRequest
+                or (short)PacketRecvOperations.WorldRequest
+                or (short)PacketRecvOperations.CheckUserLimit
+                or (short)PacketRecvOperations.SelectWorld
+                or (short)PacketRecvOperations.LogoutWorld
+                or (short)PacketRecvOperations.CheckSPWRequest
+                or (short)PacketRecvOperations.EnableSPWRequest
+                or (short)PacketRecvOperations.CreateNewCharacter
+                or (short)PacketRecvOperations.DeleteCharacter;
     }
 
     private void HandleClientDumpLog(PacketReader reader)
@@ -299,9 +318,10 @@ public sealed class UserOnPacketDiagnosticsPlug(
         var rawSeq = reader.ReadInt();
         var type = reader.ReadShort();
         var remaining = Math.Max(0, backupBufferSize - 6);
-        var buffer = remaining <= reader.Available
-            ? reader.ReadBytes((short)remaining)
-            : reader.ReadBytes((short)Math.Min(reader.Available, MaxCrashBufferBytes));
+        var buffer =
+            remaining <= reader.Available
+                ? reader.ReadBytes((short)remaining)
+                : reader.ReadBytes((short)Math.Min(reader.Available, MaxCrashBufferBytes));
 
         var crashCallType = (CrashCallType)callType;
         var callTypeName = Enum.IsDefined(crashCallType)
@@ -319,32 +339,42 @@ public sealed class UserOnPacketDiagnosticsPlug(
             ["packetName"] = packetOpName,
             ["bufferSize"] = buffer.Length,
             ["bufferHex"] = Convert.ToHexString(buffer),
-            ["bufferAscii"] = HexFormatter.FormatAsciiDump(buffer)
+            ["bufferAscii"] = HexFormatter.FormatAsciiDump(buffer),
         };
 
         // Try to parse additional info from the buffer based on packet type
         CrashAnalyzer.ParseCrashBuffer(type, buffer.AsSpan(), details);
 
-        _diagnostics.LogPacketReceived("ClientDumpLog", (int)PacketRecvOperations.ClientDumpLog, details);
+        _diagnostics.LogPacketReceived(
+            "ClientDumpLog",
+            (int)PacketRecvOperations.ClientDumpLog,
+            details
+        );
 
         _logger?.LogWarning(
-            "[Diag] ========== CLIENT CRASH DETECTED ==========\n" +
-            "  CallType: {CallType} ({CallTypeName})\n" +
-            "  ErrorCode: 0x{Error:X8} ({ErrorName})\n" +
-            "  RawSeq: 0x{Seq:X8}\n" +
-            "  PacketType: 0x{Type:X2} ({PacketName})\n" +
-            "  BufferSize: {BufferSize} bytes",
-            callType, callTypeName,
-            errorCode, CrashAnalyzer.GetNTStatusName(errorCode),
+            "[Diag] ========== CLIENT CRASH DETECTED ==========\n"
+                + "  CallType: {CallType} ({CallTypeName})\n"
+                + "  ErrorCode: 0x{Error:X8} ({ErrorName})\n"
+                + "  RawSeq: 0x{Seq:X8}\n"
+                + "  PacketType: 0x{Type:X2} ({PacketName})\n"
+                + "  BufferSize: {BufferSize} bytes",
+            callType,
+            callTypeName,
+            errorCode,
+            CrashAnalyzer.GetNTStatusName(errorCode),
             rawSeq,
-            type, packetOpName,
+            type,
+            packetOpName,
             buffer.Length
         );
 
         // Log buffer hex dump for debugging
         if (buffer.Length > 0)
         {
-            _logger?.LogDebug("[Diag] Crash buffer hex dump:\n{HexDump}", HexFormatter.FormatHexDump(buffer));
+            _logger?.LogDebug(
+                "[Diag] Crash buffer hex dump:\n{HexDump}",
+                HexFormatter.FormatHexDump(buffer)
+            );
         }
 
         // Auto-generate report on crash
@@ -354,7 +384,10 @@ public sealed class UserOnPacketDiagnosticsPlug(
             // the state at crash time before the client cleans up and nulls everything
             _diagnostics.SaveCrashSnapshot();
 
-            _diagnostics.LogError("Client", $"Client crash: {callTypeName} while processing {packetOpName}");
+            _diagnostics.LogError(
+                "Client",
+                $"Client crash: {callTypeName} while processing {packetOpName}"
+            );
             var report = GenerateReport();
 
             // Log crash analysis based on packet type
@@ -365,21 +398,34 @@ public sealed class UserOnPacketDiagnosticsPlug(
             SaveTimelineForMode();
 
             // Save the crash report to file
-            var watchMode = _config.ClientMemory?.WatchMode ?? RueConfigClientMemory.WatchModeActive;
-            var reportPrefix = watchMode.Equals(RueConfigClientMemory.WatchModePassive, StringComparison.OrdinalIgnoreCase)
+            var watchMode =
+                _config.ClientMemory?.WatchMode ?? RueConfigClientMemory.WatchModeActive;
+            var reportPrefix = watchMode.Equals(
+                RueConfigClientMemory.WatchModePassive,
+                StringComparison.OrdinalIgnoreCase
+            )
                 ? CrashReportPrefixManual
                 : CrashReportPrefixAuto;
-            var reportPath = LoginDiagnostics.SaveReportToFile(report + "\n\n" + crashAnalysis, reportPrefix);
+            var reportPath = LoginDiagnostics.SaveReportToFile(
+                report + "\n\n" + crashAnalysis,
+                reportPrefix
+            );
             _logger?.LogInformation("[Diag] Crash report saved to: {Path}", reportPath);
 
             // If both timelines exist, generate and save comparison
             if (LoginDiagnostics.HasBothTimelines)
             {
                 var comparison = LoginDiagnostics.GenerateComparison();
-                _logger?.LogInformation("[Diag] MANUAL vs AUTO COMPARISON:\n{Comparison}", comparison);
+                _logger?.LogInformation(
+                    "[Diag] MANUAL vs AUTO COMPARISON:\n{Comparison}",
+                    comparison
+                );
 
                 var comparisonPath = LoginDiagnostics.SaveComparisonReport();
-                _logger?.LogInformation("[Diag] Comparison report saved to: {Path}", comparisonPath);
+                _logger?.LogInformation(
+                    "[Diag] Comparison report saved to: {Path}",
+                    comparisonPath
+                );
             }
         }
     }
@@ -390,7 +436,12 @@ public sealed class UserOnPacketDiagnosticsPlug(
     private void SaveTimelineForMode()
     {
         var watchMode = _config.ClientMemory?.WatchMode ?? RueConfigClientMemory.WatchModeActive;
-        if (watchMode.Equals(RueConfigClientMemory.WatchModePassive, StringComparison.OrdinalIgnoreCase))
+        if (
+            watchMode.Equals(
+                RueConfigClientMemory.WatchModePassive,
+                StringComparison.OrdinalIgnoreCase
+            )
+        )
         {
             _diagnostics.SaveAsManualBaseline();
             _logger?.LogInformation("[Diag] Saved timeline as MANUAL baseline for comparison");
@@ -411,7 +462,8 @@ public sealed class UserOnPacketDiagnosticsPlug(
         {
             var exceptionText = reader.ReadString();
 
-            var isAccessViolation = exceptionText.Contains("ACCESS_VIOLATION", StringComparison.OrdinalIgnoreCase)
+            var isAccessViolation =
+                exceptionText.Contains("ACCESS_VIOLATION", StringComparison.OrdinalIgnoreCase)
                 || exceptionText.Contains("0xC0000005", StringComparison.OrdinalIgnoreCase);
 
             var writer = EnsureWriter();
@@ -422,11 +474,15 @@ public sealed class UserOnPacketDiagnosticsPlug(
                 ["accountId"] = message.User.Account?.ID,
                 ["accessViolation"] = isAccessViolation,
                 ["cliStep"] = writer?.ReadLoginStep(),
-                ["cliStepChanging"] = writer?.ReadStepChanging()
+                ["cliStepChanging"] = writer?.ReadStepChanging(),
             };
 
             // Log as a single event (no separate LogError to avoid duplication)
-            _diagnostics.LogPacketReceived("ExceptionLog", (int)PacketRecvOperations.ExceptionLog, details);
+            _diagnostics.LogPacketReceived(
+                "ExceptionLog",
+                (int)PacketRecvOperations.ExceptionLog,
+                details
+            );
 
             var accountId = message.User.Account?.ID;
             if (accountId.HasValue)
@@ -435,21 +491,26 @@ public sealed class UserOnPacketDiagnosticsPlug(
                     "[Diag] ExceptionLog (srv={State}, accId={AccountId}, accessViolation={IsAccessViolation})",
                     message.User.State,
                     accountId,
-                    isAccessViolation);
+                    isAccessViolation
+                );
             }
             else
             {
                 _logger?.LogDebug(
                     "[Diag] ExceptionLog pre-login (srv={State}, accessViolation={IsAccessViolation})",
                     message.User.State,
-                    isAccessViolation);
+                    isAccessViolation
+                );
             }
 
             _logger?.LogDebug("[Diag] ExceptionLog text:\n{ExceptionText}", exceptionText);
         }
         catch (Exception ex)
         {
-            _diagnostics.LogError("ExceptionLog", $"Failed to parse ExceptionLog packet: {ex.Message}");
+            _diagnostics.LogError(
+                "ExceptionLog",
+                $"Failed to parse ExceptionLog packet: {ex.Message}"
+            );
         }
     }
 
@@ -556,8 +617,10 @@ public sealed class UserOnPacketDiagnosticsPlug(
                     // Flush any accumulated flapping count
                     if (_flappingCount > 3)
                     {
-                        _diagnostics.LogInfo("ClientMemory",
-                            $"[Memory] (suppressed {_flappingCount - 3} repetitive field changes)");
+                        _diagnostics.LogInfo(
+                            "ClientMemory",
+                            $"[Memory] (suppressed {_flappingCount - 3} repetitive field changes)"
+                        );
                     }
                     _flappingCount = 0;
                     _flappingFields.Clear();
@@ -584,22 +647,34 @@ public sealed class UserOnPacketDiagnosticsPlug(
     /// </summary>
     private bool IsFlapping(MemorySnapshot? prev, MemorySnapshot current)
     {
-        if (prev == null) return false;
+        if (prev == null)
+            return false;
 
         var p = prev;
         var changedFields = new HashSet<string>();
 
-        if (p.AccountId != current.AccountId) changedFields.Add("AccountId");
-        if (p.WorldId != current.WorldId) changedFields.Add("WorldId");
-        if (p.ChannelId != current.ChannelId) changedFields.Add("ChannelId");
-        if (p.CharacterCount != current.CharacterCount) changedFields.Add("CharacterCount");
-        if (p.SlotCount != current.SlotCount) changedFields.Add("SlotCount");
-        if (p.RequestSent != current.RequestSent) changedFields.Add("RequestSent");
-        if (p.LoginStep != current.LoginStep) changedFields.Add("LoginStep");
-        if (p.StepChanging != current.StepChanging) changedFields.Add("StepChanging");
-        if (p.CharSelected != current.CharSelected) changedFields.Add("CharSelected");
-        if (p.ChannelSelectExists != current.ChannelSelectExists) changedFields.Add("CUIChannelSelect");
-        if (p.WorldSelectExists != current.WorldSelectExists) changedFields.Add("CUIWorldSelect");
+        if (p.AccountId != current.AccountId)
+            changedFields.Add("AccountId");
+        if (p.WorldId != current.WorldId)
+            changedFields.Add("WorldId");
+        if (p.ChannelId != current.ChannelId)
+            changedFields.Add("ChannelId");
+        if (p.CharacterCount != current.CharacterCount)
+            changedFields.Add("CharacterCount");
+        if (p.SlotCount != current.SlotCount)
+            changedFields.Add("SlotCount");
+        if (p.RequestSent != current.RequestSent)
+            changedFields.Add("RequestSent");
+        if (p.LoginStep != current.LoginStep)
+            changedFields.Add("LoginStep");
+        if (p.StepChanging != current.StepChanging)
+            changedFields.Add("StepChanging");
+        if (p.CharSelected != current.CharSelected)
+            changedFields.Add("CharSelected");
+        if (p.ChannelSelectExists != current.ChannelSelectExists)
+            changedFields.Add("CUIChannelSelect");
+        if (p.WorldSelectExists != current.WorldSelectExists)
+            changedFields.Add("CUIWorldSelect");
 
         if (_flappingFields.Count == 0)
         {
@@ -625,9 +700,13 @@ public sealed class UserOnPacketDiagnosticsPlug(
         {
             SaveTimelineForMode();
 
-            var watchMode = _config.ClientMemory?.WatchMode ?? RueConfigClientMemory.WatchModeActive;
+            var watchMode =
+                _config.ClientMemory?.WatchMode ?? RueConfigClientMemory.WatchModeActive;
             var report = _diagnostics.GenerateReport();
-            var prefix = watchMode.Equals(RueConfigClientMemory.WatchModePassive, StringComparison.OrdinalIgnoreCase)
+            var prefix = watchMode.Equals(
+                RueConfigClientMemory.WatchModePassive,
+                StringComparison.OrdinalIgnoreCase
+            )
                 ? CompleteReportPrefixManual
                 : CompleteReportPrefixAuto;
             var path = LoginDiagnostics.SaveReportToFile(report, prefix);
@@ -636,10 +715,15 @@ public sealed class UserOnPacketDiagnosticsPlug(
             // If both timelines exist after this capture, generate comparison
             if (LoginDiagnostics.HasBothTimelines)
             {
-                _logger?.LogInformation("[Diag] MANUAL vs AUTO COMPARISON available - both timelines captured");
+                _logger?.LogInformation(
+                    "[Diag] MANUAL vs AUTO COMPARISON available - both timelines captured"
+                );
 
                 var comparisonPath = LoginDiagnostics.SaveComparisonReport();
-                _logger?.LogInformation("[Diag] Comparison report saved to: {Path}", comparisonPath);
+                _logger?.LogInformation(
+                    "[Diag] Comparison report saved to: {Path}",
+                    comparisonPath
+                );
             }
         }
     }
@@ -673,11 +757,11 @@ public sealed class UserOnPacketDiagnosticsPlug(
     private void LogSnapshotToLogger(string label, MemorySnapshot s)
     {
         _logger?.LogInformation(
-            "[Diag] {Label} snapshot:\n" +
-            "  CWvsContext: AcctId={AcctId}, World={World}, Ch={Ch}, CharCount={CharCount}, Slots={Slots}, ChanNamePtr={ChanNamePtr}, AdultChanPtr={AdultChanPtr}\n" +
-            "  CLogin: ReqSent={ReqSent}, Step={Step}, StepChanging={StepChg}, CharSel={CharSel}, LoginOpt={LoginOpt}\n" +
-            "  CUIChannelSelect: exists={CSExists}, selected={CSSel}, worldItemPtr={WorldItemPtr}, connDlg={ConnDlg}\n" +
-            "  CUIWorldSelect: exists={WSExists}, worldIdx={WSIdx}",
+            "[Diag] {Label} snapshot:\n"
+                + "  CWvsContext: AcctId={AcctId}, World={World}, Ch={Ch}, CharCount={CharCount}, Slots={Slots}, ChanNamePtr={ChanNamePtr}, AdultChanPtr={AdultChanPtr}\n"
+                + "  CLogin: ReqSent={ReqSent}, Step={Step}, StepChanging={StepChg}, CharSel={CharSel}, LoginOpt={LoginOpt}\n"
+                + "  CUIChannelSelect: exists={CSExists}, selected={CSSel}, worldItemPtr={WorldItemPtr}, connDlg={ConnDlg}\n"
+                + "  CUIWorldSelect: exists={WSExists}, worldIdx={WSIdx}",
             label,
             s.AccountId,
             s.WorldId,
@@ -711,29 +795,47 @@ public sealed class UserOnPacketDiagnosticsPlug(
         var p = prev;
         var changes = new List<string>();
 
-        if (p.AccountId != current.AccountId) changes.Add($"AccountId: {p.AccountId}->{current.AccountId}");
-        if (p.WorldId != current.WorldId) changes.Add($"WorldId: {p.WorldId}->{current.WorldId}");
-        if (p.ChannelId != current.ChannelId) changes.Add($"ChannelId: {p.ChannelId}->{current.ChannelId}");
-        if (p.CharacterCount != current.CharacterCount) changes.Add($"CharCount: {p.CharacterCount}->{current.CharacterCount}");
-        if (p.SlotCount != current.SlotCount) changes.Add($"SlotCount: {p.SlotCount}->{current.SlotCount}");
-        if (p.ChannelNameArrayPtr != current.ChannelNameArrayPtr) changes.Add($"ChannelNamePtr: {p.ChannelNameArrayPtr}->{current.ChannelNameArrayPtr}");
-        if (p.AdultChannelArrayPtr != current.AdultChannelArrayPtr) changes.Add($"AdultChannelPtr: {p.AdultChannelArrayPtr}->{current.AdultChannelArrayPtr}");
-        if (p.RequestSent != current.RequestSent) changes.Add($"RequestSent: {p.RequestSent}->{current.RequestSent}");
-        if (p.LoginStep != current.LoginStep) changes.Add($"LoginStep: {p.LoginStep}->{current.LoginStep}");
-        if (p.StepChanging != current.StepChanging) changes.Add($"StepChanging: {p.StepChanging}->{current.StepChanging}");
-        if (p.CharSelected != current.CharSelected) changes.Add($"CharSelected: {p.CharSelected}->{current.CharSelected}");
-        if (p.LoginOpt != current.LoginOpt) changes.Add($"LoginOpt: {p.LoginOpt}->{current.LoginOpt}");
-        if (p.ChannelSelectExists != current.ChannelSelectExists) changes.Add($"CUIChannelSelect: {p.ChannelSelectExists}->{current.ChannelSelectExists}");
-        if (p.SelectedChannel != current.SelectedChannel) changes.Add($"SelectedChannel: {p.SelectedChannel}->{current.SelectedChannel}");
-        if (p.WorldItemPtr != current.WorldItemPtr) changes.Add($"WorldItemPtr: {p.WorldItemPtr}->{current.WorldItemPtr}");
-        if (p.ConnectionDlgExists != current.ConnectionDlgExists) changes.Add($"ConnectionDlg: {p.ConnectionDlgExists}->{current.ConnectionDlgExists}");
-        if (p.WorldSelectExists != current.WorldSelectExists) changes.Add($"CUIWorldSelect: {p.WorldSelectExists}->{current.WorldSelectExists}");
-        if (p.WorldIdx != current.WorldIdx) changes.Add($"WorldIdx: {p.WorldIdx}->{current.WorldIdx}");
+        if (p.AccountId != current.AccountId)
+            changes.Add($"AccountId: {p.AccountId}->{current.AccountId}");
+        if (p.WorldId != current.WorldId)
+            changes.Add($"WorldId: {p.WorldId}->{current.WorldId}");
+        if (p.ChannelId != current.ChannelId)
+            changes.Add($"ChannelId: {p.ChannelId}->{current.ChannelId}");
+        if (p.CharacterCount != current.CharacterCount)
+            changes.Add($"CharCount: {p.CharacterCount}->{current.CharacterCount}");
+        if (p.SlotCount != current.SlotCount)
+            changes.Add($"SlotCount: {p.SlotCount}->{current.SlotCount}");
+        if (p.ChannelNameArrayPtr != current.ChannelNameArrayPtr)
+            changes.Add($"ChannelNamePtr: {p.ChannelNameArrayPtr}->{current.ChannelNameArrayPtr}");
+        if (p.AdultChannelArrayPtr != current.AdultChannelArrayPtr)
+            changes.Add(
+                $"AdultChannelPtr: {p.AdultChannelArrayPtr}->{current.AdultChannelArrayPtr}"
+            );
+        if (p.RequestSent != current.RequestSent)
+            changes.Add($"RequestSent: {p.RequestSent}->{current.RequestSent}");
+        if (p.LoginStep != current.LoginStep)
+            changes.Add($"LoginStep: {p.LoginStep}->{current.LoginStep}");
+        if (p.StepChanging != current.StepChanging)
+            changes.Add($"StepChanging: {p.StepChanging}->{current.StepChanging}");
+        if (p.CharSelected != current.CharSelected)
+            changes.Add($"CharSelected: {p.CharSelected}->{current.CharSelected}");
+        if (p.LoginOpt != current.LoginOpt)
+            changes.Add($"LoginOpt: {p.LoginOpt}->{current.LoginOpt}");
+        if (p.ChannelSelectExists != current.ChannelSelectExists)
+            changes.Add(
+                $"CUIChannelSelect: {p.ChannelSelectExists}->{current.ChannelSelectExists}"
+            );
+        if (p.SelectedChannel != current.SelectedChannel)
+            changes.Add($"SelectedChannel: {p.SelectedChannel}->{current.SelectedChannel}");
+        if (p.WorldItemPtr != current.WorldItemPtr)
+            changes.Add($"WorldItemPtr: {p.WorldItemPtr}->{current.WorldItemPtr}");
+        if (p.ConnectionDlgExists != current.ConnectionDlgExists)
+            changes.Add($"ConnectionDlg: {p.ConnectionDlgExists}->{current.ConnectionDlgExists}");
+        if (p.WorldSelectExists != current.WorldSelectExists)
+            changes.Add($"CUIWorldSelect: {p.WorldSelectExists}->{current.WorldSelectExists}");
+        if (p.WorldIdx != current.WorldIdx)
+            changes.Add($"WorldIdx: {p.WorldIdx}->{current.WorldIdx}");
 
-        _logger?.LogInformation(
-            "[Diag] Memory changed: {Changes}",
-            string.Join(", ", changes)
-        );
+        _logger?.LogInformation("[Diag] Memory changed: {Changes}", string.Join(", ", changes));
     }
-
 }

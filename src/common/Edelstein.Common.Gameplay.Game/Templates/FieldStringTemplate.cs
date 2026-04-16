@@ -12,9 +12,9 @@ public record FieldStringTemplate : IFieldStringTemplate
         MapName = node.ResolveString("mapName") ?? string.Empty;
         StreetName = node.ResolveString("streetName") ?? string.Empty;
     }
-    
+
     public int ID { get; }
-    
+
     public string MapName { get; }
     public string StreetName { get; }
 }

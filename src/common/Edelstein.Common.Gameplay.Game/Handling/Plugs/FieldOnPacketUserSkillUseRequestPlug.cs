@@ -10,18 +10,17 @@ public class FieldOnPacketUserSkillUseRequestPlug : IPipelinePlug<FieldOnPacketU
 {
     private readonly ISkillManager _skillManager;
 
-    public FieldOnPacketUserSkillUseRequestPlug(ISkillManager skillManager) 
-        => _skillManager = skillManager;
-    
+    public FieldOnPacketUserSkillUseRequestPlug(ISkillManager skillManager) =>
+        _skillManager = skillManager;
+
     public async Task Handle(IPipelineContext ctx, FieldOnPacketUserSkillUseRequest message)
     {
-        if (!await _skillManager.Check(message.User, message.SkillID)) 
+        if (!await _skillManager.Check(message.User, message.SkillID))
             return;
 
         await _skillManager.HandleSkillUse(message.User, message.SkillID);
-        
-        using var packet = new PacketWriter(PacketSendOperations.SkillUseResult)
-            .WriteBool(true);
+
+        using var packet = new PacketWriter(PacketSendOperations.SkillUseResult).WriteBool(true);
         await message.User.Dispatch(packet.Build());
     }
 }

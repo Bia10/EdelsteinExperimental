@@ -38,7 +38,8 @@ public class RemoteFunctionCaller(ILogger? logger, IntPtr processHandle) : IDisp
     private IntPtr _shellcodeAddr = IntPtr.Zero;
     private const int SHELLCODE_SIZE = 256;
 
-    private const Win32Api.AllocationType AllocationType = Win32Api.AllocationType.Commit | Win32Api.AllocationType.Reserve;
+    private const Win32Api.AllocationType AllocationType =
+        Win32Api.AllocationType.Commit | Win32Api.AllocationType.Reserve;
     private const Win32Api.FreeType FreeType = Win32Api.FreeType.Release;
     private const Win32Api.MemoryProtection Protection = Win32Api.MemoryProtection.ExecuteReadWrite;
 
@@ -50,7 +51,12 @@ public class RemoteFunctionCaller(ILogger? logger, IntPtr processHandle) : IDisp
     /// <param name="worldId">World ID to select</param>
     /// <param name="channelId">Channel ID to select</param>
     /// <returns>True if the remote call succeeded, false otherwise</returns>
-    public bool CallSendLoginPacket(IntPtr cLoginInstance, IntPtr sendLoginPacketAddr, int worldId, int channelId)
+    public bool CallSendLoginPacket(
+        IntPtr cLoginInstance,
+        IntPtr sendLoginPacketAddr,
+        int worldId,
+        int channelId
+    )
     {
         if (_processHandle == IntPtr.Zero)
         {
@@ -71,20 +77,36 @@ public class RemoteFunctionCaller(ILogger? logger, IntPtr processHandle) : IDisp
         }
 
         _logger?.LogInformation(
-            "[Rue-RemoteCall] Calling CLogin::SendLoginPacket(worldId={WorldId}, channelId={ChannelId}) " +
-            "at 0x{FuncAddr:X8} with this=0x{This:X8}",
-            worldId, channelId, sendLoginPacketAddr.ToInt32(), cLoginInstance.ToInt32());
+            "[Rue-RemoteCall] Calling CLogin::SendLoginPacket(worldId={WorldId}, channelId={ChannelId}) "
+                + "at 0x{FuncAddr:X8} with this=0x{This:X8}",
+            worldId,
+            channelId,
+            sendLoginPacketAddr.ToInt32(),
+            cLoginInstance.ToInt32()
+        );
 
         // Allocate memory for shellcode
         if (_shellcodeAddr == IntPtr.Zero)
         {
-            _shellcodeAddr = Win32Api.VirtualAllocEx(_processHandle, IntPtr.Zero, SHELLCODE_SIZE, AllocationType, Protection);
+            _shellcodeAddr = Win32Api.VirtualAllocEx(
+                _processHandle,
+                IntPtr.Zero,
+                SHELLCODE_SIZE,
+                AllocationType,
+                Protection
+            );
             if (_shellcodeAddr == IntPtr.Zero)
             {
-                _logger?.LogError("[Rue-RemoteCall] Failed to allocate shellcode memory: 0x{Error:X8}", Marshal.GetLastWin32Error());
+                _logger?.LogError(
+                    "[Rue-RemoteCall] Failed to allocate shellcode memory: 0x{Error:X8}",
+                    Marshal.GetLastWin32Error()
+                );
                 return false;
             }
-            _logger?.LogDebug("[Rue-RemoteCall] Allocated shellcode at 0x{Addr:X8}", _shellcodeAddr.ToInt32());
+            _logger?.LogDebug(
+                "[Rue-RemoteCall] Allocated shellcode at 0x{Addr:X8}",
+                _shellcodeAddr.ToInt32()
+            );
         }
 
         // Build shellcode for __thiscall CLogin::SendLoginPacket(int, int)
@@ -93,26 +115,57 @@ public class RemoteFunctionCaller(ILogger? logger, IntPtr processHandle) : IDisp
             cLoginInstance,
             sendLoginPacketAddr,
             worldId,
-            channelId);
+            channelId
+        );
 
-        _logger?.LogDebug("[Rue-RemoteCall] Shellcode ({Len} bytes): {Hex}", shellcode.Length, BitConverter.ToString(shellcode));
+        _logger?.LogDebug(
+            "[Rue-RemoteCall] Shellcode ({Len} bytes): {Hex}",
+            shellcode.Length,
+            BitConverter.ToString(shellcode)
+        );
 
         // Write shellcode to target process
-        if (!Win32Api.WriteProcessMemory(_processHandle, _shellcodeAddr, shellcode, shellcode.Length, out var bytesWritten) || bytesWritten != shellcode.Length)
+        if (
+            !Win32Api.WriteProcessMemory(
+                _processHandle,
+                _shellcodeAddr,
+                shellcode,
+                shellcode.Length,
+                out var bytesWritten
+            )
+            || bytesWritten != shellcode.Length
+        )
         {
-            _logger?.LogError("[Rue-RemoteCall] Failed to write shellcode: 0x{Error:X8}", Marshal.GetLastWin32Error());
+            _logger?.LogError(
+                "[Rue-RemoteCall] Failed to write shellcode: 0x{Error:X8}",
+                Marshal.GetLastWin32Error()
+            );
             return false;
         }
 
         // Create remote thread to execute shellcode
-        var threadHandle = Win32Api.CreateRemoteThread(_processHandle, IntPtr.Zero, 0, _shellcodeAddr, IntPtr.Zero, 0, out var threadId);
+        var threadHandle = Win32Api.CreateRemoteThread(
+            _processHandle,
+            IntPtr.Zero,
+            0,
+            _shellcodeAddr,
+            IntPtr.Zero,
+            0,
+            out var threadId
+        );
         if (threadHandle == IntPtr.Zero)
         {
-            _logger?.LogError("[Rue-RemoteCall] Failed to create remote thread: 0x{Error:X8}", Marshal.GetLastWin32Error());
+            _logger?.LogError(
+                "[Rue-RemoteCall] Failed to create remote thread: 0x{Error:X8}",
+                Marshal.GetLastWin32Error()
+            );
             return false;
         }
 
-        _logger?.LogDebug("[Rue-RemoteCall] Created remote thread {ThreadId}, waiting for completion...", threadId);
+        _logger?.LogDebug(
+            "[Rue-RemoteCall] Created remote thread {ThreadId}, waiting for completion...",
+            threadId
+        );
 
         // Wait for thread completion (max 10 seconds)
         var waitResult = Win32Api.WaitForSingleObject(threadHandle, 10000);
@@ -146,13 +199,30 @@ public class RemoteFunctionCaller(ILogger? logger, IntPtr processHandle) : IDisp
             return null;
 
         var buffer = new byte[size];
-        if (Win32Api.ReadProcessMemory(_processHandle, functionAddr, buffer, size, out var bytesRead) && bytesRead > 0)
+        if (
+            Win32Api.ReadProcessMemory(
+                _processHandle,
+                functionAddr,
+                buffer,
+                size,
+                out var bytesRead
+            )
+            && bytesRead > 0
+        )
         {
-            _logger?.LogDebug("[Rue-RemoteCall] Read {Bytes} bytes from function at 0x{Addr:X8}", bytesRead, functionAddr.ToInt32());
+            _logger?.LogDebug(
+                "[Rue-RemoteCall] Read {Bytes} bytes from function at 0x{Addr:X8}",
+                bytesRead,
+                functionAddr.ToInt32()
+            );
             return buffer[..bytesRead];
         }
 
-        _logger?.LogWarning("[Rue-RemoteCall] Failed to read function at 0x{Addr:X8}: 0x{Error:X8}", functionAddr.ToInt32(), Marshal.GetLastWin32Error());
+        _logger?.LogWarning(
+            "[Rue-RemoteCall] Failed to read function at 0x{Addr:X8}: 0x{Error:X8}",
+            functionAddr.ToInt32(),
+            Marshal.GetLastWin32Error()
+        );
         return null;
     }
 
@@ -200,7 +270,7 @@ public class RemoteFunctionCaller(ILogger? logger, IntPtr processHandle) : IDisp
             for (var b = 0; b < instr.Length && offset + b < bytes.Length; b++)
                 hexParts.Append($"{bytes[offset + b]:x2} ");
 
-            sb.AppendLine($"  {ip:x8}: {hexParts.ToString().TrimEnd(),-24} {text}");
+            sb.AppendLine($"  {ip:x8}: {hexParts.ToString().TrimEnd(), -24} {text}");
 
             if (instr.FlowControl == FlowControl.Return)
                 break;

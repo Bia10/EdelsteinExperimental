@@ -11,7 +11,8 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Handling.Plugs;
 
-public abstract class AbstractUserOnDisconnectPlug<TStageUser> : IPipelinePlug<UserOnDisconnect<TStageUser>>
+public abstract class AbstractUserOnDisconnectPlug<TStageUser>
+    : IPipelinePlug<UserOnDisconnect<TStageUser>>
     where TStageUser : IStageUser<TStageUser>
 {
     private readonly ISessionService _session;
@@ -26,8 +27,8 @@ public abstract class AbstractUserOnDisconnectPlug<TStageUser> : IPipelinePlug<U
         ISessionService session,
         IAccountRepository accountRepository,
         IAccountWorldRepository accountWorldRepository,
-        ICharacterRepository characterRepository, 
-        IFriendService friendService, 
+        ICharacterRepository characterRepository,
+        IFriendService friendService,
         IPartyService partyService,
         IGuildService guildService
     )
@@ -54,42 +55,49 @@ public abstract class AbstractUserOnDisconnectPlug<TStageUser> : IPipelinePlug<U
             if (!message.User.IsMigrating)
             {
                 new ModifyTemporaryStatContext(message.User.Character.TemporaryStats).ResetAll();
-                _ = _friendService.UpdateChannel(new FriendUpdateChannelRequest(
-                    message.User.Character.ID,
-                    -1
-                ));
+                _ = _friendService.UpdateChannel(
+                    new FriendUpdateChannelRequest(message.User.Character.ID, -1)
+                );
                 if (message.User.Party != null)
                 {
                     if (message.User.Character.ID == message.User.Party.BossCharacterID)
                     {
-                        var nextPartyBoss = message.User.Party.Members.Values
-                            .Where(m => m.CharacterID != message.User.Character.ID)
+                        var nextPartyBoss = message
+                            .User.Party.Members.Values.Where(m =>
+                                m.CharacterID != message.User.Character.ID
+                            )
                             .Where(m => m.ChannelID >= 0)
                             .MaxBy(m => m.Level);
 
                         if (nextPartyBoss != null)
-                            _ = _partyService.ChangeBoss(new PartyChangeBossRequest(
-                                message.User.Character.ID,
-                                message.User.Party.ID,
-                                nextPartyBoss.CharacterID,
-                                true
-                            ));
+                            _ = _partyService.ChangeBoss(
+                                new PartyChangeBossRequest(
+                                    message.User.Character.ID,
+                                    message.User.Party.ID,
+                                    nextPartyBoss.CharacterID,
+                                    true
+                                )
+                            );
                     }
-                    
-                    _ = _partyService.UpdateChannelOrField(new PartyUpdateChannelOrFieldRequest(
-                        message.User.Party.ID,
-                        message.User.Character.ID,
-                        -2,
-                        999999999
-                    ));
+
+                    _ = _partyService.UpdateChannelOrField(
+                        new PartyUpdateChannelOrFieldRequest(
+                            message.User.Party.ID,
+                            message.User.Character.ID,
+                            -2,
+                            999999999
+                        )
+                    );
                 }
 
                 if (message.User.Guild != null)
-                    _ = _guildService.UpdateChannel(new GuildUpdateChannelRequest(
-                        message.User.Guild.ID,
-                        message.User.Character.ID,
-                        -2
-                    ));
+                    _ = _guildService.UpdateChannel(
+                        new GuildUpdateChannelRequest(
+                            message.User.Guild.ID,
+                            message.User.Character.ID,
+                            -2
+                        )
+                    );
             }
 
             await _characterRepository.Update(message.User.Character);

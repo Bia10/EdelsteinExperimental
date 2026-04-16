@@ -74,6 +74,6 @@ public enum ShopRequestOperations
     CheckFreeCashItemTable = 0x4E,
 
     SetFreeCashItemTable = 0x51,
-    
-    Give = 0xBD
+
+    Give = 0xBD,
 }

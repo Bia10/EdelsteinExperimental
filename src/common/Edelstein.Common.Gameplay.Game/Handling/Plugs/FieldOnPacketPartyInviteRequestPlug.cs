@@ -11,22 +11,26 @@ public class FieldOnPacketPartyInviteRequestPlug : IPipelinePlug<FieldOnPacketPa
 {
     public async Task Handle(IPipelineContext ctx, FieldOnPacketPartyInviteRequest message)
     {
-        if (message.User.StageUser.Party == null) return;
+        if (message.User.StageUser.Party == null)
+            return;
 
-        var response = await message.User.StageUser.Context.Services.Party.Invite(new PartyInviteRequest(
-            message.User.Character.ID,
-            message.User.Character.Name,
-            message.User.Character.Level,
-            message.User.Character.Job,
-            message.User.StageUser.Party.ID,
-            message.CharacterName
-        ));
-        
+        var response = await message.User.StageUser.Context.Services.Party.Invite(
+            new PartyInviteRequest(
+                message.User.Character.ID,
+                message.User.Character.Name,
+                message.User.Character.Level,
+                message.User.Character.Job,
+                message.User.StageUser.Party.ID,
+                message.CharacterName
+            )
+        );
+
         var result = response.Result switch
         {
             PartyResult.Success => PartyResultOperations.InvitePartySent,
-            PartyResult.FailedAlreadyInvited => PartyResultOperations.InvitePartyAlreadyInvitedByInviter,
-            _ => PartyResultOperations.InvitePartyAlreadyInvited
+            PartyResult.FailedAlreadyInvited =>
+                PartyResultOperations.InvitePartyAlreadyInvitedByInviter,
+            _ => PartyResultOperations.InvitePartyAlreadyInvited,
         };
         using var packet = new PacketWriter(PacketSendOperations.PartyResult);
         packet.WriteByte((byte)result);

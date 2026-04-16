@@ -11,5 +11,5 @@ public enum AccountSubGradeCode : short
     OutSourceSuperGM = 0x20,
     OutSourceGM = 0x40,
     UserGM = 0x80,
-    TesterAccount = 0x100
+    TesterAccount = 0x100,
 }

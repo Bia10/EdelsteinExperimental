@@ -5,7 +5,6 @@ namespace Edelstein.Common.Gameplay.Models.Inventories.Modify;
 
 public abstract class AbstractModifyInventoryOperation : IPacketWritable
 {
-
     protected AbstractModifyInventoryOperation(
         ModifyInventoryOperationType type,
         ItemInventoryType inventory,
@@ -16,6 +15,7 @@ public abstract class AbstractModifyInventoryOperation : IPacketWritable
         Inventory = inventory;
         Slot = slot;
     }
+
     public ModifyInventoryOperationType Type { get; }
     public ItemInventoryType Inventory { get; }
     public short Slot { get; }
@@ -33,7 +33,5 @@ public abstract class AbstractModifyInventoryOperation : IPacketWritable
         writer.WriteShort(Slot);
     }
 
-    protected virtual void WriteData(IPacketWriter writer)
-    {
-    }
+    protected virtual void WriteData(IPacketWriter writer) { }
 }

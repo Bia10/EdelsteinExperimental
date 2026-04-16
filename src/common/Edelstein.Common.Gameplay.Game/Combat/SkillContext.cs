@@ -28,27 +28,27 @@ public class SkillContext : ISkillContext
     private SkillContextTwoStateRideVehicle? SetTwoStateRideVehicleInfo { get; set; }
     private SkillContextTwoStateGuidedBullet? SetTwoStateGuidedBulletInfo { get; set; }
     private SkillContextTwoStatePartyBooster? SetTwoStatePartyBoosterInfo { get; set; }
-    
+
     private readonly ICollection<SkillContextTemporaryStat> _addTemporaryStat;
-    
+
     private readonly ICollection<SkillContextMobTemporaryStat> _addMobTemporaryStat;
     private readonly ICollection<SkillContextBurnedInfo> _addBurnedInfo;
-    
+
     private readonly ICollection<SkillContextSummoned> _addSummoned;
-    
+
     private readonly ICollection<SkillContextAffectedArea> _addAffectedArea;
     private readonly ICollection<SkillContextAffectedAreaBurnedInfo> _addAffectedAreaBurnedInfo;
 
     private readonly ICollection<int> _resetTemporaryStatBySkill;
     private readonly ICollection<TemporaryStatType> _resetTemporaryStatByType;
     private readonly ICollection<SkillContextTemporaryStatExisting> _resetTemporaryStatExisting;
-    
+
     private bool IsResetTwoStateDashSpeed { get; set; }
     private bool IsResetTwoStateDashJump { get; set; }
     private bool IsResetTwoStateRideVehicle { get; set; }
     private bool IsResetTwoStatePartyBooster { get; set; }
     private bool IsResetTwoStateGuidedBullet { get; set; }
-    
+
     private readonly ICollection<int> _resetMobTemporaryStatBySkill;
     private readonly ICollection<MobTemporaryStatType> _resetMobTemporaryStatByType;
 
@@ -56,15 +56,15 @@ public class SkillContext : ISkillContext
 
     private SkillContextTarget? TargetFieldInfo { get; set; }
     private SkillContextTarget? TargetPartyInfo { get; set; }
-    
+
     private int? Proc { get; set; }
     private int? RecoverHP { get; set; }
     private int? RecoverMP { get; set; }
-    
+
     public SkillContext(
         IFieldUser user,
-        ISkillTemplate? skill, 
-        ISkillTemplateLevel? skillLevel, 
+        ISkillTemplate? skill,
+        ISkillTemplateLevel? skillLevel,
         bool isHitMob = false,
         IFieldMob? mob = null
     )
@@ -76,9 +76,9 @@ public class SkillContext : ISkillContext
         _addTemporaryStat = new List<SkillContextTemporaryStat>();
         _addMobTemporaryStat = new List<SkillContextMobTemporaryStat>();
         _addBurnedInfo = new List<SkillContextBurnedInfo>();
-        
+
         _addSummoned = new List<SkillContextSummoned>();
-        
+
         _addAffectedArea = new List<SkillContextAffectedArea>();
         _addAffectedAreaBurnedInfo = new List<SkillContextAffectedAreaBurnedInfo>();
 
@@ -88,11 +88,11 @@ public class SkillContext : ISkillContext
 
         _resetMobTemporaryStatBySkill = new List<int>();
         _resetMobTemporaryStatByType = new List<MobTemporaryStatType>();
-        
+
         _resetSummoned = new List<int>();
-        
+
         Random = new Random();
-        
+
         Skill = skill;
         SkillLevel = skillLevel;
         IsHitMob = isHitMob;
@@ -101,280 +101,389 @@ public class SkillContext : ISkillContext
     public Random Random { get; }
     public ISkillTemplate? Skill { get; }
     public ISkillTemplateLevel? SkillLevel { get; }
-    
+
     public bool IsHitMob { get; }
-    
-    public void TargetField(bool active = true, int? limit = null, IRectangle2D? bounds = null)
-        => TargetFieldInfo = active 
+
+    public void TargetField(bool active = true, int? limit = null, IRectangle2D? bounds = null) =>
+        TargetFieldInfo = active
             ? new SkillContextTarget(
-                bounds ?? (SkillLevel == null
-                    ? new Rectangle2D(_user.Position, _user.Field?.Template.Bounds ?? new Rectangle2D())
-                    : new Rectangle2D(_user.Position, SkillLevel.Bounds)))
-            : null;
-    
-    public void TargetParty(bool active = true, IRectangle2D? bounds = null)
-        => TargetPartyInfo = active 
-            ? new SkillContextTarget(
-                bounds ?? (SkillLevel == null
-                    ? new Rectangle2D(_user.Position, _user.Field?.Template.Bounds ?? new Rectangle2D())
-                    : new Rectangle2D(_user.Position, SkillLevel.Bounds)))
+                bounds
+                    ?? (
+                        SkillLevel == null
+                            ? new Rectangle2D(
+                                _user.Position,
+                                _user.Field?.Template.Bounds ?? new Rectangle2D()
+                            )
+                            : new Rectangle2D(_user.Position, SkillLevel.Bounds)
+                    )
+            )
             : null;
 
-    public void SetProc(int? proc = null)
-        => Proc = proc ?? (SkillLevel?.Prop > 0
-            ? SkillLevel.Prop
-            : 0);
+    public void TargetParty(bool active = true, IRectangle2D? bounds = null) =>
+        TargetPartyInfo = active
+            ? new SkillContextTarget(
+                bounds
+                    ?? (
+                        SkillLevel == null
+                            ? new Rectangle2D(
+                                _user.Position,
+                                _user.Field?.Template.Bounds ?? new Rectangle2D()
+                            )
+                            : new Rectangle2D(_user.Position, SkillLevel.Bounds)
+                    )
+            )
+            : null;
 
-    public void SetRecoverHP(int? hp = null)
-        => RecoverHP = hp ?? (SkillLevel?.HP > 0
-            ? (int)(_user.Stats.MaxHP * SkillLevel.HP / 100d)
-            : 0);
-    
-    public void SetRecoverMP(int? mp = null)
-        => RecoverMP = mp ?? (SkillLevel?.MP > 0
-            ? (int)(_user.Stats.MaxMP * SkillLevel.MP / 100d)
-            : 0);
-    
-    public void SetTwoStateDashSpeed(int value, int? reason = null, TimeSpan? term = null)
-        => SetTwoStateDashSpeedInfo = new SkillContextTwoStateDynamicTerm(
-            value, 
+    public void SetProc(int? proc = null) =>
+        Proc = proc ?? (SkillLevel?.Prop > 0 ? SkillLevel.Prop : 0);
+
+    public void SetRecoverHP(int? hp = null) =>
+        RecoverHP =
+            hp ?? (SkillLevel?.HP > 0 ? (int)(_user.Stats.MaxHP * SkillLevel.HP / 100d) : 0);
+
+    public void SetRecoverMP(int? mp = null) =>
+        RecoverMP =
+            mp ?? (SkillLevel?.MP > 0 ? (int)(_user.Stats.MaxMP * SkillLevel.MP / 100d) : 0);
+
+    public void SetTwoStateDashSpeed(int value, int? reason = null, TimeSpan? term = null) =>
+        SetTwoStateDashSpeedInfo = new SkillContextTwoStateDynamicTerm(
+            value,
             reason ?? Skill?.ID ?? 0,
             term ?? TimeSpan.FromSeconds(SkillLevel?.Time ?? 0)
         );
-    
-    public void SetTwoStateDashJump(int value, int? reason = null, TimeSpan? term = null)
-        => SetTwoStateDashJumpInfo = new SkillContextTwoStateDynamicTerm(
-            value, 
+
+    public void SetTwoStateDashJump(int value, int? reason = null, TimeSpan? term = null) =>
+        SetTwoStateDashJumpInfo = new SkillContextTwoStateDynamicTerm(
+            value,
             reason ?? Skill?.ID ?? 0,
             term ?? TimeSpan.FromSeconds(SkillLevel?.Time ?? 0)
         );
 
-    public void SetTwoStateRideVehicle(int value, int? reason = null)
-        => SetTwoStateRideVehicleInfo = new SkillContextTwoStateRideVehicle(value, reason ?? (value > 0 ? Skill?.ID ?? 0 : 0));
-    
-    public void SetTwoStatePartyBooster(int value, int? reason = null, DateTime? dateStart = null, TimeSpan? term = null) 
-        => SetTwoStatePartyBoosterInfo = new SkillContextTwoStatePartyBooster(
-            value, 
+    public void SetTwoStateRideVehicle(int value, int? reason = null) =>
+        SetTwoStateRideVehicleInfo = new SkillContextTwoStateRideVehicle(
+            value,
+            reason ?? (value > 0 ? Skill?.ID ?? 0 : 0)
+        );
+
+    public void SetTwoStatePartyBooster(
+        int value,
+        int? reason = null,
+        DateTime? dateStart = null,
+        TimeSpan? term = null
+    ) =>
+        SetTwoStatePartyBoosterInfo = new SkillContextTwoStatePartyBooster(
+            value,
             reason ?? Skill?.ID ?? 0,
             dateStart ?? DateTime.UtcNow,
             term ?? TimeSpan.FromSeconds(SkillLevel?.Time ?? 0)
         );
 
-    public void SetTwoStateGuidedBullet(int value, int mobID, int? reason = null)
-        => SetTwoStateGuidedBulletInfo = new SkillContextTwoStateGuidedBullet(value, mobID, reason ?? (value > 0 ? Skill?.ID ?? 0 : 0));
-    
-    public void AddTemporaryStat(TemporaryStatType type, int value, int? reason = null, DateTime? expire = null)
-        => _addTemporaryStat.Add(new SkillContextTemporaryStat(
-            type, 
-            value, 
-            reason ?? Skill?.ID ?? 0, 
-            expire ?? (SkillLevel?.Time == 0 ? DateTime.MaxValue : _now.AddSeconds(SkillLevel?.Time ?? 0))
-        ));
+    public void SetTwoStateGuidedBullet(int value, int mobID, int? reason = null) =>
+        SetTwoStateGuidedBulletInfo = new SkillContextTwoStateGuidedBullet(
+            value,
+            mobID,
+            reason ?? (value > 0 ? Skill?.ID ?? 0 : 0)
+        );
 
-    public void AddMobTemporaryStat(MobTemporaryStatType type, int value, int? reason = null, DateTime? expire = null)
-        => _addMobTemporaryStat.Add(new SkillContextMobTemporaryStat(
-            type, 
-            value, 
-            reason ?? Skill?.ID ?? 0, 
-            expire ?? (SkillLevel?.Time == 0 ? DateTime.MaxValue : _now.AddSeconds(SkillLevel?.Time ?? 0))
-        ));
+    public void AddTemporaryStat(
+        TemporaryStatType type,
+        int value,
+        int? reason = null,
+        DateTime? expire = null
+    ) =>
+        _addTemporaryStat.Add(
+            new SkillContextTemporaryStat(
+                type,
+                value,
+                reason ?? Skill?.ID ?? 0,
+                expire
+                    ?? (
+                        SkillLevel?.Time == 0
+                            ? DateTime.MaxValue
+                            : _now.AddSeconds(SkillLevel?.Time ?? 0)
+                    )
+            )
+        );
 
-    public void AddMobBurnedInfo(int damage, int? skillID = null, TimeSpan? interval = null, DateTime? expire = null)
-        => _addBurnedInfo.Add(new SkillContextBurnedInfo(
-            damage,
-            skillID ?? Skill?.ID ?? 0,
-            interval ?? TimeSpan.FromSeconds(SkillLevel?.DotInterval ?? 0),
-            expire ?? _now.AddSeconds(SkillLevel?.DotTime ?? 0)
-        ));
-    
+    public void AddMobTemporaryStat(
+        MobTemporaryStatType type,
+        int value,
+        int? reason = null,
+        DateTime? expire = null
+    ) =>
+        _addMobTemporaryStat.Add(
+            new SkillContextMobTemporaryStat(
+                type,
+                value,
+                reason ?? Skill?.ID ?? 0,
+                expire
+                    ?? (
+                        SkillLevel?.Time == 0
+                            ? DateTime.MaxValue
+                            : _now.AddSeconds(SkillLevel?.Time ?? 0)
+                    )
+            )
+        );
+
+    public void AddMobBurnedInfo(
+        int damage,
+        int? skillID = null,
+        TimeSpan? interval = null,
+        DateTime? expire = null
+    ) =>
+        _addBurnedInfo.Add(
+            new SkillContextBurnedInfo(
+                damage,
+                skillID ?? Skill?.ID ?? 0,
+                interval ?? TimeSpan.FromSeconds(SkillLevel?.DotInterval ?? 0),
+                expire ?? _now.AddSeconds(SkillLevel?.DotTime ?? 0)
+            )
+        );
+
     public void AddSummoned(
-        MoveAbilityType moveAbilityType, 
-        SummonedAssistType summonedAssistType, 
-        int? skillID = null, 
-        int? skillLevel = null, 
-        bool? allowDuplicate = false, 
-        DateTime? expire = null, 
+        MoveAbilityType moveAbilityType,
+        SummonedAssistType summonedAssistType,
+        int? skillID = null,
+        int? skillLevel = null,
+        bool? allowDuplicate = false,
+        DateTime? expire = null,
         IPoint2D? position = null
-    )   
-        => _addSummoned.Add(new SkillContextSummoned(
-            moveAbilityType,
-            summonedAssistType,
-            skillID ?? Skill?.ID ?? 0,
-            skillLevel ?? SkillLevel?.Level ?? 0,
-            allowDuplicate ?? false,
-            expire ?? _now.AddSeconds(SkillLevel?.Time ?? 0),
-            position ?? _user.Position
-        ));
+    ) =>
+        _addSummoned.Add(
+            new SkillContextSummoned(
+                moveAbilityType,
+                summonedAssistType,
+                skillID ?? Skill?.ID ?? 0,
+                skillLevel ?? SkillLevel?.Level ?? 0,
+                allowDuplicate ?? false,
+                expire ?? _now.AddSeconds(SkillLevel?.Time ?? 0),
+                position ?? _user.Position
+            )
+        );
 
-    public void AddAffectedArea(AffectedAreaType type, int? skillID = null, int? skillLevel = null, int? info = null, int? phase = null, IRectangle2D? bounds = null, DateTime? expire = null)
-        => _addAffectedArea.Add(new SkillContextAffectedArea(
-            type,
-            skillID ?? Skill?.ID ?? 0,
-            skillLevel ?? SkillLevel?.Level ?? 0,
-            info ?? 0,
-            phase ?? 0,
-            bounds ?? (SkillLevel == null
-                ? new Rectangle2D()
-                : new Rectangle2D(
-                    new Point2D(
-                        _user.Position.X, 
-                        _user.Position.Y - (int)(SkillLevel.Bounds.Height / 2) + 10
-                    ), 
-                    SkillLevel.Bounds
-            )),
-            expire ?? _now.AddSeconds(SkillLevel?.Time ?? 0)
-        ));
-    
-    public void AddAffectedAreaBurnedInfo(int? skillID = null, int? skillLevel = null, TimeSpan? interval = null, TimeSpan? duration = null, IFieldUser? user = null)
-        => _addAffectedAreaBurnedInfo.Add(new SkillContextAffectedAreaBurnedInfo(
-            skillID ?? Skill?.ID ?? 0,
-            skillLevel ?? SkillLevel?.Level ?? 0,
-            interval ?? TimeSpan.FromSeconds(SkillLevel?.DotInterval ?? 0),
-            duration ?? TimeSpan.FromSeconds(SkillLevel?.DotTime ?? 0),
-            user ?? _user
-        ));
+    public void AddAffectedArea(
+        AffectedAreaType type,
+        int? skillID = null,
+        int? skillLevel = null,
+        int? info = null,
+        int? phase = null,
+        IRectangle2D? bounds = null,
+        DateTime? expire = null
+    ) =>
+        _addAffectedArea.Add(
+            new SkillContextAffectedArea(
+                type,
+                skillID ?? Skill?.ID ?? 0,
+                skillLevel ?? SkillLevel?.Level ?? 0,
+                info ?? 0,
+                phase ?? 0,
+                bounds
+                    ?? (
+                        SkillLevel == null
+                            ? new Rectangle2D()
+                            : new Rectangle2D(
+                                new Point2D(
+                                    _user.Position.X,
+                                    _user.Position.Y - (int)(SkillLevel.Bounds.Height / 2) + 10
+                                ),
+                                SkillLevel.Bounds
+                            )
+                    ),
+                expire ?? _now.AddSeconds(SkillLevel?.Time ?? 0)
+            )
+        );
 
-    public void ResetTemporaryStatBySkill(int? skillID = null)
-        => _resetTemporaryStatBySkill.Add(skillID ?? Skill?.ID ?? 0);
-    
-    public void ResetTemporaryStatByType(TemporaryStatType type)
-        => _resetTemporaryStatByType.Add(type);
+    public void AddAffectedAreaBurnedInfo(
+        int? skillID = null,
+        int? skillLevel = null,
+        TimeSpan? interval = null,
+        TimeSpan? duration = null,
+        IFieldUser? user = null
+    ) =>
+        _addAffectedAreaBurnedInfo.Add(
+            new SkillContextAffectedAreaBurnedInfo(
+                skillID ?? Skill?.ID ?? 0,
+                skillLevel ?? SkillLevel?.Level ?? 0,
+                interval ?? TimeSpan.FromSeconds(SkillLevel?.DotInterval ?? 0),
+                duration ?? TimeSpan.FromSeconds(SkillLevel?.DotTime ?? 0),
+                user ?? _user
+            )
+        );
 
-    public void ResetTemporaryStatExisting(TemporaryStatType type, int value)
-        => _resetTemporaryStatExisting.Add(new SkillContextTemporaryStatExisting(type, value));
-    public void ResetTwoStateDashSpeed()
-        => IsResetTwoStateDashSpeed = true;
-    
-    public void ResetTwoStateDashJump()
-        => IsResetTwoStateDashJump = true;
+    public void ResetTemporaryStatBySkill(int? skillID = null) =>
+        _resetTemporaryStatBySkill.Add(skillID ?? Skill?.ID ?? 0);
 
-    public void ResetTwoStateRideVehicle()
-        => IsResetTwoStateRideVehicle = true;
-    
-    public void ResetTwoStatePartyBooster()
-        => IsResetTwoStatePartyBooster = true;
+    public void ResetTemporaryStatByType(TemporaryStatType type) =>
+        _resetTemporaryStatByType.Add(type);
 
-    public void ResetTwoStateGuidedBullet()
-        => IsResetTwoStateGuidedBullet = true;
+    public void ResetTemporaryStatExisting(TemporaryStatType type, int value) =>
+        _resetTemporaryStatExisting.Add(new SkillContextTemporaryStatExisting(type, value));
 
-    public void ResetMobTemporaryStatBySkill(int? skillID = null)
-        => _resetMobTemporaryStatBySkill.Add(skillID ?? Skill?.ID ?? 0);
-    
-    public void ResetMobTemporaryStatByType(MobTemporaryStatType type)
-        => _resetMobTemporaryStatByType.Add(type);
+    public void ResetTwoStateDashSpeed() => IsResetTwoStateDashSpeed = true;
+
+    public void ResetTwoStateDashJump() => IsResetTwoStateDashJump = true;
+
+    public void ResetTwoStateRideVehicle() => IsResetTwoStateRideVehicle = true;
+
+    public void ResetTwoStatePartyBooster() => IsResetTwoStatePartyBooster = true;
+
+    public void ResetTwoStateGuidedBullet() => IsResetTwoStateGuidedBullet = true;
+
+    public void ResetMobTemporaryStatBySkill(int? skillID = null) =>
+        _resetMobTemporaryStatBySkill.Add(skillID ?? Skill?.ID ?? 0);
+
+    public void ResetMobTemporaryStatByType(MobTemporaryStatType type) =>
+        _resetMobTemporaryStatByType.Add(type);
 
     public void ResetSummoned(int? skillID = null) => _resetSummoned.Add(skillID ?? Skill?.ID ?? 0);
 
     public async Task Execute()
     {
-        var targets = new HashSet<IFieldObject>{ _user };
+        var targets = new HashSet<IFieldObject> { _user };
 
         if (_mob != null)
             targets.Add(_mob);
 
         if (TargetFieldInfo != null && _user.Field != null)
-            foreach (var target in _user.Field
-                         .GetSplits(TargetFieldInfo.Bounds)
-                         .Where(s => s != null)
-                         .SelectMany(s => s!.Objects)
-                         .Where(o => TargetFieldInfo.Bounds.Intersects(o.Position))
-                         .OrderBy(u => _user.Position.Distance(u.Position)))
-                targets.Add(target);
-        
-        if (TargetPartyInfo != null && _user is { Field: not null, StageUser.Party: not null })
-            foreach (var target in _user.Field
-                         .GetSplits(TargetPartyInfo.Bounds)
-                         .Where(s => s != null)
-                         .SelectMany(s => s!.Objects)
-                         .OfType<IFieldUser>()
-                         .Where(o => TargetPartyInfo.Bounds.Intersects(o.Position))
-                         .Where(o => o.StageUser.Party?.ID == _user.StageUser.Party.ID)
-                         .OrderBy(u => _user.Position.Distance(u.Position)))
-                targets.Add(target);
-
-        await Task.WhenAll(targets
-            .OfType<IFieldUser>()
-            .Where(o => Proc == null || Random.Next(0, 100) <= Proc)
-            .Select(t => t.Modify(m =>
-            {
-                m.Stats(s =>
-                {
-                    if (RecoverHP != null)
-                        s.HP += RecoverHP.Value;
-                    if (RecoverMP != null)
-                        s.MP += RecoverMP.Value;
-                });
-                
-                m.TemporaryStats(s =>
-                {
-                    foreach (var x in _resetTemporaryStatBySkill)
-                        s.ResetByReason(x);
-                    foreach (var x in _resetTemporaryStatByType)
-                        s.ResetByType(x);
-                    foreach (var x in _resetTemporaryStatExisting)
-                    {
-                        var existingStat = t.Character.TemporaryStats[x.Type];
-                        if (existingStat != null)
-                            s.Set(x.Type, x.Value, existingStat.Reason, existingStat.DateExpire);
-                    }
-                    
-                    if (IsResetTwoStateDashSpeed)
-                        s.ResetDashSpeed();
-                    if (IsResetTwoStateDashJump)
-                        s.ResetDashJump();
-                    if (IsResetTwoStateRideVehicle)
-                        s.ResetRideVehicle();
-                    if (IsResetTwoStatePartyBooster)
-                        s.ResetPartyBooster();
-                    if (IsResetTwoStateGuidedBullet)
-                        s.ResetGuidedBullet();
-                        
-                    if (SetTwoStateDashSpeedInfo != null)
-                        s.SetDashSpeed(SetTwoStateDashSpeedInfo.Value, SetTwoStateDashSpeedInfo.Reason, SetTwoStateDashSpeedInfo.Term);
-                    if (SetTwoStateDashJumpInfo != null)
-                        s.SetDashJump(SetTwoStateDashJumpInfo.Value, SetTwoStateDashJumpInfo.Reason, SetTwoStateDashJumpInfo.Term);
-                    if (SetTwoStateRideVehicleInfo != null)
-                        s.SetRideVehicle(SetTwoStateRideVehicleInfo.Value, SetTwoStateRideVehicleInfo.Reason);
-                    if (SetTwoStatePartyBoosterInfo != null)
-                        s.SetPartyBooster(SetTwoStatePartyBoosterInfo.Value, SetTwoStatePartyBoosterInfo.Reason, SetTwoStatePartyBoosterInfo.DateStart, SetTwoStatePartyBoosterInfo.Term);
-                    if (SetTwoStateGuidedBulletInfo != null)
-                        s.SetGuidedBullet(SetTwoStateGuidedBulletInfo.Value, SetTwoStateGuidedBulletInfo.MobID, SetTwoStateGuidedBulletInfo.Reason);
-
-                    foreach (var ts in _addTemporaryStat)
-                        s.Set(ts.Type, ts.Value, ts.Reason, ts.Expire);
-                });
-            })));
-
-        await Task.WhenAll(targets
-            .OfType<IFieldMob>()
-            .Take(
-                SkillLevel == null 
-                    ? 100
-                    : SkillLevel.MobCount > 0
-                        ? SkillLevel.MobCount
-                        : 100
+            foreach (
+                var target in _user
+                    .Field.GetSplits(TargetFieldInfo.Bounds)
+                    .Where(s => s != null)
+                    .SelectMany(s => s!.Objects)
+                    .Where(o => TargetFieldInfo.Bounds.Intersects(o.Position))
+                    .OrderBy(u => _user.Position.Distance(u.Position))
             )
-            .Where(o => Proc == null || Random.Next(0, 100) <= Proc)
-            .Select(t => t.ModifyTemporaryStats(s =>
-            {
-                foreach (var x in _resetMobTemporaryStatBySkill)
-                    s.ResetByReason(x);
-                foreach (var x in _resetMobTemporaryStatByType)
-                    s.ResetByType(x);
-                if (_addMobTemporaryStat.Count > 0)
-                    foreach (var mts in _addMobTemporaryStat)
-                        s.Set(mts.Type, mts.Value, mts.Reason, mts.Expire);
-                if (_addBurnedInfo.Count > 0)
-                    foreach (var b in _addBurnedInfo)
-                        s.SetBurnedInfo(new MobBurnedInfo(
-                            _user.Character.ID,
-                            b.SkillID,
-                            b.Damage,
-                            b.Interval,
-                            _now,
-                            b.Expire
-                        ));
-            })));
+                targets.Add(target);
+
+        if (TargetPartyInfo != null && _user is { Field: not null, StageUser.Party: not null })
+            foreach (
+                var target in _user
+                    .Field.GetSplits(TargetPartyInfo.Bounds)
+                    .Where(s => s != null)
+                    .SelectMany(s => s!.Objects)
+                    .OfType<IFieldUser>()
+                    .Where(o => TargetPartyInfo.Bounds.Intersects(o.Position))
+                    .Where(o => o.StageUser.Party?.ID == _user.StageUser.Party.ID)
+                    .OrderBy(u => _user.Position.Distance(u.Position))
+            )
+                targets.Add(target);
+
+        await Task.WhenAll(
+            targets
+                .OfType<IFieldUser>()
+                .Where(o => Proc == null || Random.Next(0, 100) <= Proc)
+                .Select(t =>
+                    t.Modify(m =>
+                    {
+                        m.Stats(s =>
+                        {
+                            if (RecoverHP != null)
+                                s.HP += RecoverHP.Value;
+                            if (RecoverMP != null)
+                                s.MP += RecoverMP.Value;
+                        });
+
+                        m.TemporaryStats(s =>
+                        {
+                            foreach (var x in _resetTemporaryStatBySkill)
+                                s.ResetByReason(x);
+                            foreach (var x in _resetTemporaryStatByType)
+                                s.ResetByType(x);
+                            foreach (var x in _resetTemporaryStatExisting)
+                            {
+                                var existingStat = t.Character.TemporaryStats[x.Type];
+                                if (existingStat != null)
+                                    s.Set(
+                                        x.Type,
+                                        x.Value,
+                                        existingStat.Reason,
+                                        existingStat.DateExpire
+                                    );
+                            }
+
+                            if (IsResetTwoStateDashSpeed)
+                                s.ResetDashSpeed();
+                            if (IsResetTwoStateDashJump)
+                                s.ResetDashJump();
+                            if (IsResetTwoStateRideVehicle)
+                                s.ResetRideVehicle();
+                            if (IsResetTwoStatePartyBooster)
+                                s.ResetPartyBooster();
+                            if (IsResetTwoStateGuidedBullet)
+                                s.ResetGuidedBullet();
+
+                            if (SetTwoStateDashSpeedInfo != null)
+                                s.SetDashSpeed(
+                                    SetTwoStateDashSpeedInfo.Value,
+                                    SetTwoStateDashSpeedInfo.Reason,
+                                    SetTwoStateDashSpeedInfo.Term
+                                );
+                            if (SetTwoStateDashJumpInfo != null)
+                                s.SetDashJump(
+                                    SetTwoStateDashJumpInfo.Value,
+                                    SetTwoStateDashJumpInfo.Reason,
+                                    SetTwoStateDashJumpInfo.Term
+                                );
+                            if (SetTwoStateRideVehicleInfo != null)
+                                s.SetRideVehicle(
+                                    SetTwoStateRideVehicleInfo.Value,
+                                    SetTwoStateRideVehicleInfo.Reason
+                                );
+                            if (SetTwoStatePartyBoosterInfo != null)
+                                s.SetPartyBooster(
+                                    SetTwoStatePartyBoosterInfo.Value,
+                                    SetTwoStatePartyBoosterInfo.Reason,
+                                    SetTwoStatePartyBoosterInfo.DateStart,
+                                    SetTwoStatePartyBoosterInfo.Term
+                                );
+                            if (SetTwoStateGuidedBulletInfo != null)
+                                s.SetGuidedBullet(
+                                    SetTwoStateGuidedBulletInfo.Value,
+                                    SetTwoStateGuidedBulletInfo.MobID,
+                                    SetTwoStateGuidedBulletInfo.Reason
+                                );
+
+                            foreach (var ts in _addTemporaryStat)
+                                s.Set(ts.Type, ts.Value, ts.Reason, ts.Expire);
+                        });
+                    })
+                )
+        );
+
+        await Task.WhenAll(
+            targets
+                .OfType<IFieldMob>()
+                .Take(
+                    SkillLevel == null ? 100
+                    : SkillLevel.MobCount > 0 ? SkillLevel.MobCount
+                    : 100
+                )
+                .Where(o => Proc == null || Random.Next(0, 100) <= Proc)
+                .Select(t =>
+                    t.ModifyTemporaryStats(s =>
+                    {
+                        foreach (var x in _resetMobTemporaryStatBySkill)
+                            s.ResetByReason(x);
+                        foreach (var x in _resetMobTemporaryStatByType)
+                            s.ResetByType(x);
+                        if (_addMobTemporaryStat.Count > 0)
+                            foreach (var mts in _addMobTemporaryStat)
+                                s.Set(mts.Type, mts.Value, mts.Reason, mts.Expire);
+                        if (_addBurnedInfo.Count > 0)
+                            foreach (var b in _addBurnedInfo)
+                                s.SetBurnedInfo(
+                                    new MobBurnedInfo(
+                                        _user.Character.ID,
+                                        b.SkillID,
+                                        b.Damage,
+                                        b.Interval,
+                                        _now,
+                                        b.Expire
+                                    )
+                                );
+                    })
+                )
+        );
 
         if (_addSummoned.Count > 0)
         {
@@ -382,8 +491,8 @@ public class SkillContext : ISkillContext
             {
                 if (!summoned.AllowDuplicate)
                 {
-                    var existing = _user.Owned
-                        .OfType<IFieldSummoned>()
+                    var existing = _user
+                        .Owned.OfType<IFieldSummoned>()
                         .FirstOrDefault(o => o.SkillID == summoned.SkillID);
 
                     if (existing != null)
@@ -401,12 +510,10 @@ public class SkillContext : ISkillContext
                     summoned.MoveAbilityType,
                     summoned.SummonedAssistType,
                     summoned.Position,
-                    _user.Field?.Template.Footholds
-                        .FindBelow(summoned.Position)
-                        .FirstOrDefault(),
+                    _user.Field?.Template.Footholds.FindBelow(summoned.Position).FirstOrDefault(),
                     summoned.Expire
                 );
-                
+
                 _user.Owned.Add(obj);
                 if (_user.Field != null)
                     await _user.Field.Enter(obj, () => obj.GetEnterFieldPacket(1));
@@ -415,10 +522,12 @@ public class SkillContext : ISkillContext
 
         if (_resetSummoned.Count > 0)
         {
-            foreach (var summoned in _user.Owned
-                         .OfType<IFieldSummoned>()
-                         .Where(s => _resetSummoned.Contains(s.SkillID))
-                         .ToImmutableArray())
+            foreach (
+                var summoned in _user
+                    .Owned.OfType<IFieldSummoned>()
+                    .Where(s => _resetSummoned.Contains(s.SkillID))
+                    .ToImmutableArray()
+            )
             {
                 _user.Owned.Remove(summoned);
                 if (_user.Field != null)
@@ -441,17 +550,19 @@ public class SkillContext : ISkillContext
                     _now,
                     affectedArea.Expire
                 );
-                
+
                 if (_addAffectedAreaBurnedInfo.Count > 0)
                     foreach (var burned in _addAffectedAreaBurnedInfo)
-                        obj.Actions.Add(new FieldAffectedAreaActionBurned(
-                            _user,
-                            burned.SkillID,
-                            burned.SkillLevel,
-                            burned.Interval,
-                            burned.Duration
-                        ));
-                
+                        obj.Actions.Add(
+                            new FieldAffectedAreaActionBurned(
+                                _user,
+                                burned.SkillID,
+                                burned.SkillLevel,
+                                burned.Interval,
+                                burned.Duration
+                            )
+                        );
+
                 if (_user.Field != null)
                     await _user.Field.Enter(obj, () => obj.GetEnterFieldPacket());
             }

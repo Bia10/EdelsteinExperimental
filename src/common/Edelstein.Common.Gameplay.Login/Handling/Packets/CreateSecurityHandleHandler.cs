@@ -7,16 +7,18 @@ using Edelstein.Protocol.Utilities.Pipelines;
 
 namespace Edelstein.Common.Gameplay.Login.Handling.Packets;
 
-public class CreateSecurityHandleHandler : AbstractPipedPacketHandler<ILoginStageUser, UserOnPacketCreateSecurityHandle>
+public class CreateSecurityHandleHandler
+    : AbstractPipedPacketHandler<ILoginStageUser, UserOnPacketCreateSecurityHandle>
 {
-    public CreateSecurityHandleHandler(IPipeline<UserOnPacketCreateSecurityHandle> pipeline) : base(pipeline)
-    {
-    }
+    public CreateSecurityHandleHandler(IPipeline<UserOnPacketCreateSecurityHandle> pipeline)
+        : base(pipeline) { }
 
     public override short Operation => (short)PacketRecvOperations.CreateSecurityHandle;
 
     public override bool Check(ILoginStageUser user) => user.State == LoginState.CheckPassword;
 
-    public override UserOnPacketCreateSecurityHandle? Serialize(ILoginStageUser user, IPacketReader reader)
-        => new(user);
+    public override UserOnPacketCreateSecurityHandle? Serialize(
+        ILoginStageUser user,
+        IPacketReader reader
+    ) => new(user);
 }

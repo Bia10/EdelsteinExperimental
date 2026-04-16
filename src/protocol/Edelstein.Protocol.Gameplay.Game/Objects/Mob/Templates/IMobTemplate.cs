@@ -8,7 +8,7 @@ public interface IMobTemplate : ITemplate
     MoveAbilityType MoveAbility { get; }
 
     short Level { get; }
-    
+
     bool IsBoss { get; }
 
     int MaxHP { get; }
@@ -24,6 +24,6 @@ public interface IMobTemplate : ITemplate
     int EVA { get; }
 
     int EXP { get; }
-    
+
     IDictionary<Element, ElementAttribute> ElementAttributes { get; }
 }

@@ -2,7 +2,4 @@
 
 namespace Edelstein.Protocol.Gameplay.Game.Contracts;
 
-public record FieldOnPacketUserCharacterInfoRequest(
-    IFieldUser User,
-    IFieldUser Target
-);
+public record FieldOnPacketUserCharacterInfoRequest(IFieldUser User, IFieldUser Target);

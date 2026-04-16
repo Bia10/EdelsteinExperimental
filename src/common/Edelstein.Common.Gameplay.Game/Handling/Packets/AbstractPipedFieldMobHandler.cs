@@ -8,17 +8,18 @@ namespace Edelstein.Common.Gameplay.Game.Handling.Packets;
 
 public abstract class AbstractPipedFieldMobHandler<TMessage> : AbstractPipedFieldHandler<TMessage>
 {
-    protected AbstractPipedFieldMobHandler(IPipeline<TMessage> pipeline) : base(pipeline)
-    {
-    }
+    protected AbstractPipedFieldMobHandler(IPipeline<TMessage> pipeline)
+        : base(pipeline) { }
 
     protected override TMessage? Serialize(IFieldUser user, IPacketReader reader)
     {
         var objID = reader.ReadInt();
         var obj = user.Field?.GetPool(FieldObjectType.Mob)?.GetObject(objID);
 
-        if (obj is not IFieldMob mob) return default;
-        if (mob.Controller != user) return default;
+        if (obj is not IFieldMob mob)
+            return default;
+        if (mob.Controller != user)
+            return default;
 
         return Serialize(user, mob, reader);
     }

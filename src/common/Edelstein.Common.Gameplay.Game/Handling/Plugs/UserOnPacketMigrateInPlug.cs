@@ -6,17 +6,25 @@ using Microsoft.Extensions.Logging;
 
 namespace Edelstein.Common.Gameplay.Game.Handling.Plugs;
 
-public class UserOnPacketMigrateInPlug : AbstractUserOnPacketMigrateInPlug<IGameStage, IGameStageUser>
+public class UserOnPacketMigrateInPlug
+    : AbstractUserOnPacketMigrateInPlug<IGameStage, IGameStageUser>
 {
     public UserOnPacketMigrateInPlug(
-        ILogger<AbstractUserOnPacketMigrateInPlug<IGameStage, IGameStageUser>> logger, 
-        IGameStage stage, 
-        IMigrationService migrationService, 
-        ISessionService sessionService, 
-        IFriendService friendService, 
+        ILogger<AbstractUserOnPacketMigrateInPlug<IGameStage, IGameStageUser>> logger,
+        IGameStage stage,
+        IMigrationService migrationService,
+        ISessionService sessionService,
+        IFriendService friendService,
         IPartyService partyService,
         IGuildService guildService
-    ) : base(logger, stage, migrationService, sessionService, friendService, partyService, guildService)
-    {
-    }
+    )
+        : base(
+            logger,
+            stage,
+            migrationService,
+            sessionService,
+            friendService,
+            partyService,
+            guildService
+        ) { }
 }
