@@ -41,6 +41,8 @@ public class NettyTransportConnectorHandler : ChannelHandlerAdapter
             var seqSend = reader.ReadUInt();
             var seqRecv = reader.ReadUInt();
             var locale = reader.ReadByte();
+            // CrcKey is read but server-to-server sockets have CRC validation disabled (key stays 0).
+            _ = reader.ReadUInt();
 
             if (version != _version.Major)
                 return;

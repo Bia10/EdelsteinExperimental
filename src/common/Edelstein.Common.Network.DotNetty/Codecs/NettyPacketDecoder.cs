@@ -118,9 +118,8 @@ public class NettyPacketDecoder : ReplayingDecoder<NettyPacketState>
                             }
 
                             packetLength = (short)(_length - 4);
+                            socket.CrcKey = CrcCipher.AdvanceKey(socket.CrcKey);
                         }
-
-                        socket.CrcKey = CrcCipher.AdvanceKey(socket.CrcKey);
                     }
 
                     socket.SeqRecv = _igCipher.Hash(seqRecv, 4, 0);
