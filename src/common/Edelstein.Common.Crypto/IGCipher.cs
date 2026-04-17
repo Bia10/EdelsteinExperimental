@@ -266,8 +266,7 @@ public class IGCipher
                 0x08,
                 0x49,
             }
-        )
-    { }
+        ) { }
 
     public IGCipher(byte[] shuffle, uint key = 0xC65053F2)
     {

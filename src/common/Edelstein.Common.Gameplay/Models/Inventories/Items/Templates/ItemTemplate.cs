@@ -24,6 +24,8 @@ public record ItemTemplate : IItemTemplate
         AccountSharable = info.ResolveBool("accountSharable") ?? false;
 
         Cash = info.ResolveBool("cash") ?? false;
+
+        NoCancelMouse = (info.ResolveInt("noCancelMouse") ?? 0) != 0;
     }
 
     public int ID { get; }
@@ -45,4 +47,7 @@ public record ItemTemplate : IItemTemplate
     public bool AccountSharable { get; }
 
     public bool Cash { get; }
+
+    /// <summary>If true, the item icon does not deselect when the cursor moves away (WZ: noCancelMouse).</summary>
+    public bool NoCancelMouse { get; }
 }
