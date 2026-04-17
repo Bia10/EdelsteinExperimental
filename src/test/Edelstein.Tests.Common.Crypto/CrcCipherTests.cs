@@ -6,12 +6,30 @@ namespace Edelstein.Tests.Common.Crypto;
 public class CrcCipherTests
 {
     [Fact]
-    public void Compute_WithEmptyBuffer_ReturnsKeyXorMask()
+    public void Compute_WithEmptyBuffer_ReturnsKey()
     {
         var crcKey = 0u;
         var result = CrcCipher.Compute([], crcKey);
-        // Empty buffer: crc starts as crcKey ^ 0xFFFFFFFF, no iterations, then ^ 0xFFFFFFFF → crcKey
+        // CRC-32/BZIP2: init = crcKey, no iterations, no final XOR -> returns crcKey unchanged.
         Assert.Equal(crcKey, result);
+    }
+
+    [Fact]
+    public void Compute_Seed95_MatchesReferenceVector()
+    {
+        // V95_CRC_Complete_Reference.md s2.1: GetCrc32(&{95}, 4, 0) == 0xC36FDB97
+        // 95 = 0x5F in little-endian 4 bytes.
+        var data = new byte[] { 0x5F, 0x00, 0x00, 0x00 };
+        Assert.Equal(0xC36FDB97u, CrcCipher.Compute(data, 0u));
+    }
+
+    [Fact]
+    public void Compute_Step2_MatchesReferenceVector()
+    {
+        // V95_CRC_Complete_Reference.md s2.1: GetCrc32(&0xC36FDB97, 4, 0) == 0x4A800456
+        // 0xC36FDB97 in little-endian = { 0x97, 0xDB, 0x6F, 0xC3 }.
+        var data = new byte[] { 0x97, 0xDB, 0x6F, 0xC3 };
+        Assert.Equal(0x4A800456u, CrcCipher.Compute(data, 0u));
     }
 
     [Fact]
@@ -57,7 +75,6 @@ public class CrcCipherTests
 
         var crc = CrcCipher.Compute(data, crcKey);
         var buffer = data.Concat(BitConverter.GetBytes(crc)).ToArray();
-        // Flip a bit in the tail
         buffer[^1] ^= 0xFF;
 
         Assert.False(CrcCipher.Verify(buffer, crcKey));
@@ -71,7 +88,6 @@ public class CrcCipherTests
 
         var crc = CrcCipher.Compute(data, crcKey);
         var buffer = data.Concat(BitConverter.GetBytes(crc)).ToArray();
-        // Flip a byte in the data portion
         buffer[0] ^= 0xFF;
 
         Assert.False(CrcCipher.Verify(buffer, crcKey));
@@ -105,19 +121,14 @@ public class CrcCipherTests
     public void AdvanceKey_IsDeterministic()
     {
         var key = 0xCAFEBABEu;
-
-        var advanced1 = CrcCipher.AdvanceKey(key);
-        var advanced2 = CrcCipher.AdvanceKey(key);
-
-        Assert.Equal(advanced1, advanced2);
+        Assert.Equal(CrcCipher.AdvanceKey(key), CrcCipher.AdvanceKey(key));
     }
 
     [Fact]
     public void AdvanceKey_ProducesDifferentKeyFromInput()
     {
         var key = 0x11223344u;
-        var advanced = CrcCipher.AdvanceKey(key);
-        Assert.NotEqual(key, advanced);
+        Assert.NotEqual(key, CrcCipher.AdvanceKey(key));
     }
 
     [Fact]

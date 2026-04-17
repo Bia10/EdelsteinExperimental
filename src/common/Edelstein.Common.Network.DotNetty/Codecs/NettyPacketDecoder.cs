@@ -101,9 +101,6 @@ public class NettyPacketDecoder : ReplayingDecoder<NettyPacketState>
 
                     if (socket.IsDataEncrypted)
                     {
-                        _aesCipher.Transform(buffer, _length, seqRecv);
-                        ShandaCipher.DecryptTransform(buffer, _length);
-
                         if (socket.CrcKey != 0)
                         {
                             if (!CrcCipher.Verify(buffer.AsSpan(0, _length), socket.CrcKey))
@@ -120,6 +117,9 @@ public class NettyPacketDecoder : ReplayingDecoder<NettyPacketState>
                             packetLength = (short)(_length - 4);
                             socket.CrcKey = CrcCipher.AdvanceKey(socket.CrcKey);
                         }
+
+                        _aesCipher.Transform(buffer, packetLength, seqRecv);
+                        ShandaCipher.DecryptTransform(buffer, packetLength);
                     }
 
                     socket.SeqRecv = _igCipher.Hash(seqRecv, 4, 0);
