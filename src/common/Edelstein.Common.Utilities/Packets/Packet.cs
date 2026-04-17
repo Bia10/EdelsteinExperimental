@@ -13,6 +13,14 @@ public class Packet : IPacket
         Array.Copy(buffer, Buffer, Length);
     }
 
+    public Packet(byte[] buffer, int length)
+    {
+        Length = length;
+        Buffer = ArrayPool<byte>.Shared.Rent(Length);
+
+        Array.Copy(buffer, Buffer, Length);
+    }
+
     public Packet(Stream stream)
     {
         Length = (int)stream.Length;
