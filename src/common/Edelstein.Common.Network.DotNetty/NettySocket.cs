@@ -9,11 +9,18 @@ public class NettySocket : ISocket
 {
     private readonly IChannel _channel;
 
-    public NettySocket(IChannel channel, uint seqSend, uint seqRecv, bool isDataEncrypted = true)
+    public NettySocket(
+        IChannel channel,
+        uint seqSend,
+        uint seqRecv,
+        uint crcKey = 0,
+        bool isDataEncrypted = true
+    )
     {
         _channel = channel;
         SeqSend = seqSend;
         SeqRecv = seqRecv;
+        CrcKey = crcKey;
         IsDataEncrypted = isDataEncrypted;
     }
 
@@ -24,6 +31,7 @@ public class NettySocket : ISocket
 
     public uint SeqSend { get; set; }
     public uint SeqRecv { get; set; }
+    public uint CrcKey { get; set; }
 
     public bool IsDataEncrypted { get; }
 

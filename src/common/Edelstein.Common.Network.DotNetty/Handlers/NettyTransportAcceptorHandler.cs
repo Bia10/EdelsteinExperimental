@@ -27,22 +27,22 @@ public class NettyTransportAcceptorHandler : ChannelHandlerAdapter
     public override void ChannelActive(IChannelHandlerContext context)
     {
         var random = new Random();
-        var newSocket = new NettySocket(context.Channel, (uint)random.Next(), (uint)random.Next());
+        var newSocket = new NettySocket(
+            context.Channel,
+            (uint)random.Next(),
+            (uint)random.Next(),
+            (uint)random.Next()
+        );
         var newAdapter = _initializer.Initialize(newSocket);
-        using var handshake = new PacketWriter();
-
-        handshake.WriteShort(_version.Major);
-        handshake.WriteString(_version.Patch);
-        handshake.WriteInt((int)newSocket.SeqRecv);
-        handshake.WriteInt((int)newSocket.SeqSend);
-        handshake.WriteByte(_version.Locale);
 
         var packet = new PacketWriter()
             .WriteShort(_version.Major)
             .WriteString(_version.Patch)
             .WriteInt((int)newSocket.SeqRecv)
             .WriteInt((int)newSocket.SeqSend)
-            .WriteByte(_version.Locale);
+            .WriteByte(_version.Locale)
+            // TODO(RE #4 Q2-Q3): Confirm whether CrcKey is sent here or derived client-side from SeqRecv.
+            .WriteUInt(newSocket.CrcKey);
 
         _ = newSocket.Dispatch(packet.Build());
 

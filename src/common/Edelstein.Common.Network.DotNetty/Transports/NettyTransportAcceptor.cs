@@ -9,19 +9,26 @@ using Edelstein.Common.Utilities.Repositories;
 using Edelstein.Protocol.Network;
 using Edelstein.Protocol.Network.Transports;
 using Edelstein.Protocol.Utilities.Repositories;
+using Microsoft.Extensions.Logging;
 
 namespace Edelstein.Common.Network.DotNetty.Transports;
 
 public class NettyTransportAcceptor : ITransportAcceptor
 {
     private readonly IAdapterInitializer _initializer;
+    private readonly ILoggerFactory _loggerFactory;
     private readonly IRepository<string, ISocket> _sockets;
     private readonly TransportVersion _version;
 
-    public NettyTransportAcceptor(IAdapterInitializer initializer, TransportVersion version)
+    public NettyTransportAcceptor(
+        IAdapterInitializer initializer,
+        TransportVersion version,
+        ILoggerFactory loggerFactory
+    )
     {
         _initializer = initializer;
         _version = version;
+        _loggerFactory = loggerFactory;
         _sockets = new Repository<string, ISocket>();
     }
 
@@ -41,7 +48,12 @@ public class NettyTransportAcceptor : ITransportAcceptor
                 {
                     ch.Pipeline.AddLast(
                         new ReadTimeoutHandler(TimeSpan.FromMinutes(5)),
-                        new NettyPacketDecoder(_version, aesCipher, igCipher),
+                        new NettyPacketDecoder(
+                            _version,
+                            aesCipher,
+                            igCipher,
+                            _loggerFactory.CreateLogger<NettyPacketDecoder>()
+                        ),
                         new NettyTransportAcceptorHandler(_version, _initializer, _sockets),
                         new NettyPacketEncoder(_version, aesCipher, igCipher)
                     );

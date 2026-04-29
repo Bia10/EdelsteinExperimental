@@ -21,6 +21,13 @@ public record FieldPortal : IFieldPortal
             node.ResolveInt("x") ?? int.MinValue,
             node.ResolveInt("y") ?? int.MinValue
         );
+
+        HRange = node.ResolveInt("hRange") ?? 0;
+        VRange = node.ResolveInt("vRange") ?? 0;
+        DelayTime = node.ResolveInt("delay") ?? 0;
+        OnlyOnce = (node.ResolveInt("onlyOnce") ?? 0) != 0;
+        VImpact = node.ResolveInt("vImpact") ?? 0;
+        HImpact = node.ResolveInt("hImpact") ?? 0;
     }
 
     public int ID { get; }
@@ -40,4 +47,11 @@ public record FieldPortal : IFieldPortal
     public string? ToName { get; }
 
     public IPoint2D Position { get; }
+
+    public int HRange { get; }
+    public int VRange { get; }
+    public int DelayTime { get; }
+    public bool OnlyOnce { get; }
+    public int VImpact { get; }
+    public int HImpact { get; }
 }

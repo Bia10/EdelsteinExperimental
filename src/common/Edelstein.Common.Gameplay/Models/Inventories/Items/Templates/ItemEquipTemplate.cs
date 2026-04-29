@@ -51,6 +51,13 @@ public record ItemEquipTemplate : ItemTemplate, IItemEquipTemplate
 
         SetItemID = info.ResolveInt("setItemID") ?? 0;
         Durability = info.ResolveInt("durability") ?? -1;
+
+        ReqMobLevel = info.ResolveInt("reqMobLevel") ?? 0;
+        Recovery = info.ResolveDouble("recovery") ?? 0.0;
+        Fs = info.ResolveDouble("fs") ?? 0.0;
+        Knockback = info.ResolveInt("knockback") ?? 0;
+        Swim = info.ResolveInt("swim") ?? 0;
+        Epic = (info.ResolveInt("epicItem") ?? 0) != 0;
     }
 
     public short ReqSTR { get; }
@@ -100,4 +107,22 @@ public record ItemEquipTemplate : ItemTemplate, IItemEquipTemplate
     public int SetItemID { get; }
 
     public int Durability { get; }
+
+    /// <summary>Minimum mob level required to drop (WZ: reqMobLevel).</summary>
+    public int ReqMobLevel { get; }
+
+    /// <summary>HP recovery rate per second while equipped (WZ: recovery, 8-byte IEEE-754).</summary>
+    public double Recovery { get; }
+
+    /// <summary>Float speed coefficient (WZ: fs, 8-byte IEEE-754).</summary>
+    public double Fs { get; }
+
+    /// <summary>Knockback resistance (WZ: knockback).</summary>
+    public int Knockback { get; }
+
+    /// <summary>Swim speed bonus while equipped (WZ: swim).</summary>
+    public int Swim { get; }
+
+    /// <summary>True if this item is an epic (unique) grade item (WZ: epicItem).</summary>
+    public bool Epic { get; }
 }

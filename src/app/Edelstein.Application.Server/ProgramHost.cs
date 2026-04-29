@@ -108,7 +108,8 @@ public class ProgramHost : IHostedService
 
                 b.Register(c => new NettyTransportAcceptor(
                         c.Resolve<IAdapterInitializer>(),
-                        new TransportVersion(stage.Version, stage.Patch, stage.Locale)
+                        new TransportVersion(stage.Version, stage.Patch, stage.Locale),
+                        c.Resolve<ILoggerFactory>()
                     ))
                     .As<ITransportAcceptor>()
                     .SingleInstance();

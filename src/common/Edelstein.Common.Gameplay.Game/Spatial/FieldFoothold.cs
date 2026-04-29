@@ -18,6 +18,11 @@ public record FieldFoothold : IFieldFoothold
             new Point2D(node.ResolveInt("x1") ?? 0, node.ResolveInt("y1") ?? 0),
             new Point2D(node.ResolveInt("x2") ?? 0, node.ResolveInt("y2") ?? 0)
         );
+
+        Drag = node.ResolveInt("drag") ?? 0;
+        Force = node.ResolveInt("force") ?? 0;
+        ForbidFallDown = node.ResolveInt("forbidFallDown") ?? 0;
+        CantThrough = node.ResolveInt("cantThrough") ?? 0;
     }
 
     public int ID { get; }
@@ -32,4 +37,16 @@ public record FieldFoothold : IFieldFoothold
     public int PrevID { get; }
 
     public ISegment2D Line { get; }
+
+    /// <summary>Raw WZ drag coefficient (integer before /100 conversion).</summary>
+    public int Drag { get; }
+
+    /// <summary>Raw WZ wind force (integer before /100 conversion).</summary>
+    public int Force { get; }
+
+    /// <summary>1 if falling through this foothold is prevented, else 0.</summary>
+    public int ForbidFallDown { get; }
+
+    /// <summary>1 if jumping through this foothold is prevented, else 0.</summary>
+    public int CantThrough { get; }
 }

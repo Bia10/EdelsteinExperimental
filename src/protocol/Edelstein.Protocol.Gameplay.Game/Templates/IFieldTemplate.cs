@@ -24,4 +24,10 @@ public interface IFieldTemplate : ITemplate
     double MobRate { get; }
     int MobCapacityMin { get; }
     int MobCapacityMax { get; }
+
+    /// <summary>
+    /// Field composite CRC (CField::m_dwCrc) — expected value sent in every movement packet.
+    /// Computed from footholds, portals, and map info flags using CRC-32/BZIP2.
+    /// </summary>
+    uint CrcValue { get; }
 }

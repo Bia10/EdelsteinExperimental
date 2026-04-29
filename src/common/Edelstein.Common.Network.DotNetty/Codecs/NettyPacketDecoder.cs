@@ -5,6 +5,7 @@ using DotNetty.Transport.Channels;
 using Edelstein.Common.Crypto;
 using Edelstein.Common.Utilities.Packets;
 using Edelstein.Protocol.Network.Transports;
+using Microsoft.Extensions.Logging;
 
 namespace Edelstein.Common.Network.DotNetty.Codecs;
 
@@ -12,17 +13,24 @@ public class NettyPacketDecoder : ReplayingDecoder<NettyPacketState>
 {
     private readonly AESCipher _aesCipher;
     private readonly IGCipher _igCipher;
+    private readonly ILogger<NettyPacketDecoder> _logger;
     private readonly TransportVersion _version;
     private short _length;
 
     private short _sequence;
 
-    public NettyPacketDecoder(TransportVersion version, AESCipher aesCipher, IGCipher igCipher)
+    public NettyPacketDecoder(
+        TransportVersion version,
+        AESCipher aesCipher,
+        IGCipher igCipher,
+        ILogger<NettyPacketDecoder> logger
+    )
         : base(NettyPacketState.DecodingHeader)
     {
         _version = version;
         _aesCipher = aesCipher;
         _igCipher = igCipher;
+        _logger = logger;
     }
 
     protected override void Decode(
@@ -81,6 +89,8 @@ public class NettyPacketDecoder : ReplayingDecoder<NettyPacketState>
                 if (_length < 0x2)
                     return;
 
+                var packetLength = _length;
+
                 if (socket != null)
                 {
                     var seqRecv = socket.SeqRecv;
@@ -91,14 +101,31 @@ public class NettyPacketDecoder : ReplayingDecoder<NettyPacketState>
 
                     if (socket.IsDataEncrypted)
                     {
-                        _aesCipher.Transform(buffer, _length, seqRecv);
-                        ShandaCipher.DecryptTransform(buffer, _length);
+                        if (socket.CrcKey != 0)
+                        {
+                            if (!CrcCipher.Verify(buffer.AsSpan(0, _length), socket.CrcKey))
+                            {
+                                _logger.LogWarning(
+                                    "Transport CRC mismatch from {Remote} — disconnecting",
+                                    socket.AddressRemote
+                                );
+                                ArrayPool<byte>.Shared.Return(buffer);
+                                _ = socket.Close();
+                                return;
+                            }
+
+                            packetLength = (short)(_length - 4);
+                            socket.CrcKey = CrcCipher.AdvanceKey(socket.CrcKey);
+                        }
+
+                        _aesCipher.Transform(buffer, packetLength, seqRecv);
+                        ShandaCipher.DecryptTransform(buffer, packetLength);
                     }
 
                     socket.SeqRecv = _igCipher.Hash(seqRecv, 4, 0);
                 }
 
-                output.Add(new Packet(buffer));
+                output.Add(new Packet(buffer, packetLength));
                 ArrayPool<byte>.Shared.Return(buffer);
                 return;
         }

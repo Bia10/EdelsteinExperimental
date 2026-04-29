@@ -14,6 +14,8 @@ public record ItemBundleTemplate : ItemTemplate, IItemBundleTemplate
         IncPAD = info.ResolveInt("incPAD") ?? 0;
 
         MaxPerSlot = info.ResolveShort("slotMax") ?? 100;
+        Max = info.ResolveInt("max") ?? 0;
+        AppliableKarmaType = info.ResolveByte("tradeAvailable") ?? 0;
     }
 
     public double UnitPrice { get; }
@@ -22,4 +24,10 @@ public record ItemBundleTemplate : ItemTemplate, IItemBundleTemplate
     public int IncPAD { get; }
 
     public short MaxPerSlot { get; }
+
+    /// <summary>Maximum total count a character can hold (WZ: max). Distinct from MaxPerSlot (slotMax).</summary>
+    public int Max { get; }
+
+    /// <summary>Karma stamp applicability type (WZ: tradeAvailable).</summary>
+    public byte AppliableKarmaType { get; }
 }
