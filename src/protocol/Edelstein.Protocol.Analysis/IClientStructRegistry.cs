@@ -18,7 +18,7 @@ public interface IClientStructRegistry
     /// <param name="fieldName">Case-sensitive field name (e.g. "WorldId").</param>
     /// <param name="field">The resolved field descriptor when found.</param>
     /// <returns><c>true</c> if the struct and field are registered; otherwise <c>false</c>.</returns>
-    bool TryGetField(string structName, string fieldName, out IStructField? field);
+    bool TryGetField(string structName, string fieldName, [NotNullWhen(true)] out IStructField? field);
 
     /// <summary>All fields registered for the specified struct, keyed by field name.</summary>
     IReadOnlyDictionary<string, IStructField> GetFields(string structName);

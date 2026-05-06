@@ -10,6 +10,8 @@ internal sealed class StringPoolEntryAdapter : IStringPoolEntry
 
     internal StringPoolEntryAdapter(StringPoolEntry inner) => _inner = inner;
 
+    internal StringPoolEntryAdapter(uint index, string value) => _inner = new StringPoolEntry(index, value);
+
     public int Index => (int)_inner.Index;
     public string Value => _inner.Value;
 }

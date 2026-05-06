@@ -5,7 +5,6 @@ using Maple.Client.V95.Analysis;
 using Maple.Client.V95.Runtime;
 using Maple.Memory;
 using Maple.Process;
-using Microsoft.Extensions.Options;
 
 namespace Edelstein.Common.Analysis;
 
@@ -16,8 +15,6 @@ namespace Edelstein.Common.Analysis;
 [SupportedOSPlatform("windows")]
 public sealed class ClientAnalysisService : IClientAnalysisService
 {
-    private readonly string _processName;
-
     private ProcessHandle? _processHandle;
     private WindowsProcessMemory? _processMemory;
     private MemoryAccessor? _accessor;
@@ -26,10 +23,7 @@ public sealed class ClientAnalysisService : IClientAnalysisService
 
     private bool _disposed;
 
-    public ClientAnalysisService(IOptions<AnalysisOptions> options)
-    {
-        _processName = options.Value.ProcessName;
-    }
+    public ClientAnalysisService() { }
 
     public bool IsAttached => _processHandle?.IsAttached ?? false;
 

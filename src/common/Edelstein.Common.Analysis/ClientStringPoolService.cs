@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Versioning;
 using Edelstein.Protocol.Analysis;
 using Maple.StringPool;
@@ -11,7 +12,7 @@ namespace Edelstein.Common.Analysis;
 /// Requires <see cref="AnalysisOptions.ClientExePath"/> to be configured.
 /// </summary>
 [SupportedOSPlatform("windows")]
-public sealed class ClientStringPoolService : IClientStringPoolService, IDisposable
+public sealed class ClientStringPoolService : IClientStringPoolService
 {
     private readonly StringPoolDecoder _decoder;
 
@@ -27,7 +28,7 @@ public sealed class ClientStringPoolService : IClientStringPoolService, IDisposa
 
     public int SlotCount => _decoder.Count;
 
-    public bool TryGetEntry(int index, out IStringPoolEntry? entry)
+    public bool TryGetEntry(int index, [NotNullWhen(true)] out IStringPoolEntry? entry)
     {
         if (index < 0 || index >= _decoder.Count)
         {
@@ -36,7 +37,7 @@ public sealed class ClientStringPoolService : IClientStringPoolService, IDisposa
         }
 
         string value = _decoder.GetString((uint)index);
-        entry = new StringPoolEntryAdapter(new StringPoolEntry((uint)index, value));
+        entry = new StringPoolEntryAdapter((uint)index, value);
         return true;
     }
 

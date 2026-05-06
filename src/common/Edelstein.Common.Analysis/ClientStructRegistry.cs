@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Edelstein.Protocol.Analysis;
 using Maple.Client.V95;
 
@@ -11,7 +12,7 @@ public sealed class ClientStructRegistry : IClientStructRegistry
 {
     public IEnumerable<string> StructNames => ClientStructs.Registry.StructNames;
 
-    public bool TryGetField(string structName, string fieldName, out IStructField? field)
+    public bool TryGetField(string structName, string fieldName, [NotNullWhen(true)] out IStructField? field)
     {
         if (ClientStructs.Registry.TryGetField(structName, fieldName, out StructField raw))
         {

@@ -1,11 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Edelstein.Protocol.Analysis;
 
 /// <summary>
 /// Provides zero-allocation read access to the GMS v95 <c>StringPool</c> singleton.
 /// </summary>
-public interface IClientStringPoolService
+public interface IClientStringPoolService : IDisposable
 {
     /// <summary>Total number of slots in the StringPool.</summary>
     int SlotCount { get; }
@@ -16,7 +18,7 @@ public interface IClientStringPoolService
     /// <param name="index">Zero-based slot index.</param>
     /// <param name="entry">The decoded entry when found.</param>
     /// <returns><c>true</c> when the slot is valid and successfully decoded.</returns>
-    bool TryGetEntry(int index, out IStringPoolEntry? entry);
+    bool TryGetEntry(int index, [NotNullWhen(true)] out IStringPoolEntry? entry);
 
     /// <summary>Decodes and returns all non-empty StringPool entries.</summary>
     IEnumerable<IStringPoolEntry> ReadAll();
