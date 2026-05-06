@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30114.105
@@ -97,6 +97,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{16A309AE-74F4-8EB4-D47C-487D8870B464}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edelstein.Tests.Common.Crypto", "src\test\Edelstein.Tests.Common.Crypto\Edelstein.Tests.Common.Crypto.csproj", "{92190699-7FD5-4BD0-AF30-2B334B7DBD59}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Edelstein.Protocol.Analysis", "src\protocol\Edelstein.Protocol.Analysis\Edelstein.Protocol.Analysis.csproj", "{B4E8C3A1-2F7D-4E9B-A3C6-8D1F5E2B9047}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Edelstein.Common.Analysis", "src\common\Edelstein.Common.Analysis\Edelstein.Common.Analysis.csproj", "{A7F2D4C8-3E6B-4A1D-B5F9-2C8E7D3A6B4F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -560,5 +564,7 @@ Global
 		{EFAF05A4-B54F-4B30-96C6-A7CDC2C2A81A} = {52AE6DEF-E54C-47DC-85F3-8AF3C6FCD504}
 		{16A309AE-74F4-8EB4-D47C-487D8870B464} = {71E8FDEE-8F29-4294-8B21-97F367594BD3}
 		{92190699-7FD5-4BD0-AF30-2B334B7DBD59} = {16A309AE-74F4-8EB4-D47C-487D8870B464}
-	EndGlobalSection
+		{B4E8C3A1-2F7D-4E9B-A3C6-8D1F5E2B9047} = {7F8DD283-A64C-40EC-98F2-84FA38716C28}
+		{A7F2D4C8-3E6B-4A1D-B5F9-2C8E7D3A6B4F} = {52AE6DEF-E54C-47DC-85F3-8AF3C6FCD504}
+EndGlobalSection
 EndGlobal

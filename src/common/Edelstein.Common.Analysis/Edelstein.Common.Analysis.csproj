@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\Common.targets" />
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\protocol\Edelstein.Protocol.Analysis\Edelstein.Protocol.Analysis.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Foundation: native type layouts and allocator contracts (cross-platform) -->
+    <PackageReference Include="Maple.Native" Version="0.1.0" />
+
+    <!-- Process attachment and raw remote memory (Windows-only) -->
+    <PackageReference Include="Maple.Process" Version="0.1.0" />
+
+    <!-- Allocator adapters and higher-level memory R/W facade (Windows-only) -->
+    <PackageReference Include="Maple.Memory" Version="0.1.0" />
+
+    <!-- Remote x86 call-stub generation and execution (Windows-only) -->
+    <PackageReference Include="Maple.Memory.Execution" Version="0.1.0" />
+
+    <!-- Zero-alloc StringPool decoder and mutation helpers (cross-platform) -->
+    <PackageReference Include="Maple.StringPool" Version="0.2.0" />
+
+    <!-- GMS v95 struct definitions, singleton addresses, field offset registry (cross-platform) -->
+    <PackageReference Include="Maple.Client.V95" Version="0.1.0" />
+
+    <!-- Attached-process singleton resolution, field reads, login-flow snapshots (Windows-only) -->
+    <PackageReference Include="Maple.Client.V95.Runtime" Version="0.1.0" />
+
+    <!-- Snapshot-backed x86 function disassembly and control-flow analysis (Windows-only) -->
+    <PackageReference Include="Maple.Client.V95.Analysis" Version="0.1.0" />
+
+    <!-- DI abstractions for IServiceCollection extension method -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.0" />
+
+    <!-- Options pattern for AnalysisOptions -->
+    <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.0" />
+  </ItemGroup>
+
+</Project>
